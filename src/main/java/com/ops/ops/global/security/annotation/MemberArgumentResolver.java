@@ -3,6 +3,7 @@ package com.ops.ops.global.security.annotation;
 import static com.ops.ops.modules.member.exception.MemberExceptionType.NOT_FOUND_MEMBER;
 
 import com.ops.ops.global.security.MemberDetails;
+import com.ops.ops.modules.member.domain.Member;
 import com.ops.ops.modules.member.domain.dao.MemberRepository;
 import com.ops.ops.modules.member.exception.MemberException;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +26,7 @@ public class MemberArgumentResolver implements HandlerMethodArgumentResolver {
     @Override
     public boolean supportsParameter(@NonNull final MethodParameter parameter) {
         return parameter.hasParameterAnnotation(LoginMember.class)
-                && parameter.getParameterType().equals(MemberDetails.class);
+                && Member.class.isAssignableFrom(parameter.getParameterType());
     }
 
     @Override
@@ -34,7 +35,8 @@ public class MemberArgumentResolver implements HandlerMethodArgumentResolver {
                                   @NonNull final NativeWebRequest webRequest,
                                   @NonNull final WebDataBinderFactory binderFactory) {
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.getPrincipal() instanceof MemberDetails principal) {
+        if (authentication != null
+                && authentication.getPrincipal() instanceof MemberDetails principal) {
             final Long memberId = principal.memberId();
             return memberRepository.findById(memberId)
                     .orElseThrow(() -> new MemberException(NOT_FOUND_MEMBER));
