@@ -22,8 +22,8 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
     public void commence(final HttpServletRequest request, final HttpServletResponse response,
                          final AuthenticationException authException) throws IOException {
 
-        final SecurityErrorResponse errorResponse = SecurityErrorResponse.from("로그인이 필요합니다.");
-        final String json = objectMapper.writeValueAsString(errorResponse);
+        final SecurityErrorResponse err = new SecurityErrorResponse("권한이 없습니다.");
+        final String json = objectMapper.writeValueAsString(err);
 
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
