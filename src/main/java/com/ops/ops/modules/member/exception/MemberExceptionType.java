@@ -3,7 +3,10 @@ package com.ops.ops.modules.member.exception;
 import com.ops.ops.global.base.BaseExceptionType;
 import org.springframework.http.HttpStatus;
 
-public class MemberExceptionType implements BaseExceptionType {
+public enum MemberExceptionType implements BaseExceptionType {
+
+    NOT_FOUND_MEMBER(HttpStatus.NOT_FOUND, "회원을 찾을 수 없습니다."),
+    ;
 
     private final HttpStatus httpStatus;
     private final String errorMessage;
