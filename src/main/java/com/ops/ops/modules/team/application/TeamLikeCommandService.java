@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import com.ops.ops.modules.team.application.dto.response.TeamLikeToggleResponse;
 import com.ops.ops.modules.team.domain.Team;
 import com.ops.ops.modules.team.domain.TeamLike;
-import com.ops.ops.modules.team.domain.TeamLikeRepository;
+import com.ops.ops.modules.team.domain.dao.TeamLikeRepository;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
