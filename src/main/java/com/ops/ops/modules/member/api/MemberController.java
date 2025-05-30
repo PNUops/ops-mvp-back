@@ -6,7 +6,9 @@ import static org.springframework.http.HttpStatus.NO_CONTENT;
 import com.ops.ops.modules.member.application.MemberCommandService;
 import com.ops.ops.modules.member.application.dto.request.EmailAuthConfirmRequest;
 import com.ops.ops.modules.member.application.dto.request.EmailAuthRequest;
+import com.ops.ops.modules.member.application.dto.request.SignInRequest;
 import com.ops.ops.modules.member.application.dto.request.SignUpRequest;
+import com.ops.ops.modules.member.application.dto.response.SignInResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -38,5 +40,11 @@ public class MemberController {
             @Valid @RequestBody final EmailAuthConfirmRequest emailAuthConfirmRequest) {
         memberCommandService.confirmSignUpEmailAuth(emailAuthConfirmRequest);
         return ResponseEntity.status(NO_CONTENT).build();
+    }
+
+    @PostMapping("/sign-in")
+    public ResponseEntity<SignInResponse> signIn(@Valid @RequestBody final SignInRequest signInRequest) {
+        final SignInResponse response = memberCommandService.signIn(signInRequest);
+        return ResponseEntity.ok(response);
     }
 }

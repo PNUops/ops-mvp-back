@@ -5,13 +5,19 @@ import static com.ops.ops.modules.member.exception.EmailAuthExceptionType.NOT_PU
 import static com.ops.ops.modules.member.exception.EmailAuthExceptionType.NOT_VERIFIED_EMAIL_AUTH;
 import static com.ops.ops.modules.member.exception.MemberExceptionType.ALREADY_EXIST_EMAIL;
 import static com.ops.ops.modules.member.exception.MemberExceptionType.ALREADY_EXIST_STUDENT_ID;
+import static com.ops.ops.modules.member.exception.MemberExceptionType.CANNOT_MATCH_PASSWORD;
+import static com.ops.ops.modules.member.exception.MemberExceptionType.NOT_FOUND_MEMBER;
 
+import com.ops.ops.global.security.JwtProvider;
 import com.ops.ops.global.util.MailUtil;
 import com.ops.ops.modules.member.application.dto.request.EmailAuthConfirmRequest;
 import com.ops.ops.modules.member.application.dto.request.EmailAuthRequest;
+import com.ops.ops.modules.member.application.dto.request.SignInRequest;
 import com.ops.ops.modules.member.application.dto.request.SignUpRequest;
+import com.ops.ops.modules.member.application.dto.response.SignInResponse;
 import com.ops.ops.modules.member.domain.EmailAuth;
 import com.ops.ops.modules.member.domain.Member;
+import com.ops.ops.modules.member.domain.MemberRoleType;
 import com.ops.ops.modules.member.domain.dao.EmailAuthRepository;
 import com.ops.ops.modules.member.domain.dao.MemberRepository;
 import com.ops.ops.modules.member.exception.EmailAuthException;
@@ -34,6 +40,7 @@ public class MemberCommandService {
     private final EmailAuthRepository emailAuthRepository;
 
     private final PasswordEncoder passwordEncoder;
+    private final JwtProvider jwtProvider;
     private final MailUtil mailUtil;
 
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
@@ -69,14 +76,27 @@ public class MemberCommandService {
 
     public void confirmSignUpEmailAuth(final EmailAuthConfirmRequest request) {
         final EmailAuth memberEmailAuth = emailAuthRepository.findByEmail(request.email());
-        if (memberEmailAuth.getToken().equals(request.authCode())) memberEmailAuth.correct();
-        else throw new EmailAuthException(NOT_VERIFIED_EMAIL_AUTH);
+        if (memberEmailAuth.getToken().equals(request.authCode())) {
+            memberEmailAuth.correct();
+        } else {
+            throw new EmailAuthException(NOT_VERIFIED_EMAIL_AUTH);
+        }
+    }
+
+    public SignInResponse signIn(final SignInRequest request) {
+        final Member member = validateExistMember(request.email());
+        checkCorrectPassword(member.getPassword(), request.password());
+        final List<String> roles = member.getRoles().stream()
+                .map(MemberRoleType::toString)
+                .toList();
+        final String token = jwtProvider.createToken(String.valueOf(member.getId()), roles, member.getName());
+        return SignInResponse.from(member, token);
     }
 
     private void registerNewMember(final String name, final String studentId, final String email,
                                    final String password) {
         checkIsDuplicateStudentId(studentId);
-        
+
         memberRepository.save(Member.builder()
                 .name(name)
                 .studentId(studentId)
@@ -124,6 +144,17 @@ public class MemberCommandService {
     private void validatePusanDomain(final String email) {
         if (!email.endsWith("@pusan.ac.kr")) {
             throw new EmailAuthException(NOT_PUSAN_UNIVERSITY_EMAIL);
+        }
+    }
+
+    private Member validateExistMember(final String email) {
+        return memberRepository.findByEmail(email)
+                .orElseThrow(() -> new MemberException(NOT_FOUND_MEMBER));
+    }
+
+    private void checkCorrectPassword(final String savePassword, final String inputPassword) {
+        if (!passwordEncoder.matches(inputPassword, savePassword)) {
+            throw new MemberException(CANNOT_MATCH_PASSWORD);
         }
     }
 }
