@@ -7,10 +7,12 @@ import com.ops.ops.modules.member.application.MemberCommandService;
 import com.ops.ops.modules.member.application.dto.request.EmailAuthConfirmRequest;
 import com.ops.ops.modules.member.application.dto.request.EmailAuthRequest;
 import com.ops.ops.modules.member.application.dto.request.SignUpRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -20,19 +22,20 @@ public class MemberController {
     private final MemberCommandService memberCommandService;
 
     @PostMapping("/sign-up")
-    public ResponseEntity<Void> signUp(final SignUpRequest signUpRequest) {
+    public ResponseEntity<Void> signUp(@Valid @RequestBody final SignUpRequest signUpRequest) {
         memberCommandService.signUp(signUpRequest);
         return ResponseEntity.status(CREATED).build();
     }
 
     @PostMapping("/sign-up/email-auth")
-    public ResponseEntity<Void> signUpEmailAuth(final EmailAuthRequest emailAuthRequest) {
+    public ResponseEntity<Void> signUpEmailAuth(@Valid @RequestBody final EmailAuthRequest emailAuthRequest) {
         memberCommandService.signUpEmailAuth(emailAuthRequest);
         return ResponseEntity.status(CREATED).build();
     }
 
     @PatchMapping("/sign-up/email-auth")
-    public ResponseEntity<Void> confirmSignUpEmailAuth(final EmailAuthConfirmRequest emailAuthConfirmRequest) {
+    public ResponseEntity<Void> confirmSignUpEmailAuth(
+            @Valid @RequestBody final EmailAuthConfirmRequest emailAuthConfirmRequest) {
         memberCommandService.confirmSignUpEmailAuth(emailAuthConfirmRequest);
         return ResponseEntity.status(NO_CONTENT).build();
     }
