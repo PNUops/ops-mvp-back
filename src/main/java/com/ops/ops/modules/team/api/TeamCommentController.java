@@ -33,5 +33,12 @@ public class TeamCommentController {
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 
-
+	@GetMapping
+	public ResponseEntity<List<TeamCommentResponse>> getComments(
+		@PathVariable final Long teamId,
+		@LoginMember final Member member
+	) {
+		List<TeamCommentResponse> response = teamCommentQueryService.getComments(teamId);
+		return ResponseEntity.ok(response);
+	}
 }
