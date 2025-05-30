@@ -1,12 +1,9 @@
-package com.ops.ops.modules.team.application.dto;
+package com.ops.ops.modules.team.application.dto.response;
 
 import com.ops.ops.modules.team.domain.Team;
-import com.ops.ops.modules.member.domain.Member;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Getter
 @Builder
@@ -32,7 +29,7 @@ public class TeamDetailResponse {
                 .projectName(team.getProjectName())
                 .overview(team.getOverview())
                 .leaderName(team.getLeaderName())
-//                .participants(team.getParticipants().stream()
+//                .participants(team.getParticipants().stream())
 //                        .map(Member::getName)
 //                        .collect(Collectors.toList()))
 //                .imagePath(team.getFiles().stream()
