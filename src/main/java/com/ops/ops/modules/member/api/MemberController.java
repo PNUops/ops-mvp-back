@@ -48,7 +48,7 @@ public class MemberController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/sign-in/email-auth")
+    @PostMapping("/sign-in/password-reset/email-auth")
     public ResponseEntity<Void> signInEmailAuth(@Valid @RequestBody final EmailAuthRequest emailAuthRequest) {
         memberCommandService.signInEmailAuth(emailAuthRequest);
         return ResponseEntity.status(CREATED).build();
