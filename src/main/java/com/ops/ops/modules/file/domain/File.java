@@ -29,14 +29,14 @@ public class File extends BaseEntity {
     private String filePath;
 
     @Column(nullable = false)
-    private String teamId;
+    private Long teamId;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private FileImageType type;
 
     @Builder
-    private File(final String name, final String filePath, final String teamId, final FileImageType type) {
+    private File(final String name, final String filePath, final Long teamId, final FileImageType type) {
         this.name = name;
         this.filePath = filePath;
         this.teamId = teamId;

@@ -20,6 +20,9 @@ spring:
         dialect: org.hibernate.dialect.MySQL8Dialect
     show-sql: true
 
+file:
+  upload-dir: ${user.dir}/file/
+
 cors:
   allow:
     origins: https://test.url
