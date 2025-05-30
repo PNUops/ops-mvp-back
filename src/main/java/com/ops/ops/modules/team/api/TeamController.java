@@ -2,7 +2,7 @@ package com.ops.ops.modules.team.api;
 
 
 import com.ops.ops.modules.team.application.TeamCommandService;
-import com.ops.ops.modules.file.application.dto.ThumbnailRequest;
+import com.ops.ops.modules.team.application.dto.ThumbnailRequest;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

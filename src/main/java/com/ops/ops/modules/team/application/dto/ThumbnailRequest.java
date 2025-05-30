@@ -1,7 +1,5 @@
-package com.ops.ops.modules.file.application.dto;
+package com.ops.ops.modules.team.application.dto;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 
 public record ThumbnailRequest(

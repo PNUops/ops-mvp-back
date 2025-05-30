@@ -1,6 +1,6 @@
-package com.ops.ops.modules.file.application;
+package com.ops.ops.modules.team.application;
 
-import com.ops.ops.modules.file.application.dto.ThumbnailRequest;
+import com.ops.ops.modules.team.application.dto.ThumbnailRequest;
 import com.ops.ops.modules.file.domain.File;
 import com.ops.ops.modules.file.domain.FileImageType;
 import com.ops.ops.modules.file.domain.dao.FileRepository;
@@ -18,7 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
-public class FileCommandService {
+public class TeamCommandService {
 
     @Value("${file.upload-dir}")
     private String uploadDir;
