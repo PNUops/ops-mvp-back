@@ -25,18 +25,18 @@ public class TeamLikeCommandService {
 		// 좋아요 등록
 		if (!teamLike.getIsLiked() && isLiked) {
 			teamLike.setLiked(true);
-			return TeamLikeToggleResponse.of(team.getId(), true, "Liked successfully");
+			return TeamLikeToggleResponse.of(team.getId(), true, "좋아요가 등록되었습니다.");
 		}
 
 		// 좋아요 취소
 		if (teamLike.getIsLiked() && !isLiked) {
 			teamLike.setLiked(false);
-			return TeamLikeToggleResponse.of(team.getId(), false, "Unliked successfully");
+			return TeamLikeToggleResponse.of(team.getId(), false, "좋아요가 취소되었습니다.");
 		}
 
 		// 상태 변화 없음
 		return TeamLikeToggleResponse.of(team.getId(), teamLike.getIsLiked(),
-			isLiked ? "이미 좋아요한 상태입니다." : "이미 좋아요 취소한 상태입니다.");
+			isLiked ? "이미 좋아요한 팀입니다." : "이미 좋아요를 취소한 팀입니다.");
 	}
 
 	public TeamLike createTeamLike(Long memberId, Team team) {
