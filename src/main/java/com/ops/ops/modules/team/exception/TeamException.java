@@ -1,18 +1,18 @@
-package com.ops.ops.modules.file.exception;
+package com.ops.ops.modules.team.exception;
 
 import com.ops.ops.global.base.BaseException;
 import com.ops.ops.global.base.BaseExceptionType;
 
-public class FileException extends BaseException {
+public class TeamException extends BaseException {
 
-    private final FileExceptionType exceptionType;
+    private final TeamExceptionType exceptionType;
 
-    public FileException(final FileExceptionType exceptionType) {
+    public TeamException(final TeamExceptionType exceptionType) {
         super(exceptionType.errorMessage());
         this.exceptionType = exceptionType;
     }
 
-    public FileException(final FileExceptionType exceptionType, final String message) {
+    public TeamException(final TeamExceptionType exceptionType, final String message) {
         super(message);
         this.exceptionType = exceptionType;
     }
