@@ -44,6 +44,7 @@ public class MemberCommandService {
     public void signUp(final SignUpRequest request) {
         final String encodingPassword = passwordEncoder.encode(request.password());
         final EmailAuth emailAuth = checkEmailAuth(request.email());
+        checkIsDuplicateEmail(request.email());
 
         memberRepository.findByStudentIdAndName(request.studentId(), request.name())
                 .ifPresentOrElse(
@@ -74,9 +75,8 @@ public class MemberCommandService {
 
     private void registerNewMember(final String name, final String studentId, final String email,
                                    final String password) {
-        checkIsDuplicateEmail(email);
         checkIsDuplicateStudentId(studentId);
-
+        
         memberRepository.save(Member.builder()
                 .name(name)
                 .studentId(studentId)
