@@ -47,4 +47,10 @@ public class MemberController {
         final SignInResponse response = memberCommandService.signIn(signInRequest);
         return ResponseEntity.ok(response);
     }
+
+    @PostMapping("/sign-in/email-auth")
+    public ResponseEntity<Void> signInEmailAuth(@Valid @RequestBody final EmailAuthRequest emailAuthRequest) {
+        memberCommandService.signInEmailAuth(emailAuthRequest);
+        return ResponseEntity.status(CREATED).build();
+    }
 }

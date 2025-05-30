@@ -84,13 +84,18 @@ public class MemberCommandService {
     }
 
     public SignInResponse signIn(final SignInRequest request) {
-        final Member member = validateExistMember(request.email());
+        final Member member = getValidateExistMember(request.email());
         checkCorrectPassword(member.getPassword(), request.password());
         final List<String> roles = member.getRoles().stream()
                 .map(MemberRoleType::toString)
                 .toList();
         final String token = jwtProvider.createToken(String.valueOf(member.getId()), roles, member.getName());
         return SignInResponse.from(member, token);
+    }
+
+    public void signInEmailAuth(final EmailAuthRequest request) {
+        validateExistMember(request.email());
+        signUpEmailAuth(request);
     }
 
     private void registerNewMember(final String name, final String studentId, final String email,
@@ -147,9 +152,13 @@ public class MemberCommandService {
         }
     }
 
-    private Member validateExistMember(final String email) {
+    private Member getValidateExistMember(final String email) {
         return memberRepository.findByEmail(email)
                 .orElseThrow(() -> new MemberException(NOT_FOUND_MEMBER));
+    }
+
+    private void validateExistMember(final String email) {
+        memberRepository.findByEmail(email).orElseThrow(() -> new MemberException(NOT_FOUND_MEMBER));
     }
 
     private void checkCorrectPassword(final String savePassword, final String inputPassword) {
