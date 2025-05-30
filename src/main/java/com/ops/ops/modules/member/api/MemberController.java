@@ -6,6 +6,7 @@ import static org.springframework.http.HttpStatus.NO_CONTENT;
 import com.ops.ops.modules.member.application.MemberCommandService;
 import com.ops.ops.modules.member.application.dto.request.EmailAuthConfirmRequest;
 import com.ops.ops.modules.member.application.dto.request.EmailAuthRequest;
+import com.ops.ops.modules.member.application.dto.request.PasswordUpdateRequest;
 import com.ops.ops.modules.member.application.dto.request.SignInRequest;
 import com.ops.ops.modules.member.application.dto.request.SignUpRequest;
 import com.ops.ops.modules.member.application.dto.response.SignInResponse;
@@ -58,6 +59,12 @@ public class MemberController {
     public ResponseEntity<Void> confirmSignInEmailAuth(
             @Valid @RequestBody final EmailAuthConfirmRequest emailAuthConfirmRequest) {
         memberCommandService.confirmSignInEmailAuth(emailAuthConfirmRequest);
+        return ResponseEntity.status(NO_CONTENT).build();
+    }
+
+    @PatchMapping("/sign-in/password-reset")
+    public ResponseEntity<Void> updatePassword(@Valid @RequestBody final PasswordUpdateRequest passwordUpdateRequest) {
+        memberCommandService.updatePassword(passwordUpdateRequest);
         return ResponseEntity.status(NO_CONTENT).build();
     }
 }

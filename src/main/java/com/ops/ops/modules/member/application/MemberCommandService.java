@@ -12,6 +12,7 @@ import com.ops.ops.global.security.JwtProvider;
 import com.ops.ops.global.util.MailUtil;
 import com.ops.ops.modules.member.application.dto.request.EmailAuthConfirmRequest;
 import com.ops.ops.modules.member.application.dto.request.EmailAuthRequest;
+import com.ops.ops.modules.member.application.dto.request.PasswordUpdateRequest;
 import com.ops.ops.modules.member.application.dto.request.SignInRequest;
 import com.ops.ops.modules.member.application.dto.request.SignUpRequest;
 import com.ops.ops.modules.member.application.dto.response.SignInResponse;
@@ -101,6 +102,11 @@ public class MemberCommandService {
     public void confirmSignInEmailAuth(final EmailAuthConfirmRequest request) {
         validateExistMember(request.email());
         confirmSignUpEmailAuth(request);
+    }
+
+    public void updatePassword(final PasswordUpdateRequest request) {
+        final Member member = getValidateExistMember(request.email());
+        member.updatePassword(request.newPassword());
     }
 
     private void registerNewMember(final String name, final String studentId, final String email,
