@@ -30,6 +30,7 @@ import org.springframework.stereotype.Component;
 public class JwtProvider {
     private static final Logger log = LoggerFactory.getLogger(JwtProvider.class);
     private static final String ROLES = "roles";
+    private static final String NAME = "name";
 
     @Value("${spring.jwt.secret}")
     private String secretKey;
@@ -44,9 +45,10 @@ public class JwtProvider {
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String createToken(final String userPk, final List<String> roles) {
+    public String createToken(final String userPk, final List<String> roles, final String name) {
         final Claims claims = Jwts.claims().setSubject(userPk);
         claims.put(ROLES, roles);
+        claims.put(NAME, name);
         final Date now = new Date();
         return Jwts.builder()
                 .setClaims(claims)
