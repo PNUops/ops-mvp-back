@@ -16,6 +16,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.ops.ops.modules.team.domain.Team;
+import com.ops.ops.modules.team.domain.dao.TeamRepository;
+import com.ops.ops.modules.team.exception.TeamException;
+import com.ops.ops.modules.team.exception.TeamExceptionType;
+
 @Service
 @RequiredArgsConstructor
 public class TeamCommandService {
@@ -67,4 +72,8 @@ public class TeamCommandService {
     private String getFullPath(String saveThumbnailName) {
         return uploadDir + saveThumbnailName;
     }
+	public Team validateAndGetTeamById(final Long teamId) {
+		return teamRepository.findById(teamId)
+			.orElseThrow(() -> new TeamException(TeamExceptionType.NOT_FOUND_TEAM));
+	}
 }
