@@ -1,5 +1,9 @@
 package com.ops.ops.modules.member.application;
 
+import com.ops.ops.modules.member.domain.Member;
+import com.ops.ops.modules.member.domain.dao.MemberRepository;
+import com.ops.ops.modules.member.exception.MemberException;
+import com.ops.ops.modules.member.exception.MemberExceptionType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -8,4 +12,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @RequiredArgsConstructor
 public class MemberCommandService {
+
+	private final MemberRepository memberRepository;
+
+	public void isAdmin(Member member) {
+		if (!member.isAdmin()) {
+			throw new MemberException(MemberExceptionType.NOT_ADMIN);
+		}
+	}
 }
