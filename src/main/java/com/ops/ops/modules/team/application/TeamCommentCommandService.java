@@ -19,44 +19,41 @@ public class TeamCommentCommandService {
 
 	@Transactional
 	public void createComment(final Long teamId, final Long memberId, final String description) {
-		final Team team = teamCommandService.getValidatedTeam(teamId);
+		final Team team = teamCommandService.validateAndGetTeamById(teamId);
 		final TeamComment comment = TeamComment.of(description, memberId, team);
+
 		teamCommentRepository.save(comment);
 	}
 
 	@Transactional
-	public void updateComment(
-		final Long teamId,
-		final Long commentId,
-		final Long memberId,
-		final String newDescription
-	) {
-		teamCommandService.getValidatedTeam(teamId);
-		final TeamComment comment = getValidatedCommentOwnedBy(commentId, memberId);
+	public void updateComment(final Long teamId, final Long commentId, final Long memberId, final String newDescription) {
+		teamCommandService.validateAndGetTeamById(teamId);
+		final TeamComment comment = validateAndGetCommentById(commentId);
+		validateCommentOwnership(comment, memberId);
+
 		comment.updateDescription(newDescription);
 	}
 
 	@Transactional
-	public void deleteComment(
-		final Long teamId,
-		final Long commentId,
-		final Long memberId
-	) {
-		teamCommandService.getValidatedTeam(teamId);
-
-		final TeamComment comment = getValidatedCommentOwnedBy(commentId, memberId);
+	public void deleteComment(final Long teamId, final Long commentId, final Long memberId) {
+		teamCommandService.validateAndGetTeamById(teamId);
+		final TeamComment comment = validateAndGetCommentById(commentId);
+		validateCommentOwnership(comment, memberId);
 
 		teamCommentRepository.delete(comment);
 	}
 
-	private TeamComment getValidatedCommentOwnedBy(final Long commentId, final Long memberId) {
-		TeamComment comment = teamCommentRepository.findById(commentId)
+	private TeamComment validateAndGetCommentById(final Long commentId) {
+		return teamCommentRepository.findById(commentId)
 			.orElseThrow(() -> new TeamCommentException(TeamCommentExceptionType.NOT_FOUND_COMMENT));
+	}
 
+	private void validateCommentOwnership(
+		final TeamComment comment,
+		final Long memberId
+	) {
 		if (!comment.getMemberId().equals(memberId)) {
 			throw new TeamCommentException(TeamCommentExceptionType.NOT_OWNER_COMMENT);
 		}
-
-		return comment;
 	}
 }

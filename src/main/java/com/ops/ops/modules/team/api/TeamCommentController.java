@@ -25,7 +25,7 @@ public class TeamCommentController {
 	private final TeamCommentQueryService teamCommentQueryService;
 
 	@PostMapping
-	public ResponseEntity<Void> createComment(
+	public ResponseEntity<Void> createTeamComment(
 		@PathVariable Long teamId,
 		@Valid @RequestBody final TeamCommentCreateRequest request,
 		@LoginMember final Member member
@@ -35,7 +35,7 @@ public class TeamCommentController {
 	}
 
 	@GetMapping
-	public ResponseEntity<List<TeamCommentResponse>> getComments(
+	public ResponseEntity<List<TeamCommentResponse>> getTeamComments(
 		@PathVariable final Long teamId,
 		@LoginMember final Member member
 	) {
@@ -44,7 +44,7 @@ public class TeamCommentController {
 	}
 
 	@PatchMapping("/{commentId}")
-	public ResponseEntity<Void> updateComment(
+	public ResponseEntity<Void> updateTeamComment(
 		@PathVariable final Long teamId,
 		@PathVariable final Long commentId,
 		@Valid @RequestBody final TeamCommentUpdateRequest request,
@@ -55,7 +55,7 @@ public class TeamCommentController {
 	}
 
 	@DeleteMapping("/{commentId}")
-	public ResponseEntity<Void> deleteComment(
+	public ResponseEntity<Void> deleteTeamComment(
 		@PathVariable final Long teamId,
 		@PathVariable final Long commentId,
 		@LoginMember final Member member

@@ -15,7 +15,7 @@ import com.ops.ops.modules.team.exception.TeamExceptionType;
 public class TeamCommandService {
 	private final TeamRepository teamRepository;
 
-	Team getValidatedTeam(final Long teamId) {
+	Team validateAndGetTeamById(final Long teamId) {
 		return teamRepository.findById(teamId)
 			.orElseThrow(() -> new TeamException(TeamExceptionType.NOT_FOUND_TEAM));
 	}
