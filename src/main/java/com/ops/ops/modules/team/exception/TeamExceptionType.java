@@ -4,7 +4,8 @@ import com.ops.ops.global.base.BaseExceptionType;
 import org.springframework.http.HttpStatus;
 
 public enum TeamExceptionType implements BaseExceptionType {
-    NOT_FOUND_TEAM(HttpStatus.NOT_FOUND, "Team not found.");
+    NOT_FOUND_TEAM(HttpStatus.NOT_FOUND, "팀을 찾을 수 없습니다."),
+    ;
 
     private final HttpStatus httpStatus;
     private final String errorMessage;

@@ -1,17 +1,20 @@
 package com.ops.ops.modules.member.domain;
 
-import static jakarta.persistence.FetchType.LAZY;
-
 import com.ops.ops.global.base.BaseEntity;
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import java.util.HashSet;
+import java.util.Set;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
@@ -23,6 +26,8 @@ import org.hibernate.annotations.SQLRestriction;
 @SQLRestriction("is_deleted = false")
 @SQLDelete(sql = "UPDATE member SET is_deleted = true where id = ?")
 public class Member extends BaseEntity {
+
+    private static final int MAX_ROLE_NAME_LENGTH = 20;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,21 +45,22 @@ public class Member extends BaseEntity {
     @Column(nullable = false)
     private String studentId;
 
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "member_roles", joinColumns = @JoinColumn(name = "member_id"))
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false, length = MAX_ROLE_NAME_LENGTH)
+    private Set<MemberRoleType> roles = new HashSet<>();
+
     @Column(nullable = false)
     private Boolean isDeleted;
 
-    @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "member_role_id")
-    private MemberRole memberRole;
-
-    @Builder
     private Member(final String name, final String email, final String password, final String studentId,
-                   final MemberRole memberRole) {
+                  final Set<MemberRoleType> roles) {
         this.name = name;
         this.email = email;
         this.password = password;
         this.studentId = studentId;
+        this.roles = roles;
         this.isDeleted = false;
-        this.memberRole = memberRole;
     }
 }
