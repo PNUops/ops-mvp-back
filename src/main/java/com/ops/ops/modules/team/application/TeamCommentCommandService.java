@@ -12,12 +12,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class TeamCommentCommandService {
 
 	private final TeamCommandService teamCommandService;
 	private final TeamCommentRepository teamCommentRepository;
 
-	@Transactional
 	public void createComment(final Long teamId, final Long memberId, final String description) {
 		final Team team = teamCommandService.validateAndGetTeamById(teamId);
 		final TeamComment comment = TeamComment.of(description, memberId, team);
@@ -25,7 +25,6 @@ public class TeamCommentCommandService {
 		teamCommentRepository.save(comment);
 	}
 
-	@Transactional
 	public void updateComment(final Long teamId, final Long commentId, final Long memberId, final String newDescription) {
 		teamCommandService.validateAndGetTeamById(teamId);
 		final TeamComment comment = validateAndGetCommentById(commentId);
@@ -34,7 +33,6 @@ public class TeamCommentCommandService {
 		comment.updateDescription(newDescription);
 	}
 
-	@Transactional
 	public void deleteComment(final Long teamId, final Long commentId, final Long memberId) {
 		teamCommandService.validateAndGetTeamById(teamId);
 		final TeamComment comment = validateAndGetCommentById(commentId);

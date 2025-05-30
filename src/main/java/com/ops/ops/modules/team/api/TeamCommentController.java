@@ -35,7 +35,7 @@ public class TeamCommentController {
 	@ApiResponse(responseCode = "201", description = "댓글 생성 성공")
 	@PostMapping
 	public ResponseEntity<Void> createTeamComment(
-		@PathVariable Long teamId,
+		@PathVariable final Long teamId,
 		@Valid @RequestBody final TeamCommentCreateRequest request,
 		@LoginMember final Member member
 	) {
