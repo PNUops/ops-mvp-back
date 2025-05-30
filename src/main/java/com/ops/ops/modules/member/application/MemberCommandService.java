@@ -98,6 +98,11 @@ public class MemberCommandService {
         signUpEmailAuth(request);
     }
 
+    public void confirmSignInEmailAuth(final EmailAuthConfirmRequest request) {
+        validateExistMember(request.email());
+        confirmSignUpEmailAuth(request);
+    }
+
     private void registerNewMember(final String name, final String studentId, final String email,
                                    final String password) {
         checkIsDuplicateStudentId(studentId);
