@@ -29,7 +29,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class JwtProvider {
     private static final Logger log = LoggerFactory.getLogger(JwtProvider.class);
-    public static final long EXPIRATION_MILLIS = 30 * 60 * 1000L; // 30분
     private static final String ROLES = "roles";
 
     @Value("${spring.jwt.secret}")
@@ -52,7 +51,6 @@ public class JwtProvider {
         return Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(now)
-                .setExpiration(new Date(now.getTime() + EXPIRATION_MILLIS))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
