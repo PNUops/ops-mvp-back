@@ -21,9 +21,20 @@ import com.ops.ops.modules.team.domain.dao.TeamRepository;
 import com.ops.ops.modules.team.exception.TeamException;
 import com.ops.ops.modules.team.exception.TeamExceptionType;
 
+import com.ops.ops.modules.team.domain.Team;
+import com.ops.ops.modules.team.domain.dao.TeamRepository;
+import com.ops.ops.modules.team.exception.TeamException;
+import com.ops.ops.modules.team.exception.TeamExceptionType;
+
 @Service
 @RequiredArgsConstructor
 public class TeamCommandService {
+    private final TeamRepository teamRepository;
+
+    Team validateAndGetTeamById(final Long teamId) {
+        return teamRepository.findById(teamId)
+                .orElseThrow(() -> new TeamException(TeamExceptionType.NOT_FOUND_TEAM));
+    }
 
     @Value("${file.upload-dir}")
     private String uploadDir;
