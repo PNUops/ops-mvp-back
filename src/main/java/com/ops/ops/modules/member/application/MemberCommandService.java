@@ -7,6 +7,7 @@ import static com.ops.ops.modules.member.exception.MemberExceptionType.ALREADY_E
 import static com.ops.ops.modules.member.exception.MemberExceptionType.ALREADY_EXIST_STUDENT_ID;
 
 import com.ops.ops.global.util.MailUtil;
+import com.ops.ops.modules.member.application.dto.request.EmailAuthConfirmRequest;
 import com.ops.ops.modules.member.application.dto.request.EmailAuthRequest;
 import com.ops.ops.modules.member.application.dto.request.SignUpRequest;
 import com.ops.ops.modules.member.domain.EmailAuth;
@@ -63,6 +64,12 @@ public class MemberCommandService {
                 .token(code)
                 .build());
         sendAuthCodeMail(email, code);
+    }
+
+    public void confirmSignUpEmailAuth(final EmailAuthConfirmRequest request) {
+        final EmailAuth memberEmailAuth = emailAuthRepository.findByEmail(request.email());
+        if (memberEmailAuth.getToken().equals(request.authCode())) memberEmailAuth.correct();
+        else throw new EmailAuthException(NOT_VERIFIED_EMAIL_AUTH);
     }
 
     private void registerNewMember(final String name, final String studentId, final String email,
