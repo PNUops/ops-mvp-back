@@ -38,3 +38,7 @@ out/
 
 ### 이미지 ###
 /file/
+
+# 시크릿 설정 파일 무시
+/src/main/resources/application-secret.yml
+

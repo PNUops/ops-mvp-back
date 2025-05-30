@@ -1,5 +1,6 @@
 package com.ops.ops.modules.team.api;
 
+
 import com.ops.ops.modules.file.application.FileCommandService;
 import com.ops.ops.modules.file.application.dto.ThumbnailRequest;
 import java.io.IOException;
@@ -23,4 +24,5 @@ public class TeamController {
         fileCommandService.saveThumbnail(teamId, thumbnailRequest);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
+
 }
