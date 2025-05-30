@@ -55,4 +55,8 @@ public class TeamComment extends BaseEntity {
             .team(team)
             .build();
     }
+
+    public void updateDescription(final String newDescription) {
+        this.description = newDescription;
+    }
 }

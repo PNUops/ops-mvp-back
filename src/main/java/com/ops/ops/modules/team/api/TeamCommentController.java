@@ -7,6 +7,7 @@ import com.ops.ops.modules.member.domain.Member;
 import com.ops.ops.modules.team.application.TeamCommentCommandService;
 import com.ops.ops.modules.team.application.TeamCommentQueryService;
 import com.ops.ops.modules.team.application.dto.request.TeamCommentCreateRequest;
+import com.ops.ops.modules.team.application.dto.request.TeamCommentUpdateRequest;
 import com.ops.ops.modules.team.application.dto.response.TeamCommentResponse;
 
 import jakarta.validation.Valid;
@@ -40,5 +41,26 @@ public class TeamCommentController {
 	) {
 		List<TeamCommentResponse> response = teamCommentQueryService.getComments(teamId);
 		return ResponseEntity.ok(response);
+	}
+
+	@PatchMapping("/{commentId}")
+	public ResponseEntity<Void> updateComment(
+		@PathVariable final Long teamId,
+		@PathVariable final Long commentId,
+		@Valid @RequestBody final TeamCommentUpdateRequest request,
+		@LoginMember final Member member
+	) {
+		teamCommentCommandService.updateComment(teamId, commentId, member.getId(), request.description());
+		return ResponseEntity.ok().build();
+	}
+
+	@DeleteMapping("/{commentId}")
+	public ResponseEntity<Void> deleteComment(
+		@PathVariable final Long teamId,
+		@PathVariable final Long commentId,
+		@LoginMember final Member member
+	) {
+		teamCommentCommandService.deleteComment(teamId, commentId, member.getId());
+		return ResponseEntity.noContent().build();
 	}
 }
