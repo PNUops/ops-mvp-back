@@ -1,11 +1,11 @@
 package com.ops.ops.modules.file.application;
 
+import com.ops.ops.modules.file.application.dto.ThumbnailRequest;
 import com.ops.ops.modules.file.domain.File;
 import com.ops.ops.modules.file.domain.FileImageType;
 import com.ops.ops.modules.file.domain.dao.FileRepository;
 import com.ops.ops.modules.file.exception.FileException;
 import com.ops.ops.modules.file.exception.FileExceptionType;
-import com.ops.ops.modules.member.domain.dao.MemberRepository;
 import com.ops.ops.modules.team.domain.dao.TeamRepository;
 import java.io.IOException;
 import java.util.UUID;
@@ -16,15 +16,18 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
-public class FileService {
+public class FileCommandService {
 
     @Value("${file.upload-dir}")
     private String uploadDir;
     private final FileRepository fileRepository;
     private final TeamRepository teamRepository;
 
-    public void saveThumbnail(Long teamId, MultipartFile file) throws IOException {
+    public void saveThumbnail(Long teamId, ThumbnailRequest thumbnailRequest) throws IOException {
 
+        verifyImage(thumbnailRequest);
+
+        MultipartFile file = thumbnailRequest.image();
         String originalFilename = file.getOriginalFilename() != null ? file.getOriginalFilename() : "defaultName";
         String saveThumbnailName = createSaveThumbnailName(originalFilename);
         String fullPath = getFullPath(saveThumbnailName);
@@ -39,6 +42,12 @@ public class FileService {
                 .type(FileImageType.THUMBNAIL)
                 .build();
         fileRepository.save(image);
+    }
+
+    private void verifyImage(ThumbnailRequest thumbnailRequest) {
+        if (thumbnailRequest.image() == null || thumbnailRequest.image().isEmpty()) {
+            throw new FileException(FileExceptionType.NO_IMAGE);
+        }
     }
 
     private void verifyTeamExists(Long teamId) {
