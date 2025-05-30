@@ -3,7 +3,6 @@ package com.ops.ops.modules.team.application;
 import com.ops.ops.modules.member.domain.Member;
 import com.ops.ops.modules.team.application.dto.response.TeamDetailResponse;
 import com.ops.ops.modules.team.domain.Team;
-import com.ops.ops.modules.team.domain.TeamMember;
 import com.ops.ops.modules.team.domain.dao.TeamRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
