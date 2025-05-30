@@ -3,6 +3,10 @@ package com.ops.ops.modules.file.application;
 import com.ops.ops.modules.file.domain.File;
 import com.ops.ops.modules.file.domain.FileImageType;
 import com.ops.ops.modules.file.domain.dao.FileRepository;
+import com.ops.ops.modules.file.exception.FileException;
+import com.ops.ops.modules.file.exception.FileExceptionType;
+import com.ops.ops.modules.member.domain.dao.MemberRepository;
+import com.ops.ops.modules.team.domain.dao.TeamRepository;
 import java.io.IOException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -17,14 +21,16 @@ public class FileService {
     @Value("${file.upload-dir}")
     private String uploadDir;
     private final FileRepository fileRepository;
+    private final TeamRepository teamRepository;
 
     public void saveThumbnail(Long teamId, MultipartFile file) throws IOException {
 
         String originalFilename = file.getOriginalFilename() != null ? file.getOriginalFilename() : "defaultName";
-
         String saveThumbnailName = createSaveThumbnailName(originalFilename);
-
         String fullPath = getFullPath(saveThumbnailName);
+
+        verifyTeamExists(teamId);
+
         file.transferTo(new java.io.File(fullPath));
         File image = File.builder()
                 .name(originalFilename)
@@ -33,6 +39,11 @@ public class FileService {
                 .type(FileImageType.THUMBNAIL)
                 .build();
         fileRepository.save(image);
+    }
+
+    private void verifyTeamExists(Long teamId) {
+        teamRepository.findById(teamId)
+                .orElseThrow(() -> new FileException(FileExceptionType.TEAM_NOT_FOUND));
     }
 
     private String createSaveThumbnailName(String originalFilename) {
