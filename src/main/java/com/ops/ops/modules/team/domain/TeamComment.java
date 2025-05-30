@@ -47,4 +47,12 @@ public class TeamComment extends BaseEntity {
         this.team = team;
         this.isDeleted = false;
     }
+
+    public static TeamComment of(String description, Long memberId, Team team) {
+        return TeamComment.builder()
+            .description(description)
+            .memberId(memberId)
+            .team(team)
+            .build();
+    }
 }
