@@ -4,6 +4,10 @@ spring:
     username: root
     password: 1234
     driver-class-name: com.mysql.cj.jdbc.Driver
+
+  config:
+    import: "classpath:application-secret.yml"
+
   sql:
     init:
       mode: always
@@ -15,3 +19,9 @@ spring:
         format_sql: true
         dialect: org.hibernate.dialect.MySQL8Dialect
     show-sql: true
+
+cors:
+  allow:
+    origins: https://test.url
+    methods: GET, POST, PUT, DELETE, PATCH, OPTIONS
+
