@@ -33,6 +33,9 @@ spring:
           starttls:
             enable: true
 
+file:
+  upload-dir: ${user.dir}/file/
+
 cors:
   allow:
     origins: https://test.url
