@@ -2,7 +2,8 @@ package com.ops.ops.modules.team.api;
 
 
 import com.ops.ops.modules.team.application.TeamCommandService;
-import com.ops.ops.modules.team.application.dto.ThumbnailRequest;
+import com.ops.ops.modules.team.application.dto.request.PreviewRequest;
+import com.ops.ops.modules.team.application.dto.request.ThumbnailRequest;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,9 +20,13 @@ public class TeamController {
 
     @PostMapping("/teams/{teamId}/image/thumbnail")
     public ResponseEntity<Void> saveThumbnailImage(@PathVariable Long teamId, ThumbnailRequest thumbnailRequest) throws IOException {
-
         teamCommandService.saveThumbnail(teamId, thumbnailRequest);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+    @PostMapping("/teams/{teamId}/image")
+    public ResponseEntity<Void> savePreviewImage(@PathVariable Long teamId, PreviewRequest previewRequest) throws IOException {
+        teamCommandService.savePreview(teamId, previewRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
 }
