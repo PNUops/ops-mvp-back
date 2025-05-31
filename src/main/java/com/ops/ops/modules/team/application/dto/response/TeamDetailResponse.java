@@ -13,7 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 public class TeamDetailResponse {
     private Long teamId;
-//    private Long leaderId;
+    private Long leaderId;
     private String teamName;
     private String projectName;
     private String overview;
@@ -24,10 +24,10 @@ public class TeamDetailResponse {
     private String youtubePath;
     private boolean isLiked;
 
-    public static TeamDetailResponse from(Team team, List<String> participants, boolean isLiked) {
+    public static TeamDetailResponse from(Team team, Long leaderId, List<String> participants, boolean isLiked) {
         return TeamDetailResponse.builder()
                 .teamId(team.getId())
-//                .leaderId(team.getLeader().getId())
+                .leaderId(leaderId)
                 .teamName(team.getTeamName())
                 .projectName(team.getProjectName())
                 .overview(team.getOverview())
