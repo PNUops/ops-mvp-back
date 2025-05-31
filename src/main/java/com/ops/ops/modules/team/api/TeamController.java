@@ -31,6 +31,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+import java.util.List;
+
 @Tag(name = "Team Detail", description = "팀 상세보기 조회 API")
 @RestController
 @RequiredArgsConstructor

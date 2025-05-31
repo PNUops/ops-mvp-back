@@ -20,6 +20,8 @@ import java.util.stream.Collectors;
 public class TeamQueryService {
     private final TeamRepository teamRepository;
     private final TeamMemberQueryService teamMemberQueryService;
+    private final TeamRepository teamRepository;
+
 
 
     public TeamDetailResponse getTeamDetail(final Long teamId, final Member member){
