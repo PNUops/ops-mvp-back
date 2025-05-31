@@ -1,28 +1,32 @@
 package com.ops.ops.modules.team.application;
 
-import com.ops.ops.modules.team.application.dto.ThumbnailRequest;
 import com.ops.ops.modules.file.domain.File;
 import com.ops.ops.modules.file.domain.FileImageType;
 import com.ops.ops.modules.file.domain.dao.FileRepository;
 import com.ops.ops.modules.file.exception.FileException;
 import com.ops.ops.modules.file.exception.FileExceptionType;
-import com.ops.ops.modules.team.domain.dao.TeamRepository;
-import com.ops.ops.modules.team.exception.TeamException;
-import com.ops.ops.modules.team.exception.TeamExceptionType;
-import java.io.IOException;
-import java.util.UUID;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
+import com.ops.ops.modules.team.application.dto.request.ThumbnailDeleteRequest;
+import com.ops.ops.modules.team.application.dto.request.ThumbnailSaveRequest;
 import com.ops.ops.modules.team.domain.Team;
 import com.ops.ops.modules.team.domain.dao.TeamRepository;
 import com.ops.ops.modules.team.exception.TeamException;
 import com.ops.ops.modules.team.exception.TeamExceptionType;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class TeamCommandService {
 
     @Value("${file.upload-dir}")
@@ -30,16 +34,16 @@ public class TeamCommandService {
     private final FileRepository fileRepository;
     private final TeamRepository teamRepository;
 
-    public void saveThumbnail(Long teamId, ThumbnailRequest thumbnailRequest) throws IOException {
+    public void saveThumbnail(Long teamId, ThumbnailSaveRequest thumbnailSaveRequest) throws IOException {
 
-        verifyImage(thumbnailRequest);
+        verifyImage(thumbnailSaveRequest);
 
-        MultipartFile file = thumbnailRequest.image();
+        MultipartFile file = thumbnailSaveRequest.image();
         String originalFilename = file.getOriginalFilename() != null ? file.getOriginalFilename() : "defaultName";
         String saveThumbnailName = createSaveThumbnailName(originalFilename);
         String fullPath = getFullPath(saveThumbnailName);
 
-        verifyTeamExists(teamId);
+        validateAndGetTeamById(teamId);
 
         file.transferTo(new java.io.File(fullPath));
         File image = File.builder()
@@ -51,15 +55,39 @@ public class TeamCommandService {
         fileRepository.save(image);
     }
 
-    private void verifyImage(ThumbnailRequest thumbnailRequest) {
-        if (thumbnailRequest.image() == null || thumbnailRequest.image().isEmpty()) {
-            throw new FileException(FileExceptionType.NO_IMAGE);
+    public void deleteThumbnail(Long teamId, ThumbnailDeleteRequest thumbnailDeleteRequest) throws IOException {
+        validateAndGetTeamById(teamId);
+
+        Long requestImageId = validateThumbnailOwnershipAndGetRequestImageId(teamId, thumbnailDeleteRequest);
+
+        deleteImageFiles(Collections.singletonList(requestImageId));
+    }
+
+    private Long validateThumbnailOwnershipAndGetRequestImageId(Long teamId, ThumbnailDeleteRequest thumbnailDeleteRequest) {
+        Long requestImageId = thumbnailDeleteRequest.imageId();
+        File requestThumbnail = fileRepository.findById(requestImageId)
+                .orElseThrow(() -> new FileException(FileExceptionType.NOT_EXISTS_THUMBNAIL));
+        if (!requestThumbnail.getTeamId().equals(teamId)) {
+            throw new FileException(FileExceptionType.REQUEST_NOT_OWN_IMAGE);
+        }
+        return requestImageId;
+    }
+
+    private void deleteImageFiles(List<Long> imageIds) throws IOException {
+        for (Long imageId : imageIds) {
+            File findFile = fileRepository.findById(imageId)
+                    .orElseThrow(() -> new FileException(FileExceptionType.NOT_EXISTS_MATCHING_IMAGE_ID));
+            String filePath = findFile.getFilePath();
+            Path fullPath = Paths.get(filePath);
+            Files.delete(fullPath);
+            fileRepository.deleteById(imageId);
         }
     }
 
-    private void verifyTeamExists(Long teamId) {
-        teamRepository.findById(teamId)
-                .orElseThrow(() -> new TeamException(TeamExceptionType.NOT_FOUND_TEAM));
+    private void verifyImage(ThumbnailSaveRequest thumbnailSaveRequest) {
+        if (thumbnailSaveRequest.image() == null || thumbnailSaveRequest.image().isEmpty()) {
+            throw new FileException(FileExceptionType.NO_IMAGE);
+        }
     }
 
     private String createSaveThumbnailName(String originalFilename) {
@@ -72,6 +100,7 @@ public class TeamCommandService {
     private String getFullPath(String saveThumbnailName) {
         return uploadDir + saveThumbnailName;
     }
+
 	public Team validateAndGetTeamById(final Long teamId) {
 		return teamRepository.findById(teamId)
 			.orElseThrow(() -> new TeamException(TeamExceptionType.NOT_FOUND_TEAM));
