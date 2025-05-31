@@ -24,15 +24,20 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.ops.ops.modules.team.domain.Team;
+import com.ops.ops.modules.team.domain.dao.TeamRepository;
+import com.ops.ops.modules.team.exception.TeamException;
+import com.ops.ops.modules.team.exception.TeamExceptionType;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class TeamCommandService {
+    private final TeamRepository teamRepository;
 
     @Value("${file.upload-dir}")
     private String uploadDir;
     private final FileRepository fileRepository;
-    private final TeamRepository teamRepository;
 
     public void saveThumbnail(Long teamId, ThumbnailSaveRequest thumbnailSaveRequest) throws IOException {
 
@@ -107,4 +112,5 @@ public class TeamCommandService {
 		return teamRepository.findById(teamId)
 			.orElseThrow(() -> new TeamException(TeamExceptionType.NOT_FOUND_TEAM));
 	}
+
 }
