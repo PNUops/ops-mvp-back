@@ -18,17 +18,16 @@ public class TeamQueryService {
     private final TeamCommandService teamCommandService;
     private final TeamMemberQueryService teamMemberQueryService;
 
-    public TeamDetailResponse getTeamDetail(final Long teamId/*, final Member member*/){
+    public TeamDetailResponse getTeamDetail(final Long teamId, final Member member){
         Team team = teamCommandService.validateAndGetTeamById(teamId);
         List<String> participants = teamMemberQueryService.getParticipantsbyTeamId(teamId);
         Long leaderId = teamMemberQueryService.getLeaderIdByTeamId(teamId);
 
         boolean isLiked = false;
-        /*
+
         if (member != null){
-            // isLiked = teamLikeRepository...
+            //isLiked = TeamLikeRepository.findByMemberIdAndTeam(member.getId(), teamdId)
         }
-        */
 
         return TeamDetailResponse.from(team, leaderId, participants, isLiked);
     }
