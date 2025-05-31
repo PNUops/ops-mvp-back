@@ -31,15 +31,9 @@ import com.ops.ops.modules.team.exception.TeamExceptionType;
 public class TeamCommandService {
     private final TeamRepository teamRepository;
 
-    Team validateAndGetTeamById(final Long teamId) {
-        return teamRepository.findById(teamId)
-                .orElseThrow(() -> new TeamException(TeamExceptionType.NOT_FOUND_TEAM));
-    }
-
     @Value("${file.upload-dir}")
     private String uploadDir;
     private final FileRepository fileRepository;
-    private final TeamRepository teamRepository;
 
     public void saveThumbnail(Long teamId, ThumbnailRequest thumbnailRequest) throws IOException {
 
@@ -87,4 +81,5 @@ public class TeamCommandService {
 		return teamRepository.findById(teamId)
 			.orElseThrow(() -> new TeamException(TeamExceptionType.NOT_FOUND_TEAM));
 	}
+
 }

@@ -15,11 +15,11 @@ import java.util.List;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class TeamQueryService {
-    private final TeamCommandService teamCommandService;
+    private final TeamRepository teamRepository;
     private final TeamMemberQueryService teamMemberQueryService;
 
     public TeamDetailResponse getTeamDetail(final Long teamId, final Member member){
-        Team team = teamCommandService.validateAndGetTeamById(teamId);
+        Team team = teamRepository.findByIdAndIsDeletedFalse(teamId);
         List<String> participants = teamMemberQueryService.getParticipantsbyTeamId(teamId);
         Long leaderId = teamMemberQueryService.getLeaderIdByTeamId(teamId);
 
