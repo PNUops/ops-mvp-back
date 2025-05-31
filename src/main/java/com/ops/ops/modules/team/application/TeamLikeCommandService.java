@@ -1,5 +1,7 @@
 package com.ops.ops.modules.team.application;
 
+import java.util.Optional;
+
 import org.springframework.stereotype.Service;
 
 import com.ops.ops.modules.team.application.dto.response.TeamLikeToggleResponse;
@@ -20,31 +22,27 @@ public class TeamLikeCommandService {
 
 	public TeamLikeToggleResponse toggleLike(Long memberId, Long teamId, Boolean isLiked) {
 		Team team = teamCommandService.validateAndGetTeamById(teamId);
-		TeamLike teamLike = getOrCreateTeamLike(memberId, team, isLiked);
 
-		// 좋아요 등록
-		if (!teamLike.getIsLiked() && isLiked) {
-			teamLike.setLiked(true);
-			return new TeamLikeToggleResponse(team.getId(), true, "좋아요가 등록되었습니다.");
+		Optional<TeamLike> teamLikeOptional = teamLikeRepository.findByMemberIdAndTeam(memberId, team);
+		if (teamLikeOptional.isEmpty()) {
+			saveTeamLike(memberId, team, isLiked);
+			String message = isLiked ? "좋아요가 처음 등록되었습니다." : "좋아요가 비활성화된 상태로 초기화되었습니다.";
+			return new TeamLikeToggleResponse(team.getId(), isLiked, message);
 		}
 
-		// 좋아요 취소
-		if (teamLike.getIsLiked() && !isLiked) {
-			teamLike.setLiked(false);
-			return new TeamLikeToggleResponse(team.getId(), false, "좋아요가 취소되었습니다.");
+		TeamLike teamLike = teamLikeOptional.get();
+		if (teamLike.getIsLiked() == isLiked) {
+			String message = isLiked ? "이미 좋아요한 팀입니다." : "이미 좋아요를 취소한 팀입니다.";
+			return new TeamLikeToggleResponse(team.getId(), teamLike.getIsLiked(), message);
 		}
 
-		// 상태 변화 없음
-		return new TeamLikeToggleResponse(team.getId(), teamLike.getIsLiked(),
-			isLiked ? "이미 좋아요한 팀입니다." : "이미 좋아요를 취소한 팀입니다.");
+		teamLike.setLiked(isLiked);
+		String message = isLiked ? "좋아요가 등록되었습니다." : "좋아요가 취소되었습니다.";
+		return new TeamLikeToggleResponse(team.getId(), isLiked, message);
 	}
 
-	private TeamLike getOrCreateTeamLike(Long memberId, Team team, Boolean isLiked) {
-		return teamLikeRepository.findByMemberIdAndTeam(memberId, team)
-			.orElseGet(() -> createTeamLike(memberId, team, isLiked));
-	}
-
-	public TeamLike createTeamLike(Long memberId, Team team, Boolean isLiked) {
-		return teamLikeRepository.save(TeamLike.of(memberId, team, isLiked));
+	public void saveTeamLike(Long memberId, Team team, Boolean isLiked) {
+		TeamLike teamLike = TeamLike.of(memberId, team, isLiked);
+		teamLikeRepository.save(teamLike);
 	}
 }
