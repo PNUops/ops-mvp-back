@@ -5,6 +5,7 @@ import com.ops.ops.modules.file.domain.FileImageType;
 import com.ops.ops.modules.file.domain.dao.FileRepository;
 import com.ops.ops.modules.file.exception.FileException;
 import com.ops.ops.modules.file.exception.FileExceptionType;
+import com.ops.ops.modules.team.application.dto.request.TeamDetailUpdateRequest;
 import com.ops.ops.modules.team.application.dto.request.ThumbnailDeleteRequest;
 import com.ops.ops.modules.team.application.dto.request.ThumbnailSaveRequest;
 import com.ops.ops.modules.team.domain.Team;
@@ -18,22 +19,20 @@ import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.ops.ops.modules.team.domain.Team;
-import com.ops.ops.modules.team.domain.dao.TeamRepository;
-import com.ops.ops.modules.team.exception.TeamException;
-import com.ops.ops.modules.team.exception.TeamExceptionType;
-
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class TeamCommandService {
     private final TeamRepository teamRepository;
+    private final TeamMemberQueryService teamMemberQueryService;
 
     @Value("${file.upload-dir}")
     private String uploadDir;
@@ -114,7 +113,7 @@ public class TeamCommandService {
 	}
 
 
-	public void updateTeamDetail(final Long teamId, final Long memberId, final TeamDetailUpdateRequest request) {
+	public void updateTeamDetail(final Long teamId, final Long memberId, final @Valid TeamDetailUpdateRequest request) {
 		final Team team = validateAndGetTeamById(teamId);
 		validateTeamLeader(team, memberId);
 

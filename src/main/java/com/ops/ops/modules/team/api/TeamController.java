@@ -40,7 +40,7 @@ public class TeamController {
     @ApiResponse(responseCode = "200", description = "팀 상세보기 조회 성공")
     @GetMapping("/{teamId}")
     public ResponseEntity<TeamDetailResponse> getTeamDetail(
-            @Parameter(description = "팀 ID") @PathVariable final Long teamId,
+            @PathVariable final Long teamId,
             @LoginMember final Member member
     ) {
         TeamDetailResponse response = teamQueryService.getTeamDetail(teamId, member);
@@ -65,7 +65,7 @@ public class TeamController {
     @ApiResponse(responseCode = "204", description = "팀 상세보기 수정 성공")
     @PatchMapping("/{teamId}")
     public ResponseEntity<Void> updateTeamDetail(
-            @Parameter(description = "팀 ID") @PathVariable final Long teamId,
+            @PathVariable final Long teamId,
             @Valid @RequestBody final TeamDetailUpdateRequest request,
             @LoginMember final Member member
     ) {
