@@ -68,10 +68,7 @@ public class MemberCommandService {
         validatePusanDomain(email);
         final String code = generateRandomAuthCode();
 
-        emailAuthRepository.save(EmailAuth.builder()
-                .email(email)
-                .token(code)
-                .build());
+        saveAuthCode(email, code);
         sendAuthCodeMail(email, code);
     }
 
@@ -175,6 +172,18 @@ public class MemberCommandService {
     private void checkCorrectPassword(final String savePassword, final String inputPassword) {
         if (!passwordEncoder.matches(inputPassword, savePassword)) {
             throw new MemberException(CANNOT_MATCH_PASSWORD);
+        }
+    }
+
+    private void saveAuthCode(final String email, final String code) {
+        if (emailAuthRepository.existsByEmail(email)) {
+            final EmailAuth emailAuth = emailAuthRepository.findByEmail(email);
+            emailAuth.updateAuthCode(code);
+        } else {
+            emailAuthRepository.save(EmailAuth.builder()
+                    .email(email)
+                    .token(code)
+                    .build());
         }
     }
 }

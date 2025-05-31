@@ -39,4 +39,8 @@ public class EmailAuth extends BaseEntity {
     public void correct() {
         this.isCorrected = true;
     }
+
+    public void updateAuthCode(final String newCode) {
+        this.token = newCode;
+    }
 }
