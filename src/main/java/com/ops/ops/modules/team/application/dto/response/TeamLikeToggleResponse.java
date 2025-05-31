@@ -5,7 +5,4 @@ public record TeamLikeToggleResponse(
 	Boolean isLiked,
 	String message
 ) {
-	public static TeamLikeToggleResponse of(Long teamId, Boolean isLiked, String message) {
-		return new TeamLikeToggleResponse(teamId, isLiked, message);
-	}
 }
