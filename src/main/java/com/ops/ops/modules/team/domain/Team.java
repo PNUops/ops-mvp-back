@@ -72,5 +72,6 @@ public class Team extends BaseEntity {
         this.overview = newOverview;
         this.githubPath = newGithubPath;
         this.youTubePath = newYouTubePath;
+        this.isSubmitted = true;
     }
 }
