@@ -103,7 +103,10 @@ public class MemberCommandService {
 
     public void updatePassword(final PasswordUpdateRequest request) {
         final Member member = getValidateExistMember(request.email());
+        final EmailAuth emailAuth = checkEmailAuth(request.email());
+
         member.updatePassword(request.newPassword());
+        emailAuthRepository.delete(emailAuth);
     }
 
     private void registerNewMember(final String name, final String studentId, final String email,
