@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 public enum MemberExceptionType implements BaseExceptionType {
 
     NOT_FOUND_MEMBER(HttpStatus.NOT_FOUND, "회원을 찾을 수 없습니다."),
+    NOT_ADMIN(HttpStatus.FORBIDDEN, "관리자 권한이 없습니다."),
     ;
 
     private final HttpStatus httpStatus;
