@@ -74,4 +74,9 @@ public class Member extends BaseEntity {
     public void updatePassword(final String newPassword) {
         this.password = newPassword;
     }
+
+    public boolean isAdmin() {
+        return roles.contains(MemberRoleType.ROLE_관리자);
+
+    }
 }

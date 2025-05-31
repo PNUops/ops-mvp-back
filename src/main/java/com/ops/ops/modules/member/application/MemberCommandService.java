@@ -1,5 +1,6 @@
 package com.ops.ops.modules.member.application;
 
+
 import static com.ops.ops.modules.member.domain.MemberRoleType.ROLE_회원;
 import static com.ops.ops.modules.member.exception.EmailAuthExceptionType.NOT_PUSAN_UNIVERSITY_EMAIL;
 import static com.ops.ops.modules.member.exception.EmailAuthExceptionType.NOT_VERIFIED_EMAIL_AUTH;
@@ -27,6 +28,7 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import com.ops.ops.modules.member.exception.MemberExceptionType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -189,4 +191,10 @@ public class MemberCommandService {
                     .build());
         }
     }
+
+	public void isAdmin(Member member) {
+		if (!member.isAdmin()) {
+			throw new MemberException(MemberExceptionType.NOT_ADMIN);
+		}
+	}
 }
