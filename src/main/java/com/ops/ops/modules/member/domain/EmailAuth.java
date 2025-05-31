@@ -23,7 +23,7 @@ public class EmailAuth extends BaseEntity {
     @Column(nullable = false)
     private String token;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String email;
 
     @Column(nullable = false)
