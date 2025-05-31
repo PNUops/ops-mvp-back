@@ -4,24 +4,35 @@ import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 
 import com.ops.ops.modules.member.application.MemberCommandService;
+import com.ops.ops.modules.member.application.MemberQueryService;
 import com.ops.ops.modules.member.application.dto.request.EmailAuthConfirmRequest;
 import com.ops.ops.modules.member.application.dto.request.EmailAuthRequest;
+import com.ops.ops.modules.member.application.dto.request.PasswordUpdateRequest;
+import com.ops.ops.modules.member.application.dto.request.SignInRequest;
 import com.ops.ops.modules.member.application.dto.request.SignUpRequest;
+import com.ops.ops.modules.member.application.dto.response.EmailFindResponse;
+import com.ops.ops.modules.member.application.dto.response.SignInResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+@Tag(name = "Member", description = "회원 관련 기능")
 @RestController
 @RequiredArgsConstructor
 public class MemberController {
 
     private final MemberCommandService memberCommandService;
+    private final MemberQueryService memberQueryService;
 
     @Operation(summary = "회원가입", description = "회원가입을 합니다. 팀장은 이미 회원가입 되어 있으므로 이메일과 비밀번호만 업데이트합니다.")
     @ApiResponse(responseCode = "201", description = "회원가입 성공")
@@ -46,5 +57,46 @@ public class MemberController {
             @Valid @RequestBody final EmailAuthConfirmRequest emailAuthConfirmRequest) {
         memberCommandService.confirmSignUpEmailAuth(emailAuthConfirmRequest);
         return ResponseEntity.status(NO_CONTENT).build();
+    }
+
+    @Operation(summary = "로그인", description = "로그인 합니다.")
+    @ApiResponse(responseCode = "200", description = "로그인 성공")
+    @PostMapping("/sign-in")
+    public ResponseEntity<SignInResponse> signIn(@Valid @RequestBody final SignInRequest signInRequest) {
+        final SignInResponse response = memberCommandService.signIn(signInRequest);
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "비밀번호 변경 이메일 인증", description = "인증 코드를 발급하고, 메일을 전송합니다.")
+    @ApiResponse(responseCode = "201", description = "이메일 인증 성공")
+    @PostMapping("/sign-in/password-reset/email-auth")
+    public ResponseEntity<Void> signInEmailAuth(@Valid @RequestBody final EmailAuthRequest emailAuthRequest) {
+        memberCommandService.signInEmailAuth(emailAuthRequest);
+        return ResponseEntity.status(CREATED).build();
+    }
+
+    @Operation(summary = "비밀번호 변경 이메일 인증코드 확인", description = "인증코드를 확인합니다.")
+    @ApiResponse(responseCode = "204", description = "확인 성공")
+    @PatchMapping("/sign-in/password-reset/email-auth")
+    public ResponseEntity<Void> confirmSignInEmailAuth(
+            @Valid @RequestBody final EmailAuthConfirmRequest emailAuthConfirmRequest) {
+        memberCommandService.confirmSignInEmailAuth(emailAuthConfirmRequest);
+        return ResponseEntity.status(NO_CONTENT).build();
+    }
+
+    @Operation(summary = "비밀번호 변경", description = "비밀번호를 변경합니다.")
+    @ApiResponse(responseCode = "204", description = "변경 성공")
+    @PatchMapping("/sign-in/password-reset")
+    public ResponseEntity<Void> updatePassword(@Valid @RequestBody final PasswordUpdateRequest passwordUpdateRequest) {
+        memberCommandService.updatePassword(passwordUpdateRequest);
+        return ResponseEntity.status(NO_CONTENT).build();
+    }
+
+    @Operation(summary = "가입 아이디 찾기", description = "학번을 통해 가입 이메일을 찾습니다.")
+    @ApiResponse(responseCode = "200", description = "가입 이메일 조회 성공")
+    @GetMapping("/sign-in/{studentId}/email-find")
+    public ResponseEntity<EmailFindResponse> getMyEmail(@Parameter(description = "학번") @PathVariable String studentId) {
+        final EmailFindResponse response = memberQueryService.getMyEmail(studentId);
+        return ResponseEntity.ok(response);
     }
 }

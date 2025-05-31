@@ -37,13 +37,13 @@ public class Member extends BaseEntity {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String email;
 
     @Column(nullable = false)
     private String password;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String studentId;
 
     @ElementCollection(fetch = FetchType.EAGER)
@@ -71,7 +71,12 @@ public class Member extends BaseEntity {
         this.password = password;
     }
 
+    public void updatePassword(final String newPassword) {
+        this.password = newPassword;
+    }
+
     public boolean isAdmin() {
         return roles.contains(MemberRoleType.ROLE_관리자);
+
     }
 }
