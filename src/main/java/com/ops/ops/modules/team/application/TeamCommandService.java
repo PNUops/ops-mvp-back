@@ -5,6 +5,7 @@ import com.ops.ops.modules.file.domain.FileImageType;
 import com.ops.ops.modules.file.domain.dao.FileRepository;
 import com.ops.ops.modules.file.exception.FileException;
 import com.ops.ops.modules.file.exception.FileExceptionType;
+import com.ops.ops.modules.team.application.dto.request.TeamDetailUpdateRequest;
 import com.ops.ops.modules.team.application.dto.request.ThumbnailDeleteRequest;
 import com.ops.ops.modules.team.application.dto.request.ThumbnailSaveRequest;
 import com.ops.ops.modules.team.domain.Team;
@@ -18,6 +19,8 @@ import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -28,11 +31,12 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 @Transactional
 public class TeamCommandService {
+    private final TeamRepository teamRepository;
+    private final TeamMemberQueryService teamMemberQueryService;
 
     @Value("${file.upload-dir}")
     private String uploadDir;
     private final FileRepository fileRepository;
-    private final TeamRepository teamRepository;
 
     public void saveThumbnail(Long teamId, ThumbnailSaveRequest thumbnailSaveRequest) throws IOException {
 
@@ -106,5 +110,19 @@ public class TeamCommandService {
 	public Team validateAndGetTeamById(final Long teamId) {
 		return teamRepository.findById(teamId)
 			.orElseThrow(() -> new TeamException(TeamExceptionType.NOT_FOUND_TEAM));
+	}
+
+
+	public void updateTeamDetail(final Long teamId, final Long memberId, final @Valid TeamDetailUpdateRequest request) {
+		final Team team = validateAndGetTeamById(teamId);
+		validateTeamLeader(team, memberId);
+
+		team.updateDetail(request.overview(), request.githubPath(), request.youTubePath());
+	}
+
+	private void validateTeamLeader(final Team team, final Long memberId) {
+		if (!teamMemberQueryService.getLeaderIdByTeamId(team.getId()).equals(memberId)) {
+			throw new TeamException(TeamExceptionType.NOT_TEAM_LEADER);
+		}
 	}
 }
