@@ -41,14 +41,15 @@ public class TeamCommandService {
         MultipartFile file = thumbnailSaveRequest.image();
         String originalFilename = file.getOriginalFilename() != null ? file.getOriginalFilename() : "defaultName";
         String saveThumbnailName = createSaveThumbnailName(originalFilename);
-        String fullPath = getFullPath(saveThumbnailName);
+        Path fullPath = getFullPath(saveThumbnailName);
 
         validateAndGetTeamById(teamId);
 
-        file.transferTo(new java.io.File(fullPath));
+        Files.createDirectories(Paths.get(uploadDir));
+        file.transferTo(fullPath);
         File image = File.builder()
                 .name(originalFilename)
-                .filePath(fullPath)
+                .filePath(fullPath.toString())
                 .teamId(teamId)
                 .type(FileImageType.THUMBNAIL)
                 .build();
@@ -97,8 +98,9 @@ public class TeamCommandService {
         return uuid + ext;
     }
 
-    private String getFullPath(String saveThumbnailName) {
-        return uploadDir + saveThumbnailName;
+    private Path getFullPath(String saveThumbnailName) {
+        Path uploadDirPath = Paths.get(uploadDir);
+        return uploadDirPath.resolve(saveThumbnailName);
     }
 
 	public Team validateAndGetTeamById(final Long teamId) {
