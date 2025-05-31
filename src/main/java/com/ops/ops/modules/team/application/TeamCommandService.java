@@ -113,4 +113,17 @@ public class TeamCommandService {
 			.orElseThrow(() -> new TeamException(TeamExceptionType.NOT_FOUND_TEAM));
 	}
 
+
+	public void updateTeamDetail(final Long teamId, final Long memberId, final TeamDetailUpdateRequest request) {
+		final Team team = validateAndGetTeamById(teamId);
+		validateTeamLeader(team, memberId);
+
+		team.updateDetail(request.overview(), request.githubPath(), request.youTubePath());
+	}
+
+	private void validateTeamLeader(final Team team, final Long memberId) {
+		if (!teamMemberQueryService.getLeaderIdByTeamId(team.getId()).equals(memberId)) {
+			throw new TeamException(TeamExceptionType.NOT_TEAM_LEADER);
+		}
+	}
 }

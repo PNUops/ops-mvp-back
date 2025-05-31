@@ -67,4 +67,10 @@ public class Team extends BaseEntity {
         this.isSubmitted = false;
         this.teamMembers = teamMembers;
     }
+
+    public void updateDetail(final String newOverview, final String newGithubPath, final String newYouTubePath) {
+        this.overview = newOverview;
+        this.githubPath = newGithubPath;
+        this.youTubePath = newYouTubePath;
+    }
 }
