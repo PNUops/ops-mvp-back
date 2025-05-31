@@ -70,4 +70,8 @@ public class Member extends BaseEntity {
         this.email = email;
         this.password = password;
     }
+
+    public boolean isAdmin() {
+        return roles.contains(MemberRoleType.ROLE_관리자);
+    }
 }

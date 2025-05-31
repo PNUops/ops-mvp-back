@@ -51,9 +51,6 @@ public class Team extends BaseEntity {
     @Column(nullable = false)
     private Boolean isSubmitted;
 
-    @Column(nullable = false)
-    private Integer likeCount;
-
     @OneToMany(mappedBy = "team")
     private List<TeamMember> teamMembers = new ArrayList<>();
 
@@ -68,7 +65,6 @@ public class Team extends BaseEntity {
         this.youTubePath = youTubePath;
         this.isDeleted = false;
         this.isSubmitted = false;
-        this.likeCount = 0;
         this.teamMembers = teamMembers;
     }
 }
