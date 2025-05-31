@@ -1,28 +1,29 @@
 package com.ops.ops.modules.team.application;
 
 import com.ops.ops.modules.member.domain.Member;
+import com.ops.ops.modules.member.domain.MemberRoleType;
 import com.ops.ops.modules.team.application.dto.response.TeamDetailResponse;
+import com.ops.ops.modules.team.application.dto.response.TeamSubmissionStatusResponse;
 import com.ops.ops.modules.team.application.dto.response.TeamSummaryResponse;
 import com.ops.ops.modules.team.domain.Team;
-import com.ops.ops.modules.team.domain.TeamLike;
 import com.ops.ops.modules.team.domain.TeamMember;
+import com.ops.ops.modules.team.domain.dao.TeamMemberRepository;
 import com.ops.ops.modules.team.domain.dao.TeamRepository;
+import com.ops.ops.modules.team.exception.TeamException;
+import com.ops.ops.modules.team.exception.TeamExceptionType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class TeamQueryService {
     private final TeamRepository teamRepository;
+    private final TeamMemberRepository teamMemberRepository;
     private final TeamMemberQueryService teamMemberQueryService;
-    private final TeamRepository teamRepository;
-
-
 
     public TeamDetailResponse getTeamDetail(final Long teamId, final Member member){
         Team team = teamRepository.findByIdAndIsDeletedFalse(teamId);
@@ -55,6 +56,17 @@ public class TeamQueryService {
         return teams.stream()
                 .map(team -> TeamSummaryResponse.from(team, true /*likedTeamIds.contains(team.getId())*/))
                 .toList();
+    }
+
+    public TeamSubmissionStatusResponse getSubmissionStatus(final Member member) {
+        if (!member.getRoles().contains(MemberRoleType.ROLE_팀장)) {
+            throw new TeamException(TeamExceptionType.NOT_TEAM_LEADER);
+        }
+        TeamMember teamMember = teamMemberRepository.findByMemberId(member.getId());
+        Team team = teamMember.getTeam();
+
+        return TeamSubmissionStatusResponse.fromEntity(team);
+
     }
 
 }
