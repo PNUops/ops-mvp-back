@@ -147,7 +147,7 @@ public class MemberCommandService {
         return new String(buf);
     }
 
-    void sendAuthCodeMail(final String email, final String authCode) {
+    private void sendAuthCodeMail(final String email, final String authCode) {
         final List<String> userList = new ArrayList<>(List.of(email));
         final String subject = "SW 성과관리시스템 인증코드 발송 메일입니다.";
         final String text = "인증코드는 " + authCode + " 입니다.";
