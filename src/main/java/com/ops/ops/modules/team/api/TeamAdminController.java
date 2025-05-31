@@ -4,8 +4,6 @@ import com.ops.ops.global.security.annotation.LoginMember;
 import com.ops.ops.modules.member.application.MemberCommandService;
 import com.ops.ops.modules.member.domain.Member;
 import com.ops.ops.modules.team.application.TeamAdminQueryService;
-import com.ops.ops.modules.team.application.TeamCommandService;
-import com.ops.ops.modules.team.application.TeamLikeQueryService;
 import com.ops.ops.modules.team.application.dto.response.TeamLikeRankingResponse;
 import com.ops.ops.modules.team.application.dto.response.TeamSubmissionStatusResponse;
 

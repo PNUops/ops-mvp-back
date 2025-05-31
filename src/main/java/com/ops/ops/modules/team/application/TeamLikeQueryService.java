@@ -1,9 +1,9 @@
 package com.ops.ops.modules.team.application;
 
+import com.ops.ops.modules.team.application.dto.TeamLikeCountDto;
 import com.ops.ops.modules.team.application.dto.TeamRank;
 import com.ops.ops.modules.team.application.dto.response.TeamLikeRankingResponse;
 import com.ops.ops.modules.team.domain.Team;
-import com.ops.ops.modules.team.domain.TeamLike;
 import com.ops.ops.modules.team.domain.dao.TeamLikeRepository;
 import com.ops.ops.modules.team.domain.dao.TeamRepository;
 
@@ -22,14 +22,12 @@ public class TeamLikeQueryService {
 	private final TeamLikeRepository teamLikeRepository;
 
 	public Map<Long, Integer> getTeamLikeCountMap() {
+		List<TeamLikeCountDto> likedList = teamLikeRepository.findTeamLikeCountGrouped();
+
 		Map<Long, Integer> teamLikeCountMap = new HashMap<>();
-		List<TeamLike> likedList = teamLikeRepository.findAllByIsLikedTrue();
-
-		for (TeamLike teamLike : likedList) {
-			Long teamId = teamLike.getTeam().getId();
-			teamLikeCountMap.put(teamId, teamLikeCountMap.getOrDefault(teamId, 0) + 1);
+		for (TeamLikeCountDto dto : likedList) {
+			teamLikeCountMap.put(dto.getTeamId(), dto.getLikeCount().intValue());
 		}
-
 		return teamLikeCountMap;
 	}
 
