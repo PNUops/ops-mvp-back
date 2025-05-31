@@ -6,6 +6,7 @@ import com.ops.ops.modules.team.application.TeamCommandService;
 import com.ops.ops.modules.team.application.TeamQueryService;
 import com.ops.ops.modules.team.application.dto.request.TeamDetailUpdateRequest;
 import com.ops.ops.modules.team.application.dto.response.TeamDetailResponse;
+import com.ops.ops.modules.team.application.dto.response.TeamSubmissionStatusResponse;
 import com.ops.ops.modules.team.application.dto.response.TeamSummaryResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -47,6 +48,15 @@ public class TeamController {
             @LoginMember final Member member
     ) {
         List<TeamSummaryResponse> responses = teamQueryService.getAllTeamSummaries(member);
+        return ResponseEntity.ok(responses);
+    }
+    @Operation(summary = "팀 상세보기 작성 여부 조회", description = "팀장인 사용자가 속한 팀의 상세보기 작성 여부를 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "팀 상세보기 작성 여부 조회 성공")
+    @GetMapping("/teams/submission-status")
+    public ResponseEntity<TeamSubmissionStatusResponse> getTeamSubmissionStatus(
+            @LoginMember final Member member
+    ) {
+        TeamSubmissionStatusResponse responses = teamQueryService.getSubmissionStatus(member);
         return ResponseEntity.ok(responses);
     }
 
