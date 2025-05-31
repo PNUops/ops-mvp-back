@@ -10,15 +10,18 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Getter;
 
 import com.ops.ops.modules.team.application.TeamCommandService;
-import com.ops.ops.modules.team.application.dto.ThumbnailRequest;
+import com.ops.ops.modules.team.application.dto.request.ThumbnailDeleteRequest;
+import com.ops.ops.modules.team.application.dto.request.ThumbnailSaveRequest;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "Team Detail", description = "팀 상세보기 조회 API")
@@ -43,10 +46,14 @@ public class TeamController {
     private final TeamCommandService teamCommandService;
 
     @PostMapping("/teams/{teamId}/image/thumbnail")
-    public ResponseEntity<Void> saveThumbnailImage(@PathVariable Long teamId, ThumbnailRequest thumbnailRequest) throws IOException {
-
-        teamCommandService.saveThumbnail(teamId, thumbnailRequest);
+    public ResponseEntity<Void> saveThumbnailImage(@PathVariable Long teamId, ThumbnailSaveRequest thumbnailSaveRequest) throws IOException {
+        teamCommandService.saveThumbnail(teamId, thumbnailSaveRequest);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+    @DeleteMapping("/teams/{teamId}/image/thumbnail")
+    public ResponseEntity<Void> deleteThumbnailImage(@PathVariable Long teamId, @RequestBody ThumbnailDeleteRequest thumbnailDeleteRequest) throws IOException {
+        teamCommandService.deleteThumbnail(teamId, thumbnailDeleteRequest);
+        return ResponseEntity.noContent().build();
+    }
 }

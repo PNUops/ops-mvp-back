@@ -63,4 +63,8 @@ public class Member extends BaseEntity {
         this.roles = roles;
         this.isDeleted = false;
     }
+
+    public boolean isAdmin() {
+        return roles.contains(MemberRoleType.ROLE_관리자);
+    }
 }
