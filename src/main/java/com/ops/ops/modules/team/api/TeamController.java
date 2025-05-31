@@ -6,6 +6,7 @@ import com.ops.ops.modules.team.application.TeamQueryService;
 import com.ops.ops.modules.team.application.dto.ThumbnailRequest;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
+import org.antlr.v4.runtime.misc.Pair;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -24,10 +25,13 @@ public class TeamController {
 
     @GetMapping("/teams/{teamId}/image/thumbnail")
     public ResponseEntity<Resource> getThumbnailImage(@PathVariable Long teamId) throws IOException {
-        Resource resource = teamQueryService.findThumbnail(teamId);
+        Pair<Resource, String> result = teamQueryService.findThumbnail(teamId);
+
+        String mimeType = result.b;
+        MediaType mediaType = (mimeType != null) ? MediaType.parseMediaType(mimeType) : MediaType.IMAGE_JPEG;
         return ResponseEntity.ok()
-                .contentType(MediaType.IMAGE_JPEG)
-                .body(resource);
+                .contentType(mediaType)
+                .body(result.a);
     }
 
     @PostMapping("/teams/{teamId}/image/thumbnail")
