@@ -30,7 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 @Transactional
 public class TeamCommandService {
-    
+
     //    @Value("${file.upload-dir}")
     private String uploadDir;
     private final FileRepository fileRepository;
