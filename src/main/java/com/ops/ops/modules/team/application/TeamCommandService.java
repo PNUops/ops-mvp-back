@@ -113,7 +113,7 @@ public class TeamCommandService {
 	}
 
 
-	public void updateTeamDetail(final Long teamId, final Long memberId, final @Valid TeamDetailUpdateRequest request) {
+	public void updateTeamDetail(final Long teamId, final Long memberId, final TeamDetailUpdateRequest request) {
 		final Team team = validateAndGetTeamById(teamId);
 		validateTeamLeader(team, memberId);
 
