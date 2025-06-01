@@ -19,12 +19,13 @@ public class TeamDetailResponse {
     private String overview;
     private String leaderName;
     private List<String> participants;
-//    private List<String> imagePath;
+    private Long thumbnailId;
+    private List<Long> previewIds;
     private String githubPath;
     private String youtubePath;
     private boolean isLiked;
 
-    public static TeamDetailResponse from(Team team, Long leaderId, List<String> participants, boolean isLiked) {
+    public static TeamDetailResponse from(Team team, Long leaderId, List<String> participants, Long thumbnailId, List<Long> previewIds, boolean isLiked) {
         return TeamDetailResponse.builder()
                 .teamId(team.getId())
                 .leaderId(leaderId)
@@ -33,9 +34,8 @@ public class TeamDetailResponse {
                 .overview(team.getOverview())
                 .leaderName(team.getLeaderName())
                 .participants(participants)
-//                .imagePath(team.getFiles().stream()
-//                        .map(TeamFile::getFilePath)
-//                        .collect(Collectors.toList()))
+                .previewIds(previewIds)
+                .thumbnailId(thumbnailId)
                 .githubPath(team.getGithubPath())
                 .youtubePath(team.getYouTubePath())
                 .isLiked(isLiked)
