@@ -12,9 +12,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Getter;
 
+import static com.ops.ops.modules.file.domain.FileImageType.THUMBNAIL;
+
 import com.ops.ops.modules.team.application.TeamCommandService;
 import com.ops.ops.modules.team.application.dto.request.ThumbnailDeleteRequest;
-import com.ops.ops.modules.team.application.dto.request.ThumbnailSaveRequest;
 import java.io.IOException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +27,9 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @Tag(name = "Team Detail", description = "팀 상세보기 조회 API")
 @RestController
@@ -49,14 +52,17 @@ public class TeamController {
 
     private final TeamCommandService teamCommandService;
 
-    @PostMapping("/teams/{teamId}/image/thumbnail")
-    public ResponseEntity<Void> saveThumbnailImage(@PathVariable Long teamId, ThumbnailSaveRequest thumbnailSaveRequest) throws IOException {
-        teamCommandService.saveThumbnail(teamId, thumbnailSaveRequest);
+    @PostMapping("/{teamId}/image/thumbnail")
+    public ResponseEntity<Void> saveThumbnailImage(@PathVariable final Long teamId,
+                                                   @RequestPart("image") final MultipartFile image) {
+        teamCommandService.saveThumbnailImage(teamId, image, THUMBNAIL);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @DeleteMapping("/teams/{teamId}/image/thumbnail")
-    public ResponseEntity<Void> deleteThumbnailImage(@PathVariable Long teamId, @RequestBody ThumbnailDeleteRequest thumbnailDeleteRequest) throws IOException {
+    public ResponseEntity<Void> deleteThumbnailImage(@PathVariable Long teamId,
+                                                     @RequestBody ThumbnailDeleteRequest thumbnailDeleteRequest)
+            throws IOException {
         teamCommandService.deleteThumbnail(teamId, thumbnailDeleteRequest);
         return ResponseEntity.noContent().build();
     }

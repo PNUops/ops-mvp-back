@@ -1,11 +1,8 @@
 package com.ops.ops.global.security.annotation;
 
-import static com.ops.ops.modules.member.exception.MemberExceptionType.NOT_FOUND_MEMBER;
-
 import com.ops.ops.global.security.MemberDetails;
 import com.ops.ops.modules.member.domain.Member;
 import com.ops.ops.modules.member.domain.dao.MemberRepository;
-import com.ops.ops.modules.member.exception.MemberException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.MethodParameter;
 import org.springframework.lang.NonNull;
@@ -39,8 +36,8 @@ public class MemberArgumentResolver implements HandlerMethodArgumentResolver {
                 && authentication.getPrincipal() instanceof MemberDetails principal) {
             final Long memberId = principal.memberId();
             return memberRepository.findById(memberId)
-                    .orElseThrow(() -> new MemberException(NOT_FOUND_MEMBER));
+                    .orElse(null);
         }
-        throw new MemberException(NOT_FOUND_MEMBER);
+        return null;
     }
 }
