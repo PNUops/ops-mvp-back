@@ -113,7 +113,7 @@ public class TeamQueryService {
         return new Pair<>(new ByteArrayResource(fileBytes), mimeType);
     }
     public List<TeamSummaryResponse> getAllTeamSummaries(final Member member) {
-        List<Team> teams = teamRepository.findAllByIsDeletedFalse();
+        List<Team> teams = teamRepository.findAll();
         Set<Long> likedTeamIds = (member != null)
                 ? teamLikeRepository.findByMemberIdAndTeamIn(member.getId(), teams).stream()
                 .map(teamLike -> teamLike.getTeam().getId())
