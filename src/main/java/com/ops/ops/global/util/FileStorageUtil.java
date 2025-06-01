@@ -6,6 +6,9 @@ import com.ops.ops.global.error.FileSaveFailedException;
 import com.ops.ops.modules.file.domain.File;
 import com.ops.ops.modules.file.domain.FileImageType;
 import com.ops.ops.modules.file.domain.dao.FileRepository;
+import com.ops.ops.modules.file.exception.FileException;
+import com.ops.ops.modules.file.exception.FileExceptionType;
+import jakarta.activation.MimetypesFileTypeMap;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -13,6 +16,9 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.antlr.v4.runtime.misc.Pair;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -33,6 +39,31 @@ public class FileStorageUtil {
             Files.createDirectories(DEFAULT_FILE_PATH);
         } catch (IOException ignored) {
         }
+    }
+
+    public Pair<Resource, String> findFileAndType(final Long fileId) {
+        final File findFile = fileRepository.findById(fileId)
+                .orElseThrow(() -> new FileException(FileExceptionType.NOT_EXISTS_MATCHING_IMAGE_ID));
+        final ByteArrayResource findResource =
+                findPhysicalFile(RESOURCE_PATH.resolve(findFile.getFilePath()).normalize());
+        final String mimeType = new MimetypesFileTypeMap()
+                .getContentType(RESOURCE_PATH.resolve(findFile.getFilePath()).normalize().toFile());
+
+        return new Pair<>(findResource, mimeType);
+    }
+
+    private ByteArrayResource findPhysicalFile(Path filePath) {
+        if (!Files.exists(filePath)) {
+            throw new FileException(FileExceptionType.NOT_EXISTS_PHYSICAL_FILE);
+        }
+
+        byte[] fileBytes = null;
+        try {
+            fileBytes = Files.readAllBytes(filePath);
+        } catch (IOException e) {
+            throw new FileException(FileExceptionType.NOT_EXISTS_PHYSICAL_FILE);
+        }
+        return new ByteArrayResource(fileBytes);
     }
 
     public File storeFile(final MultipartFile multipartFile, final Long teamId, final FileImageType type) {

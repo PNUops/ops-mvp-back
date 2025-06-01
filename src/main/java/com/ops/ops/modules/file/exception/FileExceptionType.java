@@ -11,7 +11,7 @@ public enum FileExceptionType implements BaseExceptionType {
     NOT_EXISTS_PREVIEW(HttpStatus.NOT_FOUND, "존재하지 않는 팀 프리뷰 ID 를 요청하였습니다"),
     NOT_INCLUDE_ID(HttpStatus.BAD_REQUEST, "ID는 반드시 포함되어야 합니다"),
     EXCEED_PREVIEW_LIMIT(HttpStatus.BAD_REQUEST, "프리뷰 이미지는 6장 이하입니다"),
-
+    NOT_EXISTS_PHYSICAL_FILE(HttpStatus.NOT_FOUND, "물리적 파일이 존재하지 않습니다"),
     ;
     private final HttpStatus httpStatus;
     private final String errorMessage;
