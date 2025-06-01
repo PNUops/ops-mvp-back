@@ -15,4 +15,9 @@ public interface TeamLikeRepository extends JpaRepository<TeamLike, Long> {
 
 	@Query("SELECT t.team.id AS teamId, COUNT(t) AS likeCount FROM TeamLike t WHERE t.isLiked = true GROUP BY t.team.id")
 	List<TeamLikeCountDto> findTeamLikeCountGrouped();
+
+	@Query("SELECT COUNT(DISTINCT t.memberId) FROM TeamLike t WHERE t.isLiked = true")
+	long countDistinctMemberIdsByIsLikedTrue();
+
+	long countByIsLikedTrue();
 }

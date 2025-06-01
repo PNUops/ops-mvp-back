@@ -1,8 +1,10 @@
 package com.ops.ops.modules.team.application;
 
+import com.ops.ops.modules.member.domain.dao.MemberRepository;
 import com.ops.ops.modules.team.application.dto.TeamLikeCountDto;
 import com.ops.ops.modules.team.application.dto.TeamRank;
 import com.ops.ops.modules.team.application.dto.response.TeamLikeRankingResponse;
+import com.ops.ops.modules.team.application.dto.response.TeamVoteRateResponse;
 import com.ops.ops.modules.team.domain.Team;
 import com.ops.ops.modules.team.domain.dao.TeamLikeRepository;
 import com.ops.ops.modules.team.domain.dao.TeamRepository;
@@ -24,6 +26,7 @@ public class TeamAdminQueryService {
 
 	private final TeamRepository teamRepository;
 	private final TeamLikeRepository teamLikeRepository;
+	private final MemberRepository memberRepository;
 
 	public List<TeamSubmissionStatusResponse> getAllTeamSubmissions() {
 		return teamRepository.findAll()
@@ -41,6 +44,23 @@ public class TeamAdminQueryService {
 
 		// 3. 랭킹을 Competition Ranking 방식으로 적용하여 반환
 		return applyCompetitionRanking(rankedList);
+	}
+
+	public TeamVoteRateResponse getVoteRate() {
+		long totalMemberCount = memberRepository.count(); // 전체 회원 수
+
+		// 좋아요를 누른 사용자 수 (중복 제거)
+		long votedMemberCount = teamLikeRepository.countDistinctMemberIdsByIsLikedTrue();
+
+		// 총 좋아요 수 (중복 포함)
+		long totalVoteCount = teamLikeRepository.countByIsLikedTrue();
+
+		double voteRate = 0.0;
+		if (totalMemberCount > 0) {
+			voteRate = Math.round((double) votedMemberCount / totalMemberCount * 1000) / 10.0; // 소수점 1자리 반올림
+		}
+
+        return new TeamVoteRateResponse(voteRate, (int) totalVoteCount);
 	}
 
 	private Map<Long, Integer> getTeamLikeCountMap() {
