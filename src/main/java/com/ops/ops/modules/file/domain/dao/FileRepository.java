@@ -8,5 +8,4 @@ import java.util.List;
 
 public interface FileRepository extends JpaRepository<File, Long> {
     List<File> findAllByTeamIdAndType(Long teamId, FileImageType type);
-    File findByTeamIdandType(Long teamId, FileImageType fileImageType);
 }

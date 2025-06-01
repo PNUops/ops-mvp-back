@@ -30,7 +30,6 @@ public class TeamQueryService {
                 .stream()
                 .map(File::getId)
                 .toList();
-        Long thumbnailId = fileRepository.findByTeamIdandType(teamId, FileImageType.THUMBNAIL).getId();
 
         boolean isLiked = false;
 
@@ -38,7 +37,7 @@ public class TeamQueryService {
             //isLiked = TeamLikeRepository.findByMemberIdAndTeam(member.getId(), teamdId)
         }
 
-        return TeamDetailResponse.from(team, leaderId,participants, thumbnailId, previewIds, isLiked);
+        return TeamDetailResponse.from(team, leaderId,participants, previewIds, isLiked);
     }
 
 }

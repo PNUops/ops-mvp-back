@@ -19,13 +19,12 @@ public class TeamDetailResponse {
     private String overview;
     private String leaderName;
     private List<String> participants;
-    private Long thumbnailId;
     private List<Long> previewIds;
     private String githubPath;
     private String youtubePath;
     private boolean isLiked;
 
-    public static TeamDetailResponse from(Team team, Long leaderId, List<String> participants, Long thumbnailId, List<Long> previewIds, boolean isLiked) {
+    public static TeamDetailResponse from(Team team, Long leaderId, List<String> participants, List<Long> previewIds, boolean isLiked) {
         return TeamDetailResponse.builder()
                 .teamId(team.getId())
                 .leaderId(leaderId)
@@ -35,7 +34,6 @@ public class TeamDetailResponse {
                 .leaderName(team.getLeaderName())
                 .participants(participants)
                 .previewIds(previewIds)
-                .thumbnailId(thumbnailId)
                 .githubPath(team.getGithubPath())
                 .youtubePath(team.getYouTubePath())
                 .isLiked(isLiked)
