@@ -35,4 +35,8 @@ public class EmailAuth extends BaseEntity {
         this.email = email;
         this.isCorrected = false;
     }
+
+    public void correct() {
+        this.isCorrected = true;
+    }
 }

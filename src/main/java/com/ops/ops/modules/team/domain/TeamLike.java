@@ -34,9 +34,21 @@ public class TeamLike extends BaseEntity {
     private Boolean isLiked;
 
     @Builder
-    public TeamLike(final Long memberId, final Team team) {
+    public TeamLike(final Long memberId, final Team team, final Boolean isLiked) {
         this.memberId = memberId;
         this.team = team;
-        this.isLiked = false;
+        this.isLiked = isLiked;
+    }
+
+    public static TeamLike of(Long memberId, Team team, boolean isLiked) {
+        return TeamLike.builder()
+            .memberId(memberId)
+            .team(team)
+            .isLiked(isLiked)
+            .build();
+    }
+
+    public void setLiked(boolean liked) {
+        this.isLiked = liked;
     }
 }

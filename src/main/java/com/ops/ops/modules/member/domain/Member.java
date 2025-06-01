@@ -15,6 +15,7 @@ import jakarta.persistence.JoinColumn;
 import java.util.HashSet;
 import java.util.Set;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
@@ -54,6 +55,7 @@ public class Member extends BaseEntity {
     @Column(nullable = false)
     private Boolean isDeleted;
 
+    @Builder
     private Member(final String name, final String email, final String password, final String studentId,
                   final Set<MemberRoleType> roles) {
         this.name = name;
@@ -62,5 +64,14 @@ public class Member extends BaseEntity {
         this.studentId = studentId;
         this.roles = roles;
         this.isDeleted = false;
+    }
+
+    public void updateTeamLeaderInfo(final String email, final String password) {
+        this.email = email;
+        this.password = password;
+    }
+
+    public boolean isAdmin() {
+        return roles.contains(MemberRoleType.ROLE_관리자);
     }
 }
