@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -24,17 +26,25 @@ public class TeamCommentQueryService {
 		Team team = teamCommandService.validateAndGetTeamById(teamId);
 		List<TeamComment> comments = teamCommentRepository.findAllByTeamId(team.getId());
 
+		List<Long> memberIds = comments.stream()
+			.map(TeamComment::getMemberId)
+			.distinct()
+			.toList();
+
+		Map<Long, String> memberIdNameMap = memberRepository.findAllById(memberIds).stream()
+			.collect(Collectors.toMap(
+				member -> member.getId(),
+				member -> member.getName()
+			));
+
 		return comments.stream()
-			.map(comment -> {
-				String memberName = memberRepository.findNameById(comment.getMemberId());
-				return new TeamCommentResponse(
-					comment.getId(),
-					comment.getDescription(),
-					comment.getMemberId(),
-					memberName,
-					team.getId()
-				);
-			})
+			.map(comment -> new TeamCommentResponse(
+				comment.getId(),
+				comment.getDescription(),
+				comment.getMemberId(),
+				memberIdNameMap.get(comment.getMemberId()),
+				team.getId()
+			))
 			.toList();
 	}
 }
