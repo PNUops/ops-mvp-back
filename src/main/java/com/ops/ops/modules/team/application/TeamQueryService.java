@@ -5,7 +5,8 @@ import com.ops.ops.modules.file.domain.dao.FileRepository;
 import com.ops.ops.modules.member.domain.Member;
 import com.ops.ops.modules.team.application.dto.response.TeamDetailResponse;
 import com.ops.ops.modules.team.domain.Team;
-import com.ops.ops.modules.team.domain.TeamMember;
+import com.ops.ops.modules.team.domain.TeamLike;
+import com.ops.ops.modules.team.domain.dao.TeamLikeRepository;
 import com.ops.ops.modules.team.domain.dao.TeamRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ import java.util.List;
 public class TeamQueryService {
     private final TeamRepository teamRepository;
     private final FileRepository fileRepository;
+    private final TeamLikeRepository teamLikeRepository;
     private final TeamMemberQueryService teamMemberQueryService;
 
     public TeamDetailResponse getTeamDetail(final Long teamId, final Member member){
@@ -32,11 +34,11 @@ public class TeamQueryService {
                 .toList();
 
         boolean isLiked = false;
-
-        if (member != null){
-            //isLiked = TeamLikeRepository.findByMemberIdAndTeam(member.getId(), teamdId)
+        if (member != null) {
+            isLiked = teamLikeRepository.findByMemberIdAndTeam(member.getId(), team)
+                    .map(TeamLike::getIsLiked)
+                    .orElse(false);
         }
-
         return TeamDetailResponse.from(team, leaderId,participants, previewIds, isLiked);
     }
 
