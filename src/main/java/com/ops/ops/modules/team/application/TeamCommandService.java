@@ -8,6 +8,7 @@ import com.ops.ops.modules.file.domain.FileImageType;
 import com.ops.ops.modules.file.domain.dao.FileRepository;
 import com.ops.ops.modules.file.exception.FileException;
 import com.ops.ops.modules.file.exception.FileExceptionType;
+import com.ops.ops.modules.team.application.dto.request.TeamDetailUpdateRequest;
 import com.ops.ops.modules.team.application.dto.request.PreviewRequest;
 import com.ops.ops.modules.team.application.dto.request.ThumbnailDeleteRequest;
 import com.ops.ops.modules.team.domain.Team;
@@ -20,8 +21,9 @@ import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -30,9 +32,10 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 @Transactional
 public class TeamCommandService {
+    private final TeamMemberQueryService teamMemberQueryService;
 
-    @Value("${file.upload-dir}")
-    private String uploadDir;
+    //    @Value("${file.upload-dir}")
+//    private String uploadDir;
     private final FileRepository fileRepository;
     private final TeamRepository teamRepository;
     private final FileStorageUtil fileStorageUtil;
@@ -160,6 +163,39 @@ public class TeamCommandService {
         int i = originalFilename.lastIndexOf(".");
         String ext = originalFilename.substring(i);
         return uuid + ext;
+    }
+
+//    private Path getFullPath(String saveThumbnailName) {
+//        Path uploadDirPath = Paths.get(uploadDir);
+//        return uploadDirPath.resolve(saveThumbnailName);
+//    }
+
+    public Team validateAndGetTeamById(final Long teamId) {
+        return teamRepository.findById(teamId)
+                .orElseThrow(() -> new TeamException(NOT_FOUND_TEAM));
+    }
+
+	public Team validateAndGetTeamById(final Long teamId) {
+		return teamRepository.findById(teamId)
+			.orElseThrow(() -> new TeamException(TeamExceptionType.NOT_FOUND_TEAM));
+	}
+
+
+	public void updateTeamDetail(final Long teamId, final Long memberId, final TeamDetailUpdateRequest request) {
+		final Team team = validateAndGetTeamById(teamId);
+		validateTeamLeader(team, memberId);
+
+		team.updateDetail(request.overview(), request.githubPath(), request.youTubePath());
+	}
+
+	private void validateTeamLeader(final Team team, final Long memberId) {
+		if (!teamMemberQueryService.getLeaderIdByTeamId(team.getId()).equals(memberId)) {
+			throw new TeamException(TeamExceptionType.NOT_TEAM_LEADER);
+		}
+	}
+
+    private void validateExistTeam(final Long teamId) {
+        teamRepository.findById(teamId).orElseThrow(() -> new TeamException(NOT_FOUND_TEAM));
     }
     private Path getFullPath(String saveThumbnailName) {
         Path uploadDirPath = Paths.get(uploadDir);
