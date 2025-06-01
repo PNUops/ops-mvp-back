@@ -12,9 +12,9 @@ public class MailUtil {
 
     private final JavaMailSender javaMailSender;
 
-    public void sendMail(final List<String> toUserList, final String subject, final String text) {
+    public void sendMail(final List<String> userList, final String subject, final String text) {
         final SimpleMailMessage simpleMessage = new SimpleMailMessage();
-        simpleMessage.setTo(toUserList.toArray(new String[0]));
+        simpleMessage.setTo(userList.toArray(new String[0]));
         simpleMessage.setSubject(subject);
         simpleMessage.setText(text);
         javaMailSender.send(simpleMessage);
