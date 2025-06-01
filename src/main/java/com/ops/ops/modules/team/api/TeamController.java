@@ -1,14 +1,15 @@
 package com.ops.ops.modules.team.api;
 
+
+import static com.ops.ops.modules.file.domain.FileImageType.PREVIEW;
 import static com.ops.ops.modules.file.domain.FileImageType.THUMBNAIL;
 
 import com.ops.ops.global.security.annotation.LoginMember;
 import com.ops.ops.modules.member.domain.Member;
 import com.ops.ops.modules.team.application.TeamCommandService;
 import com.ops.ops.modules.team.application.TeamQueryService;
-import com.ops.ops.modules.team.application.dto.request.PreviewRequest;
+import com.ops.ops.modules.team.application.dto.request.PreviewDeleteRequest;
 import com.ops.ops.modules.team.application.dto.request.TeamDetailUpdateRequest;
-import com.ops.ops.modules.team.application.dto.request.ThumbnailDeleteRequest;
 import com.ops.ops.modules.team.application.dto.response.TeamDetailResponse;
 import com.ops.ops.modules.team.application.dto.response.TeamSubmissionStatusResponse;
 import com.ops.ops.modules.team.application.dto.response.TeamSummaryResponse;
@@ -16,7 +17,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import java.io.IOException;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.antlr.v4.runtime.misc.Pair;
 import org.springframework.core.io.Resource;
@@ -34,10 +35,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
-
-import java.util.List;
 
 @Tag(name = "Team Detail", description = "팀 상세보기 조회 API")
 @RestController
@@ -79,15 +76,18 @@ public class TeamController {
         return ResponseEntity.ok(response);
     }
 
+    @Secured("ROLE_팀장")
     @PostMapping("/{teamId}/image/thumbnail")
-//    @PostMapping("/teams/{teamId}/image/thumbnail")
-//    public ResponseEntity<Void> saveThumbnailImage(@PathVariable Long teamId, ThumbnailRequest thumbnailRequest) throws IOException {
-//        teamCommandService.saveThumbnail(teamId, thumbnailRequest);
-//    }
-    @GetMapping("/teams/{teamId}/image/thumbnail")
-    public ResponseEntity<Resource> getThumbnailImage(@PathVariable Long teamId) throws IOException {
-        Pair<Resource, String> result = teamQueryService.findThumbnail(teamId);
+    public ResponseEntity<Void> saveThumbnailImage(@PathVariable final Long teamId,
+                                                   @RequestPart("image") final MultipartFile image) {
+        teamCommandService.saveThumbnailImage(teamId, image, THUMBNAIL);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
 
+    @Secured("ROLE_비회원")
+    @GetMapping("/{teamId}/image/thumbnail")
+    public ResponseEntity<Resource> getThumbnailImage(@PathVariable Long teamId) {
+        Pair<Resource, String> result = teamQueryService.findThumbnailImage(teamId);
         String mimeType = result.b;
         MediaType mediaType = (mimeType != null) ? MediaType.parseMediaType(mimeType) : MediaType.IMAGE_JPEG;
         return ResponseEntity.ok()
@@ -95,24 +95,26 @@ public class TeamController {
                 .body(result.a);
     }
 
+    @Secured("ROLE_팀장")
+    @DeleteMapping("/{teamId}/image/thumbnail")
+    public ResponseEntity<Void> deleteThumbnailImage(@PathVariable Long teamId) {
+        teamCommandService.deleteThumbnailImage(teamId, THUMBNAIL);
+        return ResponseEntity.noContent().build();
+    }
 
-    @PostMapping("/teams/{teamId}/image/thumbnail")
-    public ResponseEntity<Void> saveThumbnailImage(@PathVariable final Long teamId,
-                                                   @RequestPart("image") final MultipartFile image) {
-        teamCommandService.saveThumbnailImage(teamId, image, THUMBNAIL);
+    @Secured("ROLE_팀장")
+    @PostMapping("/{teamId}/image")
+    public ResponseEntity<Void> savePreviewImage(@PathVariable Long teamId,
+                                                 @RequestPart("images") final List<MultipartFile> images) {
+        teamCommandService.savePreviewImages(teamId, images, PREVIEW);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @PostMapping("/teams/{teamId}/image")
-    public ResponseEntity<Void> savePreviewImage(@PathVariable Long teamId, PreviewRequest previewRequest) throws IOException {
-        teamCommandService.savePreview(teamId, previewRequest);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
-    }
-    @DeleteMapping("/teams/{teamId}/image/thumbnail")
-    public ResponseEntity<Void> deleteThumbnailImage(@PathVariable Long teamId,
-                                                     @RequestBody ThumbnailDeleteRequest thumbnailDeleteRequest)
-            throws IOException {
-        teamCommandService.deleteThumbnail(teamId, thumbnailDeleteRequest);
+    @Secured("ROLE_팀장")
+    @DeleteMapping("/{teamId}/image")
+    public ResponseEntity<Void> deletePreviewImage(@PathVariable Long teamId,
+                                                   @RequestBody PreviewDeleteRequest previewDeleteRequest) {
+        teamCommandService.deletePreviewImages(teamId, previewDeleteRequest.imageIds(), PREVIEW);
         return ResponseEntity.noContent().build();
     }
 
