@@ -6,12 +6,15 @@ import com.ops.ops.modules.team.application.dto.response.TeamSummaryResponse;
 import com.ops.ops.modules.team.domain.Team;
 import com.ops.ops.modules.team.domain.TeamLike;
 import com.ops.ops.modules.team.domain.TeamMember;
+import com.ops.ops.modules.team.domain.dao.TeamLikeRepository;
 import com.ops.ops.modules.team.domain.dao.TeamRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -20,6 +23,7 @@ import java.util.stream.Collectors;
 public class TeamQueryService {
     private final TeamRepository teamRepository;
     private final TeamMemberQueryService teamMemberQueryService;
+    private final TeamLikeRepository teamLikeRepository;
 
 
     public TeamDetailResponse getTeamDetail(final Long teamId, final Member member){
@@ -38,20 +42,14 @@ public class TeamQueryService {
 
     public List<TeamSummaryResponse> getAllTeamSummaries(final Member member) {
         List<Team> teams = teamRepository.findAllByIsDeletedFalse();
-        // 비회원일 경우
-        if (member == null) {
-            return teams.stream()
-                    .map(team -> TeamSummaryResponse.from(team, false))
-                    .toList();
-        }
-        // 회원일 경우
-//        List<TeamLike> likedTeams = teamLikeRepository.findByMemberIdAndTeamIn(member.getId(), teams);
-//        Set<Long> likedTeamIds = likedTeams.stream()
-//                .map(teamLike -> teamLike.getTeam().getId())
-//                .collect(Collectors.toSet());
-//
+        Set<Long> likedTeamIds = (member != null)
+                ? teamLikeRepository.findByMemberIdAndTeamIn(member.getId(), teams).stream()
+                .map(teamLike -> teamLike.getTeam().getId())
+                .collect(Collectors.toSet())
+                : Collections.emptySet();
+
         return teams.stream()
-                .map(team -> TeamSummaryResponse.from(team, true /*likedTeamIds.contains(team.getId())*/))
+                .map(team -> TeamSummaryResponse.from(team, likedTeamIds.contains(team.getId())))
                 .toList();
     }
 

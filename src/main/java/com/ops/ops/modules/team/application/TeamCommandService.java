@@ -2,6 +2,7 @@ package com.ops.ops.modules.team.application;
 
 import static com.ops.ops.modules.team.exception.TeamExceptionType.NOT_FOUND_TEAM;
 
+
 import com.ops.ops.global.util.FileStorageUtil;
 import com.ops.ops.modules.file.domain.File;
 import com.ops.ops.modules.file.domain.FileImageType;
@@ -22,6 +23,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
+import com.ops.ops.modules.team.exception.TeamExceptionType;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -38,7 +40,6 @@ public class TeamCommandService {
     //    @Value("${file.upload-dir}")
 //    private String uploadDir;
     private final FileRepository fileRepository;
-    private final TeamRepository teamRepository;
     private final FileStorageUtil fileStorageUtil;
 
 //    public void saveThumbnail(Long teamId, ThumbnailSaveRequest thumbnailSaveRequest) throws IOException {
@@ -122,11 +123,6 @@ public class TeamCommandService {
         return teamRepository.findById(teamId)
                 .orElseThrow(() -> new TeamException(NOT_FOUND_TEAM));
     }
-
-	public Team validateAndGetTeamById(final Long teamId) {
-		return teamRepository.findById(teamId)
-			.orElseThrow(() -> new TeamException(TeamExceptionType.NOT_FOUND_TEAM));
-	}
 
 
 	public void updateTeamDetail(final Long teamId, final Long memberId, final @Valid TeamDetailUpdateRequest request) {
