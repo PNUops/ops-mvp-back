@@ -8,10 +8,8 @@ import com.ops.ops.modules.file.domain.FileImageType;
 import com.ops.ops.modules.file.domain.dao.FileRepository;
 import com.ops.ops.modules.file.exception.FileException;
 import com.ops.ops.modules.file.exception.FileExceptionType;
-import com.ops.ops.modules.team.application.dto.request.ThumbnailDeleteRequest;
-import com.ops.ops.modules.team.domain.Team;
 import com.ops.ops.modules.team.application.dto.request.PreviewRequest;
-import com.ops.ops.modules.team.application.dto.request.ThumbnailRequest;
+import com.ops.ops.modules.team.application.dto.request.ThumbnailDeleteRequest;
 import com.ops.ops.modules.team.domain.Team;
 import com.ops.ops.modules.team.domain.dao.TeamRepository;
 import com.ops.ops.modules.team.exception.TeamException;
@@ -21,11 +19,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -35,8 +31,8 @@ import org.springframework.web.multipart.MultipartFile;
 @Transactional
 public class TeamCommandService {
 
-    //    @Value("${file.upload-dir}")
-//    private String uploadDir;
+    @Value("${file.upload-dir}")
+    private String uploadDir;
     private final FileRepository fileRepository;
     private final TeamRepository teamRepository;
     private final FileStorageUtil fileStorageUtil;
@@ -72,27 +68,14 @@ public class TeamCommandService {
 
     public void deleteThumbnail(Long teamId, ThumbnailDeleteRequest thumbnailDeleteRequest) throws IOException {
         validateAndGetTeamById(teamId);
-        MultipartFile file = thumbnailRequest.image();
-        String originalFilename = file.getOriginalFilename() != null ? file.getOriginalFilename() : "defaultName";
-        String saveThumbnailName = createSaveThumbnailName(originalFilename);
-        Path fullPath = getFullPath(saveThumbnailName);
 
         Long requestImageId = validateThumbnailOwnershipAndGetRequestImageId(teamId, thumbnailDeleteRequest);
 
         deleteImageFiles(Collections.singletonList(requestImageId));
-        file.transferTo(fullPath);
-        File image = File.builder()
-                .name(originalFilename)
-                .filePath(fullPath.toString())
-                .teamId(teamId)
-                .type(FileImageType.THUMBNAIL)
-                .build();
-        fileRepository.save(image);
     }
 
     public void savePreview(Long teamId, PreviewRequest previewRequest) throws IOException {
         validatePreviewImage(previewRequest);
-        verifyTeamExists(teamId);
 
         List<MultipartFile> previewImages = previewRequest.images();
         for (MultipartFile previewImage : previewImages) {
@@ -183,8 +166,4 @@ public class TeamCommandService {
         return uploadDirPath.resolve(saveThumbnailName);
     }
 
-	public Team validateAndGetTeamById(final Long teamId) {
-		return teamRepository.findById(teamId)
-			.orElseThrow(() -> new TeamException(TeamExceptionType.NOT_FOUND_TEAM));
-	}
 }
