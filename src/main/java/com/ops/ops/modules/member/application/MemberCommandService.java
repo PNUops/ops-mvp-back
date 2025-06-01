@@ -193,8 +193,8 @@ public class MemberCommandService {
     }
 
 	public void isAdmin(Member member) {
-		if (!member.isAdmin()) {
-			throw new MemberException(MemberExceptionType.NOT_ADMIN);
-		}
-	}
+        if (!member.isAdmin()) {
+            throw new MemberException(MemberExceptionType.NOT_ADMIN);
+        }
+    }
 }
