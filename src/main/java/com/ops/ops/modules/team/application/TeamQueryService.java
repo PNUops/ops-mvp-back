@@ -17,7 +17,20 @@ import com.ops.ops.modules.team.domain.dao.TeamMemberRepository;
 import com.ops.ops.modules.team.domain.dao.TeamRepository;
 import com.ops.ops.modules.team.exception.TeamException;
 import com.ops.ops.modules.team.exception.TeamExceptionType;
+import com.ops.ops.modules.file.domain.File;
+import com.ops.ops.modules.file.domain.FileImageType;
+import com.ops.ops.modules.file.domain.dao.FileRepository;
+import com.ops.ops.modules.file.exception.FileException;
+import com.ops.ops.modules.file.exception.FileExceptionType;
+import jakarta.activation.MimetypesFileTypeMap;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import lombok.RequiredArgsConstructor;
+import org.antlr.v4.runtime.misc.Pair;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.ops.ops.modules.file.domain.File;
@@ -81,4 +94,18 @@ public class TeamQueryService {
                 .orElseThrow(() -> new MemberException(MemberExceptionType.NOT_FOUND_LEADER));
     }
 
+
+    public Pair<Resource,String> findThumbnail(Long teamId) throws IOException {
+        File thumbnail = fileRepository.findByTeamIdAndType(teamId, FileImageType.THUMBNAIL)
+                .orElseThrow(() -> new FileException(FileExceptionType.NOT_EXISTS_THUMBNAIL));
+        String filePath = thumbnail.getFilePath();
+        Path path = Paths.get(filePath);
+        if (!Files.exists(path)) {
+            throw new FileException(FileExceptionType.NOT_EXISTS_THUMBNAIL);
+        }
+
+        String mimeType = new MimetypesFileTypeMap().getContentType(filePath);
+        byte[] fileBytes = Files.readAllBytes(path);
+        return new Pair<>(new ByteArrayResource(fileBytes), mimeType);
+    }
 }
