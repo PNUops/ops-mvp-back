@@ -6,7 +6,6 @@ import static com.ops.ops.modules.file.domain.FileImageType.THUMBNAIL;
 import com.ops.ops.modules.team.application.TeamCommandService;
 import com.ops.ops.modules.team.application.dto.request.ThumbnailDeleteRequest;
 import com.ops.ops.modules.team.application.TeamQueryService;
-import com.ops.ops.modules.team.application.dto.ThumbnailRequest;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.antlr.v4.runtime.misc.Pair;
