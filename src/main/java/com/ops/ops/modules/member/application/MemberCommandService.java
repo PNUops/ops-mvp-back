@@ -107,7 +107,7 @@ public class MemberCommandService {
         final Member member = getValidateExistMember(request.email());
         final EmailAuth emailAuth = checkEmailAuth(request.email());
 
-        member.updatePassword(request.newPassword());
+        member.updatePassword(passwordEncoder.encode(request.newPassword()));
         emailAuthRepository.delete(emailAuth);
     }
 
