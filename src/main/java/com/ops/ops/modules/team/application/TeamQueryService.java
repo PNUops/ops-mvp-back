@@ -130,14 +130,10 @@ public class TeamQueryService {
     }
 
     public TeamSubmissionStatusResponse getSubmissionStatus(final Member member) {
-        if (!member.getRoles().contains(MemberRoleType.ROLE_팀장)) {
-            throw new TeamException(TeamExceptionType.NOT_TEAM_LEADER);
-        }
         TeamMember teamMember = teamMemberRepository.findByMemberId(member.getId());
         Team team = teamMember.getTeam();
 
         return TeamSubmissionStatusResponse.fromEntity(team);
-
     }
 
 }

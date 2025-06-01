@@ -56,8 +56,10 @@ public class TeamController {
         List<TeamSummaryResponse> responses = teamQueryService.getAllTeamSummaries(member);
         return ResponseEntity.ok(responses);
     }
+
     @Operation(summary = "팀 상세보기 작성 여부 조회", description = "팀장인 사용자가 속한 팀의 상세보기 작성 여부를 조회합니다.")
     @ApiResponse(responseCode = "200", description = "팀 상세보기 작성 여부 조회 성공")
+    @Secured("ROLE_팀장")
     @GetMapping("/teams/submission-status")
     public ResponseEntity<TeamSubmissionStatusResponse> getTeamSubmissionStatus(
             @LoginMember final Member member
