@@ -33,20 +33,19 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/teams")
 public class TeamController {
     private final TeamQueryService teamQueryService;
+    private final TeamCommandService teamCommandService;
 
     // 팀 상세보기 조회
     @Operation(summary = "팀 상세보기 조회", description = "특정 팀의 상세보기를 조회합니다.")
     @ApiResponse(responseCode = "200", description = "팀 상세보기 조회 성공")
     @GetMapping("/{teamId}")
     public ResponseEntity<TeamDetailResponse> getTeamDetail(
-            @PathVariable("teamId") final Long teamId,
+            @PathVariable final Long teamId,
             @LoginMember final Member member
     ) {
         TeamDetailResponse response = teamQueryService.getTeamDetail(teamId, member);
         return ResponseEntity.ok(response);
     }
-
-    private final TeamCommandService teamCommandService;
 
     @PostMapping("/{teamId}/image/thumbnail")
     public ResponseEntity<Void> saveThumbnailImage(@PathVariable final Long teamId,

@@ -22,11 +22,4 @@ public class MemberQueryService {
                 .map(Member::getName)
                 .toList();
     }
-    public Long getLeaderIdByIds(List<Long> memberIds) {
-        return memberRepository.findAllById(memberIds).stream()
-                .filter(member -> member.getRoles().contains(MemberRoleType.ROLE_팀장))
-                .findFirst()
-                .map(Member::getId)
-                .orElseThrow(() -> new MemberException(MemberExceptionType.NOT_FOUND_LEADER));
-    }
 }
