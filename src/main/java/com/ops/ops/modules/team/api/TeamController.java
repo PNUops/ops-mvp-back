@@ -4,8 +4,9 @@ package com.ops.ops.modules.team.api;
 import static com.ops.ops.modules.file.domain.FileImageType.THUMBNAIL;
 
 import com.ops.ops.modules.team.application.TeamCommandService;
-import com.ops.ops.modules.team.application.dto.request.ThumbnailDeleteRequest;
 import com.ops.ops.modules.team.application.TeamQueryService;
+import com.ops.ops.modules.team.application.dto.request.PreviewRequest;
+import com.ops.ops.modules.team.application.dto.request.ThumbnailDeleteRequest;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.antlr.v4.runtime.misc.Pair;
@@ -29,6 +30,10 @@ public class TeamController {
     private final TeamCommandService teamCommandService;
     private final TeamQueryService teamQueryService;
 
+//    @PostMapping("/teams/{teamId}/image/thumbnail")
+//    public ResponseEntity<Void> saveThumbnailImage(@PathVariable Long teamId, ThumbnailRequest thumbnailRequest) throws IOException {
+//        teamCommandService.saveThumbnail(teamId, thumbnailRequest);
+//    }
     @GetMapping("/teams/{teamId}/image/thumbnail")
     public ResponseEntity<Resource> getThumbnailImage(@PathVariable Long teamId) throws IOException {
         Pair<Resource, String> result = teamQueryService.findThumbnail(teamId);
@@ -40,13 +45,18 @@ public class TeamController {
                 .body(result.a);
     }
 
-    @PostMapping("/{teamId}/image/thumbnail")
+    @PostMapping("/teams/{teamId}/image/thumbnail")
     public ResponseEntity<Void> saveThumbnailImage(@PathVariable final Long teamId,
                                                    @RequestPart("image") final MultipartFile image) {
         teamCommandService.saveThumbnailImage(teamId, image, THUMBNAIL);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+    @PostMapping("/teams/{teamId}/image")
+    public ResponseEntity<Void> savePreviewImage(@PathVariable Long teamId, PreviewRequest previewRequest) throws IOException {
+        teamCommandService.savePreview(teamId, previewRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
     @DeleteMapping("/teams/{teamId}/image/thumbnail")
     public ResponseEntity<Void> deleteThumbnailImage(@PathVariable Long teamId,
                                                      @RequestBody ThumbnailDeleteRequest thumbnailDeleteRequest)
