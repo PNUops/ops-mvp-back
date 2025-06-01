@@ -10,6 +10,8 @@ import com.ops.ops.modules.member.exception.MemberException;
 import com.ops.ops.modules.member.exception.MemberExceptionType;
 import com.ops.ops.modules.team.application.dto.response.TeamDetailResponse;
 import com.ops.ops.modules.team.application.dto.response.TeamSummaryResponse;
+import com.ops.ops.modules.team.application.dto.response.TeamSubmissionStatusResponse;
+import com.ops.ops.modules.team.application.dto.response.TeamSummaryResponse;
 import com.ops.ops.modules.team.domain.Team;
 import com.ops.ops.modules.team.domain.TeamLike;
 import com.ops.ops.modules.team.domain.TeamMember;
@@ -123,6 +125,13 @@ public class TeamQueryService {
         return teams.stream()
                 .map(team -> TeamSummaryResponse.from(team, likedTeamIds.contains(team.getId())))
                 .toList();
+    }
+
+    public TeamSubmissionStatusResponse getSubmissionStatus(final Member member) {
+        TeamMember teamMember = teamMemberRepository.findByMemberId(member.getId());
+        Team team = teamMember.getTeam();
+
+        return TeamSubmissionStatusResponse.fromEntity(team);
     }
 
 }
