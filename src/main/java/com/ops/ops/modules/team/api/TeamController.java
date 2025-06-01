@@ -8,9 +8,8 @@ import com.ops.ops.global.security.annotation.LoginMember;
 import com.ops.ops.modules.member.domain.Member;
 import com.ops.ops.modules.team.application.TeamCommandService;
 import com.ops.ops.modules.team.application.TeamQueryService;
-import com.ops.ops.modules.team.application.dto.request.PreviewRequest;
+import com.ops.ops.modules.team.application.dto.request.PreviewDeleteRequest;
 import com.ops.ops.modules.team.application.dto.request.TeamDetailUpdateRequest;
-import com.ops.ops.modules.team.application.dto.request.ThumbnailDeleteRequest;
 import com.ops.ops.modules.team.application.dto.response.TeamDetailResponse;
 import com.ops.ops.modules.team.application.dto.response.TeamSubmissionStatusResponse;
 import com.ops.ops.modules.team.application.dto.response.TeamSummaryResponse;
@@ -18,8 +17,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import java.io.IOException;
-import com.ops.ops.modules.team.application.dto.request.PreviewDeleteRequest;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.antlr.v4.runtime.misc.Pair;
@@ -38,10 +35,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
-
-import java.util.List;
 
 @Tag(name = "Team Detail", description = "팀 상세보기 조회 API")
 @RestController

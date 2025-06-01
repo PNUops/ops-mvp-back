@@ -5,11 +5,7 @@ import static com.ops.ops.modules.team.exception.TeamExceptionType.NOT_FOUND_TEA
 import com.ops.ops.global.util.FileStorageUtil;
 import com.ops.ops.modules.file.domain.FileImageType;
 import com.ops.ops.modules.file.domain.dao.FileRepository;
-import com.ops.ops.modules.file.exception.FileException;
-import com.ops.ops.modules.file.exception.FileExceptionType;
-import com.ops.ops.modules.team.application.dto.request.PreviewRequest;
 import com.ops.ops.modules.team.application.dto.request.TeamDetailUpdateRequest;
-import com.ops.ops.modules.team.application.dto.request.ThumbnailDeleteRequest;
 import com.ops.ops.modules.team.domain.Team;
 import com.ops.ops.modules.team.domain.dao.TeamRepository;
 import com.ops.ops.modules.team.exception.TeamException;
@@ -22,8 +18,6 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class TeamCommandService {
 
-    //    @Value("${file.upload-dir}")
-    private String uploadDir;
     private final FileRepository fileRepository;
     private final TeamRepository teamRepository;
     private final FileStorageUtil fileStorageUtil;

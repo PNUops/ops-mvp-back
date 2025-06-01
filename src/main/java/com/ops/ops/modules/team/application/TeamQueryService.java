@@ -1,7 +1,14 @@
 package com.ops.ops.modules.team.application;
 
+import static com.ops.ops.modules.file.domain.FileImageType.THUMBNAIL;
+import static com.ops.ops.modules.team.exception.TeamExceptionType.NOT_FOUND_TEAM;
+
+import com.ops.ops.global.util.FileStorageUtil;
+import com.ops.ops.modules.file.domain.File;
 import com.ops.ops.modules.file.domain.FileImageType;
 import com.ops.ops.modules.file.domain.dao.FileRepository;
+import com.ops.ops.modules.file.exception.FileException;
+import com.ops.ops.modules.file.exception.FileExceptionType;
 import com.ops.ops.modules.member.application.MemberQueryService;
 import com.ops.ops.modules.member.domain.Member;
 import com.ops.ops.modules.member.domain.MemberRoleType;
@@ -9,7 +16,6 @@ import com.ops.ops.modules.member.domain.dao.MemberRepository;
 import com.ops.ops.modules.member.exception.MemberException;
 import com.ops.ops.modules.member.exception.MemberExceptionType;
 import com.ops.ops.modules.team.application.dto.response.TeamDetailResponse;
-import com.ops.ops.modules.team.application.dto.response.TeamSummaryResponse;
 import com.ops.ops.modules.team.application.dto.response.TeamSubmissionStatusResponse;
 import com.ops.ops.modules.team.application.dto.response.TeamSummaryResponse;
 import com.ops.ops.modules.team.domain.Team;
@@ -20,28 +26,15 @@ import com.ops.ops.modules.team.domain.dao.TeamMemberRepository;
 import com.ops.ops.modules.team.domain.dao.TeamRepository;
 import com.ops.ops.modules.team.exception.TeamException;
 import com.ops.ops.modules.team.exception.TeamExceptionType;
-import static com.ops.ops.modules.file.domain.FileImageType.THUMBNAIL;
-import static com.ops.ops.modules.team.exception.TeamExceptionType.NOT_FOUND_TEAM;
-
-import com.ops.ops.global.util.FileStorageUtil;
-import com.ops.ops.modules.file.domain.File;
-import com.ops.ops.modules.file.domain.dao.FileRepository;
-import com.ops.ops.modules.file.exception.FileException;
-import com.ops.ops.modules.file.exception.FileExceptionType;
-import com.ops.ops.modules.team.domain.Team;
-import com.ops.ops.modules.team.domain.dao.TeamRepository;
-import com.ops.ops.modules.team.exception.TeamException;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.antlr.v4.runtime.misc.Pair;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.ops.ops.modules.file.domain.File;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
