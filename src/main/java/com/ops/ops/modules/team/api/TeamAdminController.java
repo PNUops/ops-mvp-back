@@ -33,7 +33,6 @@ public class TeamAdminController {
 	@Secured("ROLE_ADMIN")
 	@GetMapping("/dashboard")
 	public ResponseEntity<List<TeamSubmissionStatusResponse>> getAllTeamSubmissions(@LoginMember Member member) {
-		memberCommandService.isAdmin(member);
 		return ResponseEntity.ok(teamAdminQueryService.getAllTeamSubmissions());
 	}
 
@@ -42,7 +41,6 @@ public class TeamAdminController {
 	@Secured("ROLE_ADMIN")
 	@GetMapping("/ranking")
 	public ResponseEntity<List<TeamLikeRankingResponse>> getTeamLikeRanking(@LoginMember Member member) {
-		memberCommandService.isAdmin(member);
 		return ResponseEntity.ok(teamAdminQueryService.getTeamLikeRanking());
 	}
 }
