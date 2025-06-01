@@ -128,10 +128,4 @@ public class MemberCommandService {
             throw new EmailAuthException(NOT_PUSAN_UNIVERSITY_EMAIL);
         }
     }
-
-	public void isAdmin(Member member) {
-		if (!member.isAdmin()) {
-			throw new MemberException(MemberExceptionType.NOT_ADMIN);
-		}
-	}
 }
