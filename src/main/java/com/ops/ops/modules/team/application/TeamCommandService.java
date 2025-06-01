@@ -25,16 +25,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.ops.ops.modules.team.domain.Team;
-import com.ops.ops.modules.team.domain.dao.TeamRepository;
-import com.ops.ops.modules.team.exception.TeamException;
-import com.ops.ops.modules.team.exception.TeamExceptionType;
-
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class TeamCommandService {
-    private final TeamRepository teamRepository;
 
     //    @Value("${file.upload-dir}")
 //    private String uploadDir;
@@ -124,12 +118,6 @@ public class TeamCommandService {
                 .orElseThrow(() -> new TeamException(NOT_FOUND_TEAM));
     }
 
-	public Team validateAndGetTeamById(final Long teamId) {
-		return teamRepository.findById(teamId)
-			.orElseThrow(() -> new TeamException(TeamExceptionType.NOT_FOUND_TEAM));
-	}
-
-}
     private void validateExistTeam(final Long teamId) {
         teamRepository.findById(teamId).orElseThrow(() -> new TeamException(NOT_FOUND_TEAM));
     }
