@@ -84,10 +84,19 @@ public class TeamController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @Secured("ROLE_비회원")
     @GetMapping("/{teamId}/image/thumbnail")
     public ResponseEntity<Resource> getThumbnailImage(@PathVariable Long teamId) {
         Pair<Resource, String> result = teamQueryService.findThumbnailImage(teamId);
+        String mimeType = result.b;
+        MediaType mediaType = (mimeType != null) ? MediaType.parseMediaType(mimeType) : MediaType.IMAGE_JPEG;
+        return ResponseEntity.ok()
+                .contentType(mediaType)
+                .body(result.a);
+    }
+
+    @GetMapping("/{teamId}/image/{imageId}")
+    public ResponseEntity<Resource> findPreviewImage(@PathVariable Long teamId, @PathVariable Long imageId) {
+        Pair<Resource, String> result = teamQueryService.findPreviewImage(teamId, imageId);
         String mimeType = result.b;
         MediaType mediaType = (mimeType != null) ? MediaType.parseMediaType(mimeType) : MediaType.IMAGE_JPEG;
         return ResponseEntity.ok()

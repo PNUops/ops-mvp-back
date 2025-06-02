@@ -46,10 +46,9 @@ public class TeamQueryService {
     private final MemberRepository memberRepository;
     private final TeamLikeRepository teamLikeRepository;
     private final TeamMemberRepository teamMemberRepository;
-
     private final MemberQueryService memberQueryService;
 
-    public TeamDetailResponse getTeamDetail(final Long teamId, final Member member){
+    public TeamDetailResponse getTeamDetail(final Long teamId, final Member member) {
         Team team = teamRepository.findById(teamId)
                 .orElseThrow(() -> new TeamException(TeamExceptionType.NOT_FOUND_TEAM));
 
@@ -66,7 +65,7 @@ public class TeamQueryService {
                 .orElse(false)
                 : false;
 
-        return TeamDetailResponse.from(team, leaderId,participants, previewIds, isLiked);
+        return TeamDetailResponse.from(team, leaderId, participants, previewIds, isLiked);
     }
 
     private Long getLeaderIdByTeamId(final Long teamId) {
@@ -94,7 +93,6 @@ public class TeamQueryService {
                 .orElseThrow(() -> new MemberException(MemberExceptionType.NOT_FOUND_LEADER));
     }
 
-
     public Pair<Resource, String> findThumbnailImage(final Long teamId) {
         validateAndGetTeamById(teamId);
         final File findFile = fileRepository.findByTeamIdAndType(teamId, THUMBNAIL).orElseThrow(() -> new FileException(
@@ -102,10 +100,18 @@ public class TeamQueryService {
         return fileStorageUtil.findFileAndType(findFile.getId());
     }
 
+    public Pair<Resource, String> findPreviewImage(Long teamId, Long imageId) {
+        validateAndGetTeamById(teamId);
+        final File findFile = fileRepository.findById(imageId).orElseThrow(() -> new FileException(
+                FileExceptionType.NOT_EXISTS_PREVIEW));
+        return fileStorageUtil.findFileAndType(findFile.getId());
+    }
+
     public Team validateAndGetTeamById(final Long teamId) {
         return teamRepository.findById(teamId)
                 .orElseThrow(() -> new TeamException(NOT_FOUND_TEAM));
     }
+
     public List<TeamSummaryResponse> getAllTeamSummaries(final Member member) {
         List<Team> teams = teamRepository.findAll();
         Set<Long> likedTeamIds = (member != null)
@@ -126,4 +132,9 @@ public class TeamQueryService {
         return TeamSubmissionStatusResponse.fromEntity(team);
     }
 
+    private void validateOwnership(Long teamId, File previewFile) {
+        if (!previewFile.getTeamId().equals(teamId)) {
+            throw new FileException(FileExceptionType.REQUEST_NOT_OWN_IMAGE);
+        }
+    }
 }
