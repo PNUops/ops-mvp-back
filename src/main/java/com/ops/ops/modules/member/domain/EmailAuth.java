@@ -23,7 +23,7 @@ public class EmailAuth extends BaseEntity {
     @Column(nullable = false)
     private String token;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String email;
 
     @Column(nullable = false)
@@ -34,5 +34,13 @@ public class EmailAuth extends BaseEntity {
         this.token = token;
         this.email = email;
         this.isCorrected = false;
+    }
+
+    public void correct() {
+        this.isCorrected = true;
+    }
+
+    public void updateAuthCode(final String newCode) {
+        this.token = newCode;
     }
 }

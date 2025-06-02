@@ -1,17 +1,18 @@
-package com.ops.ops.modules.team.exception;
+package com.ops.ops.modules.member.exception;
 
 import com.ops.ops.global.base.BaseExceptionType;
 import org.springframework.http.HttpStatus;
 
-public enum TeamExceptionType implements BaseExceptionType {
-    NOT_FOUND_TEAM(HttpStatus.NOT_FOUND, "팀을 찾을 수 없습니다."),
-    NOT_TEAM_LEADER(HttpStatus.FORBIDDEN, "해당 팀의 팀장 권한이 없습니다."),
+public enum EmailAuthExceptionType implements BaseExceptionType {
+
+    NOT_VERIFIED_EMAIL_AUTH(HttpStatus.BAD_REQUEST, "이메일 인증이 완료되지 않았습니다."),
+    NOT_PUSAN_UNIVERSITY_EMAIL(HttpStatus.BAD_REQUEST, "부산대 이메일만 가입 가능합니다."),
     ;
 
     private final HttpStatus httpStatus;
     private final String errorMessage;
 
-    TeamExceptionType(final HttpStatus httpStatus, final String errorMessage) {
+    EmailAuthExceptionType(final HttpStatus httpStatus, final String errorMessage) {
         this.httpStatus = httpStatus;
         this.errorMessage = errorMessage;
     }
