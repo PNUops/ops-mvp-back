@@ -84,10 +84,19 @@ public class TeamController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @Secured("ROLE_비회원")
     @GetMapping("/{teamId}/image/thumbnail")
     public ResponseEntity<Resource> getThumbnailImage(@PathVariable Long teamId) {
         Pair<Resource, String> result = teamQueryService.findThumbnailImage(teamId);
+        String mimeType = result.b;
+        MediaType mediaType = (mimeType != null) ? MediaType.parseMediaType(mimeType) : MediaType.IMAGE_JPEG;
+        return ResponseEntity.ok()
+                .contentType(mediaType)
+                .body(result.a);
+    }
+
+    @GetMapping("/{teamId}/image/{imageId}")
+    public ResponseEntity<Resource> findPreviewImage(@PathVariable Long teamId, @PathVariable Long imageId) {
+        Pair<Resource, String> result = teamQueryService.findPreviewImage(teamId, imageId);
         String mimeType = result.b;
         MediaType mediaType = (mimeType != null) ? MediaType.parseMediaType(mimeType) : MediaType.IMAGE_JPEG;
         return ResponseEntity.ok()
@@ -129,12 +138,5 @@ public class TeamController {
     ) {
         teamCommandService.updateTeamDetail(teamId, member.getId(), request);
         return ResponseEntity.noContent().build();
-    }
-    @GetMapping("/teams/{teamId}/image/{imageId}")
-    public ResponseEntity<Resource> findPreviewImage(@PathVariable Long teamId, @PathVariable Long imageId) throws IOException {
-        Resource resource = teamQueryService.findPreview(teamId, imageId);
-        return ResponseEntity.ok()
-                .contentType(MediaType.IMAGE_JPEG)
-                .body(resource);
     }
 }
