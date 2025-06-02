@@ -23,13 +23,13 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/admin")
+@Secured("ROLE_관리자")
 public class TeamAdminController {
 
 	private final TeamAdminQueryService teamAdminQueryService;
 
 	@Operation(summary = "전체 팀 등록 현황 조회", description = "관리자가 모든 팀의 제출 여부를 포함한 현황을 조회합니다.")
 	@ApiResponse(responseCode = "200", description = "조회 성공")
-	@Secured("ROLE_ADMIN")
 	@GetMapping("/dashboard")
 	public ResponseEntity<List<TeamSubmissionStatusResponse>> getAllTeamSubmissions(@LoginMember Member member) {
 		return ResponseEntity.ok(teamAdminQueryService.getAllTeamSubmissions());
