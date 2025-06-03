@@ -37,7 +37,6 @@ public class TeamAdminController {
 
 	@Operation(summary = "좋아요 랭킹 조회", description = "좋아요 수 기준으로 팀 랭킹을 조회합니다. (Competition Ranking 방식)")
 	@ApiResponse(responseCode = "200", description = "조회 성공")
-	@Secured("ROLE_관리자")
 	@GetMapping("/ranking")
 	public ResponseEntity<List<TeamLikeRankingResponse>> getTeamLikeRanking(@LoginMember Member member) {
 		return ResponseEntity.ok(teamAdminQueryService.getTeamLikeRanking());
@@ -45,7 +44,6 @@ public class TeamAdminController {
 
 	@Operation(summary = "투표 참여율 조회", description = "전체 팀의 좋아요 수를 기반으로 투표 참여율을 계산하여 반환합니다.")
 	@ApiResponse(responseCode = "200", description = "조회 성공")
-	@Secured("ROLE_관리자")
 	@GetMapping("/participation-rate")
 	public ResponseEntity<TeamVoteRateResponse> getTeamParticipationRate(@LoginMember Member member) {
 		return ResponseEntity.ok(teamAdminQueryService.getVoteRate());

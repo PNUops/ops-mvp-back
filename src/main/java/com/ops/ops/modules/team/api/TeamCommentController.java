@@ -20,12 +20,14 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "Team Comment", description = "팀 댓글 관련 API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/teams/{teamId}/comments")
+@Secured({"ROLE_회원", "ROLE_팀장", "ROLE_관리자"})
 public class TeamCommentController {
 
 	private final TeamCommentCommandService teamCommentCommandService;

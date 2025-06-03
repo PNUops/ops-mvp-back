@@ -14,12 +14,14 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "Team Like", description = "팀 좋아요 관련 API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/teams")
+@Secured({"ROLE_회원", "ROLE_팀장", "ROLE_관리자"})
 public class TeamLikeController {
 
     private final TeamLikeCommandService teamLikeService;
