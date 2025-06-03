@@ -18,8 +18,9 @@ public class MemberDetailsService implements UserDetailsService {
     private final MemberRepository memberRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String email) {
-        final Member member = memberRepository.findByEmail(email)
+    public UserDetails loadUserByUsername(final String userId) {
+        final Long memberId = Long.parseLong(userId);
+        final Member member = memberRepository.findById(memberId)
                 .filter(m -> !m.getIsDeleted())
                 .orElseThrow(() -> new MemberException(NOT_FOUND_MEMBER));
 
@@ -29,6 +30,7 @@ public class MemberDetailsService implements UserDetailsService {
                 member.getPassword(),
                 member.getRoles().stream()
                         .map(MemberRoleType::name)
-                        .toList());
+                        .toList()
+        );
     }
 }

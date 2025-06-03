@@ -22,7 +22,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -37,7 +36,7 @@ public class JwtProvider {
 
 	private Key key;
 
-	private final UserDetailsService userDetailsService;
+	private final MemberDetailsService memberDetailsService;
 
 	@PostConstruct
 	protected void init() {
@@ -58,8 +57,8 @@ public class JwtProvider {
 	}
 
 	public Authentication getAuthentication(final String token) {
-		final String username = extractUsername(token);
-		final UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+		final String memberId = extractSubject(token);
+		final UserDetails userDetails = memberDetailsService.loadUserByUsername(memberId);
 		return new UsernamePasswordAuthenticationToken(
 			userDetails,
 			null,
@@ -108,7 +107,7 @@ public class JwtProvider {
 		}
 	}
 
-	private String extractUsername(final String token) {
+	private String extractSubject(final String token) {
 		return getClaim(token).getSubject();
 	}
 }
