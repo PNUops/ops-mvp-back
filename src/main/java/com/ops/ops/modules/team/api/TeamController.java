@@ -136,7 +136,7 @@ public class TeamController {
             @Valid @RequestBody final TeamDetailUpdateRequest request,
             @LoginMember final Member member
     ) {
-        teamCommandService.updateTeamDetail(teamId, member.getId(), request);
+        teamCommandService.updateTeamDetail(teamId, member, request);
         return ResponseEntity.noContent().build();
     }
 }
