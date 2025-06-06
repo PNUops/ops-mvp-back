@@ -114,14 +114,18 @@ public class TeamQueryService {
 
     public List<TeamSummaryResponse> getAllTeamSummaries(final Member member) {
         List<Team> teams = teamRepository.findAll();
-        Set<Long> likedTeamIds = (member != null)
-                ? teamLikeRepository.findByMemberIdAndTeamIn(member.getId(), teams).stream()
-                .map(teamLike -> teamLike.getTeam().getId())
-                .collect(Collectors.toSet())
-                : Collections.emptySet();
 
         return teams.stream()
-                .map(team -> TeamSummaryResponse.from(team, likedTeamIds.contains(team.getId())))
+                .map(team -> {
+                    boolean isLiked = false;
+                    if (member != null) {
+                        isLiked = teamLikeRepository
+                                .findByMemberIdAndTeam(member.getId(), team)
+                                .map(TeamLike::getIsLiked)
+                                .orElse(false);
+                    }
+                    return TeamSummaryResponse.from(team, isLiked);
+                })
                 .toList();
     }
 
