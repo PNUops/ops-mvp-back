@@ -6,6 +6,7 @@ import static com.ops.ops.modules.member.exception.EmailAuthExceptionType.NOT_PU
 import static com.ops.ops.modules.member.exception.EmailAuthExceptionType.NOT_VERIFIED_EMAIL_AUTH;
 import static com.ops.ops.modules.member.exception.MemberExceptionType.ALREADY_EXIST_EMAIL;
 import static com.ops.ops.modules.member.exception.MemberExceptionType.ALREADY_EXIST_STUDENT_ID;
+import static com.ops.ops.modules.member.exception.MemberExceptionType.CANNOT_CHANGE_SAME_PASSWORD;
 import static com.ops.ops.modules.member.exception.MemberExceptionType.CANNOT_MATCH_PASSWORD;
 import static com.ops.ops.modules.member.exception.MemberExceptionType.NOT_FOUND_MEMBER;
 
@@ -106,6 +107,7 @@ public class MemberCommandService {
         final Member member = getValidateExistMember(request.email());
         final EmailAuth emailAuth = checkEmailAuth(request.email());
 
+        checkEqualPassword(request.newPassword(), member);
         member.updatePassword(passwordEncoder.encode(request.newPassword()));
         emailAuthRepository.delete(emailAuth);
     }
@@ -190,5 +192,11 @@ public class MemberCommandService {
                     .build());
         }
     }
-    
+
+    private void checkEqualPassword(final String newPassword, final Member member) {
+        if (member.isEqual(newPassword)) {
+            throw new MemberException(CANNOT_CHANGE_SAME_PASSWORD);
+        }
+    }
+
 }
