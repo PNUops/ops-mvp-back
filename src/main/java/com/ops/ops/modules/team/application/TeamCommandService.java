@@ -1,10 +1,14 @@
 package com.ops.ops.modules.team.application;
 
+import static com.ops.ops.modules.file.domain.FileImageType.PREVIEW;
+import static com.ops.ops.modules.file.exception.FileExceptionType.EXCEED_PREVIEW_LIMIT;
 import static com.ops.ops.modules.team.exception.TeamExceptionType.NOT_FOUND_TEAM;
 
 import com.ops.ops.global.util.FileStorageUtil;
+import com.ops.ops.modules.file.domain.File;
 import com.ops.ops.modules.file.domain.FileImageType;
 import com.ops.ops.modules.file.domain.dao.FileRepository;
+import com.ops.ops.modules.file.exception.FileException;
 import com.ops.ops.modules.team.application.dto.request.TeamDetailUpdateRequest;
 import com.ops.ops.modules.team.domain.Team;
 import com.ops.ops.modules.team.domain.dao.TeamRepository;
@@ -44,10 +48,18 @@ public class TeamCommandService {
         ids.forEach(fileStorageUtil::deleteFile);
     }
 
-    public void savePreviewImages(Long teamId, List<MultipartFile> images, FileImageType fileImageType) {
+    public void savePreviewImages(Long teamId, List<MultipartFile> images) {
         validateExistTeam(teamId);
+        checkPreviewLimit(teamId, images);
         for (MultipartFile image : images) {
-            fileStorageUtil.storeFile(image, teamId, fileImageType);
+            fileStorageUtil.storeFile(image, teamId, PREVIEW);
+        }
+    }
+
+    private void checkPreviewLimit(Long teamId, List<MultipartFile> images) {
+        List<File> findImages = fileRepository.findAllByTeamIdAndType(teamId, PREVIEW);
+        if (findImages.size() + images.size() > 5) {
+            throw new FileException(EXCEED_PREVIEW_LIMIT);
         }
     }
 

@@ -125,7 +125,7 @@ public class TeamController {
     @PostMapping("/{teamId}/image")
     public ResponseEntity<Void> savePreviewImage(@PathVariable Long teamId,
                                                  @RequestPart("images") final List<MultipartFile> images) {
-        teamCommandService.savePreviewImages(teamId, images, PREVIEW);
+        teamCommandService.savePreviewImages(teamId, images);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
