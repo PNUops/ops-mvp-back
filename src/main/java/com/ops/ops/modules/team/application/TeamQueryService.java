@@ -1,8 +1,5 @@
 package com.ops.ops.modules.team.application;
 
-import static com.ops.ops.modules.file.domain.FileImageType.THUMBNAIL;
-import static com.ops.ops.modules.team.exception.TeamExceptionType.NOT_FOUND_TEAM;
-
 import com.ops.ops.global.util.FileStorageUtil;
 import com.ops.ops.modules.file.domain.File;
 import com.ops.ops.modules.file.domain.FileImageType;
@@ -26,15 +23,19 @@ import com.ops.ops.modules.team.domain.dao.TeamMemberRepository;
 import com.ops.ops.modules.team.domain.dao.TeamRepository;
 import com.ops.ops.modules.team.exception.TeamException;
 import com.ops.ops.modules.team.exception.TeamExceptionType;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.antlr.v4.runtime.misc.Pair;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static com.ops.ops.modules.file.domain.FileImageType.THUMBNAIL;
+import static com.ops.ops.modules.team.exception.TeamExceptionType.NOT_FOUND_TEAM;
 
 @Service
 @RequiredArgsConstructor
@@ -114,6 +115,8 @@ public class TeamQueryService {
 
     public List<TeamSummaryResponse> getAllTeamSummaries(final Member member) {
         List<Team> teams = teamRepository.findAll();
+        Collections.shuffle(teams);
+
         Set<Long> likedTeamIds = (member != null)
                 ? teamLikeRepository.findByMemberIdAndTeamIn(member.getId(), teams).stream()
                 .map(teamLike -> teamLike.getTeam().getId())
