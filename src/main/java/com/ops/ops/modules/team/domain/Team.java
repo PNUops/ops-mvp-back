@@ -71,8 +71,7 @@ public class Team extends BaseEntity {
         this.isSubmitted = true;
     }
 
-    public boolean hasMember(Long memberId) {
-        return teamMembers.stream()
-                .anyMatch(tm -> tm.getMemberId().equals(memberId));
+    public boolean isTeamLeader(final Member member) {
+        return member != null && this.leaderName.equals(member.getName());
     }
 }
