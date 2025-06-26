@@ -10,4 +10,5 @@ public interface FileRepository extends JpaRepository<File, Long> {
     List<File> findAllByTeamIdAndType(Long teamId, FileImageType type);
     List<File> findAllByTeamId(final Long teamId);
     Optional<File> findByTeamIdAndType(Long teamId, FileImageType type);
+    long countByTeamIdAndType(Long teamId, FileImageType type);
 }

@@ -5,7 +5,6 @@ import static com.ops.ops.modules.file.exception.FileExceptionType.EXCEED_PREVIE
 import static com.ops.ops.modules.team.exception.TeamExceptionType.NOT_FOUND_TEAM;
 
 import com.ops.ops.global.util.FileStorageUtil;
-import com.ops.ops.modules.file.domain.File;
 import com.ops.ops.modules.file.domain.FileImageType;
 import com.ops.ops.modules.file.domain.dao.FileRepository;
 import com.ops.ops.modules.file.exception.FileException;
@@ -57,8 +56,8 @@ public class TeamCommandService {
     }
 
     private void checkPreviewLimit(Long teamId, List<MultipartFile> images) {
-        List<File> findImages = fileRepository.findAllByTeamIdAndType(teamId, PREVIEW);
-        if (findImages.size() + images.size() > 5) {
+        long savedCount = fileRepository.countByTeamIdAndType(teamId, PREVIEW);
+        if (savedCount + images.size() > 5) {
             throw new FileException(EXCEED_PREVIEW_LIMIT);
         }
     }
