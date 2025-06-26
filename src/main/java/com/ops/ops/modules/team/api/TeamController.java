@@ -76,6 +76,8 @@ public class TeamController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "팀 썸네일 저장", description = "팀의 썸네일 이미지를 저장합니다.")
+    @ApiResponse(responseCode = "201", description = "팀 썸네일 저장 완료")
     @Secured("ROLE_팀장")
     @PostMapping("/{teamId}/image/thumbnail")
     public ResponseEntity<Void> saveThumbnailImage(@PathVariable final Long teamId,
@@ -84,6 +86,8 @@ public class TeamController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+    @Operation(summary = "팀 썸네일 조회", description = "팀의 썸네일을 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "팀 썸네일 조회 성공")
     @GetMapping("/{teamId}/image/thumbnail")
     public ResponseEntity<Resource> getThumbnailImage(@PathVariable Long teamId) {
         Pair<Resource, String> result = teamQueryService.findThumbnailImage(teamId);
@@ -94,6 +98,8 @@ public class TeamController {
                 .body(result.a);
     }
 
+    @Operation(summary = "팀 프리뷰 조회", description = "팀의 프리뷰 이미지를 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "팀 프리뷰 조회 성공")
     @GetMapping("/{teamId}/image/{imageId}")
     public ResponseEntity<Resource> findPreviewImage(@PathVariable Long teamId, @PathVariable Long imageId) {
         Pair<Resource, String> result = teamQueryService.findPreviewImage(teamId, imageId);
@@ -104,6 +110,8 @@ public class TeamController {
                 .body(result.a);
     }
 
+    @Operation(summary = "팀 썸네일 삭제", description = "팀의 썸네일 이미지를 삭제합니다.")
+    @ApiResponse(responseCode = "204", description = "팀 썸네일 삭제 성공")
     @Secured("ROLE_팀장")
     @DeleteMapping("/{teamId}/image/thumbnail")
     public ResponseEntity<Void> deleteThumbnailImage(@PathVariable Long teamId) {
@@ -111,14 +119,18 @@ public class TeamController {
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(summary = "팀 프리뷰 등록", description = "팀의 프리뷰 이미지를 등록합니다.")
+    @ApiResponse(responseCode = "201", description = "팀 프리뷰 등록 성공")
     @Secured("ROLE_팀장")
     @PostMapping("/{teamId}/image")
     public ResponseEntity<Void> savePreviewImage(@PathVariable Long teamId,
                                                  @RequestPart("images") final List<MultipartFile> images) {
-        teamCommandService.savePreviewImages(teamId, images, PREVIEW);
+        teamCommandService.savePreviewImages(teamId, images);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+    @Operation(summary = "팀 프리뷰 삭제", description = "팀의 프리뷰 이미지를 삭제합니다.")
+    @ApiResponse(responseCode = "204", description = "팀 프리뷰 삭제 성공")
     @Secured("ROLE_팀장")
     @DeleteMapping("/{teamId}/image")
     public ResponseEntity<Void> deletePreviewImage(@PathVariable Long teamId,
