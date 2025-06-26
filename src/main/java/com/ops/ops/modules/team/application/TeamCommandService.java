@@ -62,11 +62,15 @@ public class TeamCommandService {
                 .orElseThrow(() -> new TeamException(NOT_FOUND_TEAM));
     }
 
-    public void updateTeamDetail(final Long teamId, final Long memberId, final TeamDetailUpdateRequest request) {
+    public void updateTeamDetail(final Long teamId, final Member member, final TeamDetailUpdateRequest request) {
         final Team team = validateAndGetTeamById(teamId);
-        if (!team.hasMember(memberId)) {
-            throw new TeamException(NOT_TEAM_MEMBER);
-        }
+        checkTeamLeader(member, team);
         team.updateDetail(request.overview(), request.githubPath(), request.youTubePath());
+    }
+
+    private void checkTeamLeader(final Member member, final Team team) {
+        if (!team.isTeamLeader(member)) {
+            throw new TeamException(CANNOT_MATCH_TEAM_LEADER_NAME);
+        }
     }
 }
