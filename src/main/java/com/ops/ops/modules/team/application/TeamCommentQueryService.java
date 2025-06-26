@@ -24,7 +24,7 @@ public class TeamCommentQueryService {
 
 	public List<TeamCommentResponse> getComments(final Long teamId) {
 		Team team = teamCommandService.validateAndGetTeamById(teamId);
-		List<TeamComment> comments = teamCommentRepository.findAllByTeamId(team.getId());
+		List<TeamComment> comments = teamCommentRepository.findAllByTeamIdOrderByIdDesc(team.getId());
 
 		List<Long> memberIds = comments.stream()
 			.map(TeamComment::getMemberId)
