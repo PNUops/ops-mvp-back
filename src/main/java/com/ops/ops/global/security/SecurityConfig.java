@@ -20,7 +20,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity
+@EnableMethodSecurity(securedEnabled = true)
 @RequiredArgsConstructor
 public class SecurityConfig {
 
@@ -42,7 +42,6 @@ public class SecurityConfig {
                 .formLogin(FormLoginConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/sign-up/**", "/sign-in/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/teams/*/comments/**").hasAnyRole("회원", "관리자", "팀장")
                         .requestMatchers(HttpMethod.GET, "/teams/**").permitAll()
                         .anyRequest().hasAnyRole("회원", "관리자", "팀장")
                 )
