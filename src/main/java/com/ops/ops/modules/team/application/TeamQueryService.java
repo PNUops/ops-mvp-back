@@ -114,6 +114,7 @@ public class TeamQueryService {
 
     public List<TeamSummaryResponse> getAllTeamSummaries(final Member member) {
         List<Team> teams = teamRepository.findAll();
+        Collections.shuffle(teams);
 
         final Map<Long, Boolean> likeMap =
                 (member != null) ? teamLikeRepository.findAllByMemberIdAndTeamIn(member.getId(), teams).stream()
