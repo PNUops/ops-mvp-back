@@ -22,4 +22,6 @@ public interface TeamLikeRepository extends JpaRepository<TeamLike, Long> {
 	long countByIsLikedTrue();
 
 	List<TeamLike> findByMemberIdAndTeamIn(Long id, List<Team> teams);
+
+	List<TeamLike> findAllByMemberIdAndTeamIn(Long id, List<Team> teams);
 }

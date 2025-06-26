@@ -28,7 +28,7 @@ import com.ops.ops.modules.team.exception.TeamException;
 import com.ops.ops.modules.team.exception.TeamExceptionType;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.antlr.v4.runtime.misc.Pair;
@@ -116,14 +116,12 @@ public class TeamQueryService {
         List<Team> teams = teamRepository.findAll();
         Collections.shuffle(teams);
 
-        Set<Long> likedTeamIds = (member != null)
-                ? teamLikeRepository.findByMemberIdAndTeamIn(member.getId(), teams).stream()
-                .map(teamLike -> teamLike.getTeam().getId())
-                .collect(Collectors.toSet())
-                : Collections.emptySet();
+        final Map<Long, Boolean> likeMap =
+                (member != null) ? teamLikeRepository.findAllByMemberIdAndTeamIn(member.getId(), teams).stream()
+                        .collect(Collectors.toMap(tl -> tl.getTeam().getId(), TeamLike::getIsLiked))
+                        : Collections.emptyMap();
 
-        return teams.stream()
-                .map(team -> TeamSummaryResponse.from(team, likedTeamIds.contains(team.getId())))
+        return teams.stream().map(team -> TeamSummaryResponse.from(team, likeMap.getOrDefault(team.getId(), false)))
                 .toList();
     }
 
