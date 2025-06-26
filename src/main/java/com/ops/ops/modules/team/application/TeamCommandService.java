@@ -3,7 +3,6 @@ package com.ops.ops.modules.team.application;
 import static com.ops.ops.modules.file.domain.FileImageType.PREVIEW;
 import static com.ops.ops.modules.file.exception.FileExceptionType.EXCEED_PREVIEW_LIMIT;
 import static com.ops.ops.modules.team.exception.TeamExceptionType.NOT_FOUND_TEAM;
-
 import com.ops.ops.global.util.FileStorageUtil;
 import com.ops.ops.modules.file.domain.FileImageType;
 import com.ops.ops.modules.file.domain.dao.FileRepository;
@@ -70,8 +69,9 @@ public class TeamCommandService {
         return teamRepository.findById(teamId)
                 .orElseThrow(() -> new TeamException(NOT_FOUND_TEAM));
     }
-	public void updateTeamDetail(final Long teamId, final Long memberId, final TeamDetailUpdateRequest request) {
-		final Team team = validateAndGetTeamById(teamId);
-		team.updateDetail(request.overview(), request.githubPath(), request.youTubePath());
-	}
+
+    public void updateTeamDetail(final Long teamId, final Long memberId, final TeamDetailUpdateRequest request) {
+        final Team team = validateAndGetTeamById(teamId);
+        team.updateDetail(request.overview(), request.githubPath(), request.youTubePath());
+    }
 }
