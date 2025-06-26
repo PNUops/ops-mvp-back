@@ -11,14 +11,11 @@ import com.ops.ops.modules.team.application.dto.request.TeamDetailUpdateRequest;
 import com.ops.ops.modules.team.domain.Team;
 import com.ops.ops.modules.team.domain.dao.TeamRepository;
 import com.ops.ops.modules.team.exception.TeamException;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
-
-import static com.ops.ops.modules.team.exception.TeamExceptionType.NOT_FOUND_TEAM;
 
 @Service
 @RequiredArgsConstructor
@@ -73,8 +70,8 @@ public class TeamCommandService {
                 .orElseThrow(() -> new TeamException(NOT_FOUND_TEAM));
     }
 
-	public void updateTeamDetail(final Long teamId, final Long memberId, final TeamDetailUpdateRequest request) {
-		final Team team = validateAndGetTeamById(teamId);
-		team.updateDetail(request.overview(), request.githubPath(), request.youTubePath());
-	}
+    public void updateTeamDetail(final Long teamId, final Long memberId, final TeamDetailUpdateRequest request) {
+        final Team team = validateAndGetTeamById(teamId);
+        team.updateDetail(request.overview(), request.githubPath(), request.youTubePath());
+    }
 }
