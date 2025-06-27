@@ -49,8 +49,7 @@ public class TeamCommentController {
 	@ApiResponse(responseCode = "200", description = "댓글 목록 조회 성공")
 	@GetMapping
 	public ResponseEntity<List<TeamCommentResponse>> getTeamComments(
-		@Parameter(description = "팀 ID") @PathVariable final Long teamId,
-		@LoginMember final Member member
+		@Parameter(description = "팀 ID") @PathVariable final Long teamId
 	) {
 		List<TeamCommentResponse> response = teamCommentQueryService.getComments(teamId);
 		return ResponseEntity.ok(response);
