@@ -75,8 +75,8 @@ public class Member extends BaseEntity {
         this.password = newPassword;
     }
 
-    public boolean isAdmin() {
-        return roles.contains(MemberRoleType.ROLE_관리자);
-
+    public boolean isEqual(final String newPassword) {
+        return this.password.equals(newPassword);
     }
+
 }
