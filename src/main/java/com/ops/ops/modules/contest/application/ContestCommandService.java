@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class ContestCommandService {
     private final ContestRepository contestRepository;
+    private final ContestTeamQueryService contestTeamQueryService;
 
     public void createContest(final String contestName) {
         validateDuplicateContestName(contestName);
@@ -40,6 +41,9 @@ public class ContestCommandService {
 
     public void deleteContest(final Long contestId) {
         final Contest contest = validateAndGetContestById(contestId);
+        if (contestTeamQueryService.isContestContainingAnyTeam(contest)) {
+            throw new ContestException(ContestExceptionType.CONTEST_HAS_TEAMS);
+        }
         contestRepository.delete(contest);
     }
 }
