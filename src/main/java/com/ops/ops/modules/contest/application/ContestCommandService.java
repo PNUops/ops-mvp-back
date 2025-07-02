@@ -30,4 +30,10 @@ public class ContestCommandService {
         return contestRepository.findById(contestId)
                 .orElseThrow(() -> new ContestException(ContestExceptionType.NOT_FOUND_CONTEST));
     }
+
+    public void deleteContest(final Long contestId) {
+        final Contest contest = validateAndGetContestById(contestId);
+        
+        contestRepository.delete(contest);
+    }
 }
