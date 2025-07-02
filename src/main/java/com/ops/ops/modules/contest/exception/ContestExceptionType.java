@@ -4,8 +4,9 @@ import com.ops.ops.global.base.BaseExceptionType;
 import org.springframework.http.HttpStatus;
 
 public enum ContestExceptionType implements BaseExceptionType {
-    NOT_FOUND_CONTEST(HttpStatus.NOT_FOUND, "존재하지 않는 대회입니다.");
-    
+    NOT_FOUND_CONTEST(HttpStatus.NOT_FOUND, "존재하지 않는 대회입니다."),
+    CONTEST_NAME_ALREADY_EXIST(HttpStatus.CONFLICT, "동일한 대회명이 있습니다.");
+
     private final HttpStatus httpStatus;
     private final String errorMessage;
 

@@ -15,13 +15,20 @@ public class ContestCommandService {
     private final ContestRepository contestRepository;
 
     public void createContest(final String contestName) {
-        boolean isCurrent = contestName.contains("6") && contestName.contains("창의융합");
+        validateDuplicateContestName(contestName);
+        boolean isCurrent = contestName.contains("6회") && contestName.contains("창의융합");
         final Contest contest = Contest.of(contestName, isCurrent);
-
         contestRepository.save(contest);
     }
 
+    private void validateDuplicateContestName(String contestName) {
+        if (contestRepository.existsByContestName(contestName)) {
+            throw new ContestException(ContestExceptionType.CONTEST_NAME_ALREADY_EXIST);
+        }
+    }
+
     public void updateContest(final Long contestId, final String newContestName) {
+        validateDuplicateContestName(newContestName);
         final Contest contest = validateAndGetContestById(contestId);
         contest.updateContestName(newContestName);
     }
@@ -33,7 +40,6 @@ public class ContestCommandService {
 
     public void deleteContest(final Long contestId) {
         final Contest contest = validateAndGetContestById(contestId);
-        
         contestRepository.delete(contest);
     }
 }
