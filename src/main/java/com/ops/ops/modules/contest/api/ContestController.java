@@ -82,8 +82,17 @@ public class ContestController {
             @PathVariable final Long contestId,
             @LoginMember final Member member
     ) {
-        List<TeamSummaryResponse> responses = contestQueryService.getAllTeamSummariesByContest(contestId,
-                member);
+        List<TeamSummaryResponse> responses = contestQueryService.getContestTeamSummaries(contestId, member);
+        return ResponseEntity.ok(responses);
+    }
+
+    @Operation(summary = "현재 진행 중인 대회의 전체 팀 조회", description = "현재 진행 중인 대회의 모든 팀을 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "현재 진행 중인 대회의 팀 전체 조회 성공")
+    @GetMapping("/current/teams")
+    public ResponseEntity<List<TeamSummaryResponse>> getAllCurrentContestTeams(
+            @LoginMember final Member member
+    ) {
+        List<TeamSummaryResponse> responses = contestQueryService.getCurrentContestTeamSummaries(member);
         return ResponseEntity.ok(responses);
     }
 }

@@ -5,6 +5,8 @@ import com.ops.ops.modules.contest.domain.Contest;
 import com.ops.ops.modules.contest.domain.ContestTeam;
 import com.ops.ops.modules.contest.domain.dao.ContestRepository;
 import com.ops.ops.modules.contest.domain.dao.ContestTeamRepository;
+import com.ops.ops.modules.contest.exception.ContestException;
+import com.ops.ops.modules.contest.exception.ContestExceptionType;
 import com.ops.ops.modules.member.domain.Member;
 import com.ops.ops.modules.team.application.TeamQueryService;
 import com.ops.ops.modules.team.application.dto.response.TeamSummaryResponse;
@@ -33,15 +35,23 @@ public class ContestQueryService {
                 .toList();
     }
 
-    private List<Long> getTeamIdsByContestId(final Long contestId) {
+    private List<Long> findTeamIdsByContestId(final Long contestId) {
         List<ContestTeam> contestTeams = contestTeamRepository.findAllByContestId(contestId);
         return contestTeams.stream()
                 .map(ContestTeam::getTeamId)
                 .toList();
     }
 
-    public List<TeamSummaryResponse> getAllTeamSummariesByContest(final Long contestId, final Member member) {
-        List<Long> contestTeamIds = getTeamIdsByContestId(contestId);
+    public List<TeamSummaryResponse> getContestTeamSummaries(final Long contestId, final Member member) {
+        List<Long> contestTeamIds = findTeamIdsByContestId(contestId);
+        return teamQueryService.getAllTeamSummaries(contestTeamIds, member);
+    }
+
+    public List<TeamSummaryResponse> getCurrentContestTeamSummaries(final Member member) {
+        Contest contest = contestRepository.findByIsCurrentTrue()
+                .orElseThrow(() -> new ContestException(ContestExceptionType.NOT_FOUND_CURRENT_CONTEST));
+        Long contestId = contest.getId();
+        List<Long> contestTeamIds = findTeamIdsByContestId(contestId);
         return teamQueryService.getAllTeamSummaries(contestTeamIds, member);
     }
 }
