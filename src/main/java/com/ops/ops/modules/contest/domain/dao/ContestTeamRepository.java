@@ -11,4 +11,6 @@ public interface ContestTeamRepository extends JpaRepository<ContestTeam, Long> 
     boolean existsByContestAndIsDeletedFalse(Contest contest);
 
     List<ContestTeam> findAllByContestId(Long contestId);
+
+    List<Long> findTeamIdsByContestId(Long id);
 }
