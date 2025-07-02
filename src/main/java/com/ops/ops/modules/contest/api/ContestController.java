@@ -3,8 +3,9 @@ package com.ops.ops.modules.contest.api;
 import com.ops.ops.global.security.annotation.LoginMember;
 import com.ops.ops.modules.contest.application.ContestCommandService;
 import com.ops.ops.modules.contest.application.ContestQueryService;
-import com.ops.ops.modules.contest.application.dto.ContestCreateRequest;
-import com.ops.ops.modules.contest.application.dto.ContestResponse;
+import com.ops.ops.modules.contest.application.dto.request.ContestCreateRequest;
+import com.ops.ops.modules.contest.application.dto.request.ContestUpdateRequest;
+import com.ops.ops.modules.contest.application.dto.response.ContestResponse;
 import com.ops.ops.modules.member.domain.Member;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -13,7 +14,10 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,11 +41,25 @@ public class ContestController {
     @Operation(summary = "대회 등록", description = "새로운 대회를 등록합니다.")
     @ApiResponse(responseCode = "201", description = "대회 등록 성공")
     @PostMapping
+    @Secured("ROLE_관리자")
     public ResponseEntity<Void> createContest(
             @Valid @RequestBody final ContestCreateRequest request,
             @LoginMember final Member member
     ) {
         contestCommandService.createContest(request.contestName());
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @Operation(summary = "대회 수정", description = "특정 대회의 정보를 수정합니다.")
+    @ApiResponse(responseCode = "204", description = "대회 정보 수정 성공")
+    @PatchMapping("/{contestId}")
+    @Secured("ROLE_관리자")
+    public ResponseEntity<Void> updateContest(
+            @PathVariable final Long contestId,
+            @Valid @RequestBody final ContestUpdateRequest request,
+            @LoginMember final Member member
+    ) {
+        contestCommandService.updateContest(contestId, request.contestName());
+        return ResponseEntity.noContent().build();
     }
 }

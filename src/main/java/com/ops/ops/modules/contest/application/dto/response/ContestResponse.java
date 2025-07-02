@@ -1,4 +1,4 @@
-package com.ops.ops.modules.contest.application.dto;
+package com.ops.ops.modules.contest.application.dto.response;
 
 import java.time.LocalDateTime;
 

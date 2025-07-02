@@ -1,6 +1,6 @@
 package com.ops.ops.modules.contest.application;
 
-import com.ops.ops.modules.contest.application.dto.ContestResponse;
+import com.ops.ops.modules.contest.application.dto.response.ContestResponse;
 import com.ops.ops.modules.contest.domain.Contest;
 import com.ops.ops.modules.contest.domain.dao.ContestRepository;
 import java.util.List;

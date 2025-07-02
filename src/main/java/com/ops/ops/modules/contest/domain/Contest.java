@@ -52,4 +52,8 @@ public class Contest extends BaseEntity {
                 .isCurrent(isCurrent)
                 .build();
     }
+
+    public void updateContestName(final String newContestName) {
+        this.contestName = newContestName;
+    }
 }
