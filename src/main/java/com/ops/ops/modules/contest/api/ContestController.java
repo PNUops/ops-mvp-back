@@ -1,10 +1,13 @@
 package com.ops.ops.modules.contest.api;
 
+import com.ops.ops.global.security.annotation.LoginMember;
 import com.ops.ops.modules.contest.application.ContestCommandService;
 import com.ops.ops.modules.contest.application.ContestQueryService;
 import com.ops.ops.modules.contest.application.dto.request.ContestCreateRequest;
 import com.ops.ops.modules.contest.application.dto.request.ContestUpdateRequest;
 import com.ops.ops.modules.contest.application.dto.response.ContestResponse;
+import com.ops.ops.modules.member.domain.Member;
+import com.ops.ops.modules.team.application.dto.response.TeamSummaryResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -70,5 +73,17 @@ public class ContestController {
     ) {
         contestCommandService.deleteContest(contestId);
         return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "특정 대회 전체 팀 조회", description = "해당 대회의 모든 팀을 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "대회의 팀 전체 조회 성공")
+    @GetMapping("/{contestId}/teams")
+    public ResponseEntity<List<TeamSummaryResponse>> getAllContestTeams(
+            @PathVariable final Long contestId,
+            @LoginMember final Member member
+    ) {
+        List<TeamSummaryResponse> responses = contestQueryService.getAllTeamSummariesByContest(contestId,
+                member);
+        return ResponseEntity.ok(responses);
     }
 }
