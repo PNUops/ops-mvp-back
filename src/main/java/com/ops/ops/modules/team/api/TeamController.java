@@ -9,6 +9,7 @@ import com.ops.ops.modules.member.domain.Member;
 import com.ops.ops.modules.team.application.TeamCommandService;
 import com.ops.ops.modules.team.application.TeamQueryService;
 import com.ops.ops.modules.team.application.dto.request.PreviewDeleteRequest;
+import com.ops.ops.modules.team.application.dto.request.TeamCreateRequest;
 import com.ops.ops.modules.team.application.dto.request.TeamDetailUpdateRequest;
 import com.ops.ops.modules.team.application.dto.response.TeamDetailResponse;
 import com.ops.ops.modules.team.application.dto.response.TeamSubmissionStatusResponse;
@@ -25,6 +26,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -151,5 +153,14 @@ public class TeamController {
     ) {
         teamCommandService.deleteTeam(teamId);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/teams")
+    public ResponseEntity<Void> createTeam(
+            @RequestBody @Validated TeamCreateRequest request,
+            @LoginMember final Member member
+    ) {
+        teamCommandService.createTeam(request, member);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }

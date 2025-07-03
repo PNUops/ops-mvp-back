@@ -73,6 +73,21 @@ public class Team extends BaseEntity {
         this.teamMembers = teamMembers;
     }
 
+    public static Team of(String leaderName, String teamName, String projectName, String overview,
+                          String productionPath, String githubPath, String youTubePath
+    ) {
+        return Team.builder()
+                .leaderName(leaderName)
+                .teamName(teamName)
+                .projectName(projectName)
+                .overview(overview)
+                .productionPath(productionPath)
+                .githubPath(githubPath)
+                .youTubePath(youTubePath)
+                .teamMembers(new ArrayList<>())
+                .build();
+    }
+
     public void updateDetail(final String newTeamName, final String newProjectName, final String newLeaderName,
                              final String newOverview, final String newProductionPath, final String newGithubPath,
                              final String newYouTubePath) {

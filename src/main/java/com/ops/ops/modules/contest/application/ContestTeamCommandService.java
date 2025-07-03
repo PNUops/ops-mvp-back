@@ -35,7 +35,8 @@ public class ContestTeamCommandService {
             if (contestTeam.isContestChanged(newContestId)) {
                 throw new ContestException(ContestExceptionType.CANNOT_CHANGE_CONTEST_FOR_CURRENT);
             }
-            if (team.isTeamNameChanged(newTeamName) || team.isProjectNameChanged(newProjectName) || team.isLeaderNameChanged(newLeaderName)) {
+            if (team.isTeamNameChanged(newTeamName) || team.isProjectNameChanged(newProjectName)
+                    || team.isLeaderNameChanged(newLeaderName)) {
                 throw new ContestException(ContestExceptionType.CANNOT_UPDATE_TEAM_INFO_FOR_CURRENT);
             }
         }
@@ -47,7 +48,7 @@ public class ContestTeamCommandService {
 
         // 4. 수정 전 팀의 대회가 isCurrent=false인데 사용자가 isCurrent=true인 대회로 변경하려고 함
         if (!isCurrent && newContest.getIsCurrent()) {
-            throw new ContestException(ContestExceptionType.CANNOT_MOVE_TO_CURRENT_CONTEST);
+            throw new ContestException(ContestExceptionType.CANNOT_CREATE_TEAM_OF_CURRENT_CONTEST);
         }
 
         // 5. 대회 변경 시 실제 변경

@@ -34,7 +34,7 @@ public class ContestCommandService {
         contest.updateContestName(newContestName);
     }
 
-    private Contest validateAndGetContestById(final Long contestId) {
+    public Contest validateAndGetContestById(final Long contestId) {
         return contestRepository.findById(contestId)
                 .orElseThrow(() -> new ContestException(ContestExceptionType.NOT_FOUND_CONTEST));
     }

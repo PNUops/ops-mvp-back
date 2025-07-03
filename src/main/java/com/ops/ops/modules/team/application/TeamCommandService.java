@@ -5,14 +5,19 @@ import static com.ops.ops.modules.file.exception.FileExceptionType.EXCEED_PREVIE
 import static com.ops.ops.modules.team.exception.TeamExceptionType.NOT_FOUND_TEAM;
 
 import com.ops.ops.global.util.FileStorageUtil;
+import com.ops.ops.modules.contest.application.ContestCommandService;
 import com.ops.ops.modules.contest.application.ContestTeamCommandService;
-import com.ops.ops.modules.contest.domain.dao.ContestRepository;
+import com.ops.ops.modules.contest.domain.Contest;
+import com.ops.ops.modules.contest.domain.ContestTeam;
 import com.ops.ops.modules.contest.domain.dao.ContestTeamRepository;
+import com.ops.ops.modules.contest.exception.ContestException;
+import com.ops.ops.modules.contest.exception.ContestExceptionType;
 import com.ops.ops.modules.file.domain.FileImageType;
 import com.ops.ops.modules.file.domain.dao.FileRepository;
 import com.ops.ops.modules.file.exception.FileException;
 import com.ops.ops.modules.member.domain.Member;
 import com.ops.ops.modules.member.domain.dao.MemberRepository;
+import com.ops.ops.modules.team.application.dto.request.TeamCreateRequest;
 import com.ops.ops.modules.team.application.dto.request.TeamDetailUpdateRequest;
 import com.ops.ops.modules.team.domain.Team;
 import com.ops.ops.modules.team.domain.TeamMember;
@@ -34,11 +39,11 @@ public class TeamCommandService {
     private final FileRepository fileRepository;
     private final TeamRepository teamRepository;
     private final FileStorageUtil fileStorageUtil;
-    private final ContestTeamRepository contestTeamRepository;
-    private final ContestRepository contestRepository;
+    private final ContestCommandService contestCommandService;
     private final ContestTeamCommandService contestTeamCommandService;
     private final MemberRepository memberRepository;
     private final TeamMemberRepository teamMemberRepository;
+    private final ContestTeamRepository contestTeamRepository;
 
     public void saveThumbnailImage(final Long teamId, final MultipartFile image, final FileImageType thumbnailType) {
         validateExistTeam(teamId);
@@ -141,6 +146,27 @@ public class TeamCommandService {
     public void deleteTeam(final Long teamId) {
         final Team team = validateAndGetTeamById(teamId);
         teamRepository.delete(team);
+    }
+
+    @Transactional
+    public void createTeam(TeamCreateRequest request, Member member) {
+        final Contest contest = contestCommandService.validateAndGetContestById(request.contestId());
+        if (contest.getIsCurrent()) {
+            throw new ContestException(ContestExceptionType.CANNOT_CREATE_TEAM_OF_CURRENT_CONTEST);
+        }
+
+        final Team team = Team.of(request.leaderName(), request.teamName(), request.projectName(), request.overview(),
+                request.productionPath(), request.githubPath(), request.youTubePath()
+        );
+        teamRepository.save(team);
+
+        final ContestTeam contestTeam = new ContestTeam(team.getId(), contest);
+        contestTeamRepository.save(contestTeam);
+
+        final Member leader = memberRepository.save(Member.createFake(request.leaderName()));
+
+        final TeamMember teamLeader = team.addTeamMember(leader.getId());
+        teamMemberRepository.save(teamLeader);
     }
 
 }
