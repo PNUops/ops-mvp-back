@@ -119,11 +119,11 @@ public class TeamCommandService {
             });
 
             // 4. 가짜 리더 생성 및 저장
-            Member fakeLeader = Member.createFake(request.leaderName());
+            final Member fakeLeader = Member.createFake(request.leaderName());
             memberRepository.save(fakeLeader);
 
             // 5. 새 리더 TeamMember 생성 및 저장
-            TeamMember newLeader = team.addTeamMember(fakeLeader.getId());
+            final TeamMember newLeader = team.addTeamMember(fakeLeader.getId());
             teamMemberRepository.save(newLeader);
         }
 
