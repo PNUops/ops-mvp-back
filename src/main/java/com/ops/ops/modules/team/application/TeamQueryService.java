@@ -128,7 +128,8 @@ public class TeamQueryService {
     }
 
     public TeamSubmissionStatusResponse getSubmissionStatus(final Member member) {
-        TeamMember teamMember = teamMemberRepository.findByMemberId(member.getId());
+        TeamMember teamMember = teamMemberRepository.findByMemberId(member.getId())
+                .orElseThrow(() -> new TeamException(TeamExceptionType.NOT_FOUND_TEAM_MEMBER));
         Team team = teamMember.getTeam();
 
         return TeamSubmissionStatusResponse.fromEntity(team);

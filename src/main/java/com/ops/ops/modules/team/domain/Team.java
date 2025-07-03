@@ -181,4 +181,17 @@ public class Team extends BaseEntity {
 
         this.contest = newContest;
     }
+
+    public void validateDuplicatedMemberName(String newMemberName, MemberRepository memberRepository) {
+        boolean duplicated = this.teamMembers.stream()
+                .filter(tm -> !tm.getIsDeleted())
+                .anyMatch(tm -> memberRepository.findById(tm.getMemberId())
+                        .map(Member::getName)
+                        .filter(name -> name.equals(newMemberName))
+                        .isPresent());
+
+        if (duplicated) {
+            throw new TeamException(TeamExceptionType.DUPLICATED_MEMBER_NAME);
+        }
+    }
 }
