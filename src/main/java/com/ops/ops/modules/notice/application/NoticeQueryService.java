@@ -25,7 +25,7 @@ public class NoticeQueryService {
     public List<NoticeSummaryResponse> getNotices() {
         return noticeRepository.findAllByOrderByCreatedAtDesc()
                 .stream()
-                .map(NoticeSummaryResponse::from)
+                .map(n -> new NoticeSummaryResponse(n.getId(), n.getTitle(), n.getUpdatedAt()))
                 .toList();
     }
 }
