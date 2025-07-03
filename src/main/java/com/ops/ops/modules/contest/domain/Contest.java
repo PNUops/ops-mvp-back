@@ -48,13 +48,6 @@ public class Contest extends BaseEntity {
         this.teams = teams;
     }
 
-    public static Contest of(final String contestName, final Boolean isCurrent) {
-        return Contest.builder()
-                .contestName(contestName)
-                .isCurrent(isCurrent)
-                .build();
-    }
-
     public void updateContestName(final String newContestName) {
         this.contestName = newContestName;
     }
