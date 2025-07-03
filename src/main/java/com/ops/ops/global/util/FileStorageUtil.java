@@ -33,6 +33,7 @@ public class FileStorageUtil {
     private static final Path DEFAULT_FILE_PATH = RESOURCE_PATH.resolve("files");
 
     private final FileRepository fileRepository;
+    private final FileEncodingUtil fileEncodingUtil;
 
     static {
         try {
@@ -46,9 +47,10 @@ public class FileStorageUtil {
                 .orElseThrow(() -> new FileException(FileExceptionType.NOT_EXISTS_MATCHING_IMAGE_ID));
         final ByteArrayResource findResource =
                 findPhysicalFile(RESOURCE_PATH.resolve(findFile.getFilePath()).normalize());
-        final String mimeType = new MimetypesFileTypeMap()
+        MimetypesFileTypeMap mimeTypesMap = new MimetypesFileTypeMap();
+        mimeTypesMap.addMimeTypes("image/webp webp WEBP");
+        final String mimeType = mimeTypesMap
                 .getContentType(RESOURCE_PATH.resolve(findFile.getFilePath()).normalize().toFile());
-
         return new Pair<>(findResource, mimeType);
     }
 
@@ -86,9 +88,11 @@ public class FileStorageUtil {
 
             final String randomFilename = UUID.randomUUID() + extension;
             final Path targetFile = uploadDir.resolve(randomFilename);
-            multipartFile.transferTo(targetFile.toFile());
+//            multipartFile.transferTo(targetFile.toFile());
+            Path webpFilePath = getWebpFilePath(targetFile);
+            fileEncodingUtil.convertToWebpAndSave(multipartFile, webpFilePath);
 
-            final Path relativePath = RESOURCE_PATH.relativize(targetFile);
+            final Path relativePath = RESOURCE_PATH.relativize(webpFilePath);
             final String filePathForDb = relativePath.toString().replace("\\", "/");
 
             return fileRepository.save(File.builder()
@@ -101,6 +105,13 @@ public class FileStorageUtil {
         } catch (IOException e) {
             throw new FileSaveFailedException("로컬 디스크에 파일을 저장하는 중 오류가 발생했습니다.", e);
         }
+    }
+
+    private Path getWebpFilePath(Path filePath) {
+        String fileName = filePath.getFileName().toString();
+        int lastDotIndex = fileName.lastIndexOf('.');
+        String newFileName = fileName.substring(0, lastDotIndex) + ".webp";
+        return filePath.getParent().resolve(newFileName);
     }
 
     public void deleteFile(final Long fileId) {
