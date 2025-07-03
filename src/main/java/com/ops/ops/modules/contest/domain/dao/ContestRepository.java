@@ -13,4 +13,5 @@ public interface ContestRepository extends JpaRepository<Contest, Long> {
     Optional<Contest> findByIsCurrentTrue();
 
     List<Long> findTeamIdsById(Long contestId);
+
 }

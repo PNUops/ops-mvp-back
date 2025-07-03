@@ -5,13 +5,11 @@ import static com.ops.ops.modules.team.exception.TeamExceptionType.NOT_FOUND_TEA
 
 import com.ops.ops.global.util.FileStorageUtil;
 import com.ops.ops.modules.contest.domain.Contest;
-import com.ops.ops.modules.contest.domain.dao.ContestTeamRepository;
 import com.ops.ops.modules.file.domain.File;
 import com.ops.ops.modules.file.domain.FileImageType;
 import com.ops.ops.modules.file.domain.dao.FileRepository;
 import com.ops.ops.modules.file.exception.FileException;
 import com.ops.ops.modules.file.exception.FileExceptionType;
-import com.ops.ops.modules.member.application.MemberQueryService;
 import com.ops.ops.modules.member.domain.Member;
 import com.ops.ops.modules.member.domain.MemberRoleType;
 import com.ops.ops.modules.member.domain.dao.MemberRepository;
@@ -48,15 +46,12 @@ public class TeamQueryService {
     private final MemberRepository memberRepository;
     private final TeamLikeRepository teamLikeRepository;
     private final TeamMemberRepository teamMemberRepository;
-    private final MemberQueryService memberQueryService;
-    private final ContestTeamRepository contestTeamRepository;
 
     public TeamDetailResponse getTeamDetail(final Long teamId, final Member member) {
         Team team = teamRepository.findById(teamId)
                 .orElseThrow(() -> new TeamException(TeamExceptionType.NOT_FOUND_TEAM));
 
-        Contest contest = contestTeamRepository.findContestByTeamId(teamId);
-
+        Contest contest = team.getContest();
         List<TeamDetailResponse.TeamMemberResponse> teamMembers = getTeamMembersByTeamId(teamId);
         Long leaderId = getLeaderIdByTeamId(teamId);
         List<Long> previewIds = fileRepository.findAllByTeamIdAndType(teamId, FileImageType.PREVIEW)

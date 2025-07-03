@@ -6,10 +6,8 @@ import static com.ops.ops.modules.team.exception.TeamExceptionType.NOT_FOUND_TEA
 
 import com.ops.ops.global.util.FileStorageUtil;
 import com.ops.ops.modules.contest.application.ContestCommandService;
-import com.ops.ops.modules.contest.application.ContestTeamCommandService;
 import com.ops.ops.modules.contest.domain.Contest;
-import com.ops.ops.modules.contest.domain.ContestTeam;
-import com.ops.ops.modules.contest.domain.dao.ContestTeamRepository;
+import com.ops.ops.modules.contest.domain.dao.ContestRepository;
 import com.ops.ops.modules.contest.exception.ContestException;
 import com.ops.ops.modules.contest.exception.ContestExceptionType;
 import com.ops.ops.modules.file.domain.FileImageType;
@@ -24,7 +22,6 @@ import com.ops.ops.modules.team.domain.TeamMember;
 import com.ops.ops.modules.team.domain.dao.TeamMemberRepository;
 import com.ops.ops.modules.team.domain.dao.TeamRepository;
 import com.ops.ops.modules.team.exception.TeamException;
-import com.ops.ops.modules.team.exception.TeamExceptionType;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -40,10 +37,9 @@ public class TeamCommandService {
     private final TeamRepository teamRepository;
     private final FileStorageUtil fileStorageUtil;
     private final ContestCommandService contestCommandService;
-    private final ContestTeamCommandService contestTeamCommandService;
     private final MemberRepository memberRepository;
     private final TeamMemberRepository teamMemberRepository;
-    private final ContestTeamRepository contestTeamRepository;
+    private final ContestRepository contestRepository;
 
     public void saveThumbnailImage(final Long teamId, final MultipartFile image, final FileImageType thumbnailType) {
         validateExistTeam(teamId);
@@ -89,58 +85,41 @@ public class TeamCommandService {
                 .orElseThrow(() -> new TeamException(NOT_FOUND_TEAM));
     }
 
+    private void changeToFakeLeader(final Team team, final String newLeaderName) {
+        // 1. 기존 리더 TeamMember 찾기
+        TeamMember oldLeader = team.findTeamMemberByName(team.getLeaderName(), memberRepository);
+
+        // 2. 기존 리더 TeamMember 삭제
+        teamMemberRepository.delete(oldLeader);
+
+        // 3. 기존 Member가 가짜면 Member도 삭제
+        memberRepository.findById(oldLeader.getMemberId())
+                .filter(Member::isFake)
+                .ifPresent(memberRepository::delete);
+
+        // 4. 가짜 리더 생성 및 저장
+        Member fakeLeader = memberRepository.save(Member.createFake(newLeaderName));
+
+        // 5. 팀 리더 변경 및 TeamMember 생성
+        TeamMember newLeader = team.changeLeaderTo(fakeLeader, team.getLeaderName());
+
+        // 6. 새 TeamMember 저장
+        teamMemberRepository.save(newLeader);
+    }
+
     public void updateTeamDetail(final Long teamId, final Member member, final TeamDetailUpdateRequest request) {
         final Team team = validateAndGetTeamById(teamId);
-        contestTeamCommandService.ValidateAndUpdateContest(
-                teamId,
-                request.contestId(),
-                team,
-                member,
-                request.teamName(),
-                request.projectName(),
-                request.leaderName()
-        );
+
+        Contest newContest = contestRepository.findById(request.contestId())
+                .orElseThrow(() -> new ContestException(ContestExceptionType.NOT_FOUND_CONTEST));
+        team.changeContest(newContest, member, request.teamName(), request.projectName(), request.leaderName());
 
         if (team.isLeaderNameChanged(request.leaderName())) {
-            // 1. 기존 리더 TeamMember 찾기
-            List<TeamMember> teamMembers = team.getTeamMembers();
-            TeamMember oldLeader = teamMembers.stream()
-                    .filter(tm -> !tm.getIsDeleted())
-                    .filter(tm -> memberRepository.findById(tm.getMemberId())
-                            .map(Member::getName)
-                            .map(name -> name.equals(request.leaderName()))
-                            .orElse(false))
-                    .findFirst()
-                    .orElseThrow(() -> new TeamException(TeamExceptionType.NOT_FOUND_TEAM_MEMBER));
-
-            // 2. 기존 리더 TeamMember 삭제
-            teamMemberRepository.delete(oldLeader);
-
-            // 3. 기존 Member가 가짜면 Member도 삭제
-            memberRepository.findById(oldLeader.getMemberId()).ifPresent(m -> {
-                if (Member.isFake(m)) {
-                    memberRepository.delete(m);
-                }
-            });
-
-            // 4. 가짜 리더 생성 및 저장
-            final Member fakeLeader = Member.createFake(request.leaderName());
-            memberRepository.save(fakeLeader);
-
-            // 5. 새 리더 TeamMember 생성 및 저장
-            final TeamMember newLeader = team.addTeamMember(fakeLeader.getId());
-            teamMemberRepository.save(newLeader);
+            changeToFakeLeader(team, request.leaderName());
         }
 
-        team.updateDetail(
-                request.teamName(),
-                request.projectName(),
-                request.leaderName(),
-                request.overview(),
-                request.productionPath(),
-                request.githubPath(),
-                request.youTubePath()
-        );
+        team.updateDetail(request.teamName(), request.leaderName(), request.overview(),
+                request.productionPath(), request.githubPath(), request.youTubePath());
     }
 
     public void deleteTeam(final Long teamId) {
@@ -150,20 +129,14 @@ public class TeamCommandService {
 
     public void createTeam(TeamCreateRequest request, Member member) {
         final Contest contest = contestCommandService.validateAndGetContestById(request.contestId());
-        if (contest.getIsCurrent()) {
-            throw new ContestException(ContestExceptionType.CANNOT_CREATE_TEAM_OF_CURRENT_CONTEST);
-        }
+        contest.validateTeamCreatable();
 
         final Team team = Team.of(request.leaderName(), request.teamName(), request.projectName(), request.overview(),
-                request.productionPath(), request.githubPath(), request.youTubePath()
+                request.productionPath(), request.githubPath(), request.youTubePath(), contest
         );
-        teamRepository.saveAndFlush(team);
-
-        final ContestTeam contestTeam = new ContestTeam(team.getId(), contest);
-        contestTeamRepository.save(contestTeam);
+        teamRepository.save(team);
 
         final Member leader = memberRepository.saveAndFlush(Member.createFake(request.leaderName()));
-
         final TeamMember teamLeader = team.addTeamMember(leader.getId());
         teamMemberRepository.save(teamLeader);
     }
