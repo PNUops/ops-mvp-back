@@ -1,6 +1,6 @@
 package com.ops.ops.modules.notice.application;
 
-import com.ops.ops.modules.notice.application.dto.request.NoticeCreateRequest;
+import com.ops.ops.modules.notice.application.dto.request.NoticeRequest;
 import com.ops.ops.modules.notice.domain.Notice;
 import com.ops.ops.modules.notice.domain.dao.NoticeRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +14,7 @@ public class NoticeCommandService {
 
     private final NoticeRepository noticeRepository;
 
-    public void createNotice(final NoticeCreateRequest request) {
+    public void createNotice(final NoticeRequest request) {
         noticeRepository.save(Notice.builder()
                 .title(request.title())
                 .description(request.description())

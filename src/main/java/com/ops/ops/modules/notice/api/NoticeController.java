@@ -2,7 +2,7 @@ package com.ops.ops.modules.notice.api;
 
 import com.ops.ops.modules.notice.application.NoticeCommandService;
 import com.ops.ops.modules.notice.application.NoticeQueryService;
-import com.ops.ops.modules.notice.application.dto.request.NoticeCreateRequest;
+import com.ops.ops.modules.notice.application.dto.request.NoticeRequest;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +27,7 @@ public class NoticeController {
 
     @PostMapping
     @Secured("ROLE_관리자")
-    public ResponseEntity<Void> createNotice(@Valid @RequestBody final NoticeCreateRequest request) {
+    public ResponseEntity<Void> createNotice(@Valid @RequestBody final NoticeRequest request) {
         noticeCommandService.createNotice(request);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
