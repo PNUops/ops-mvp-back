@@ -42,6 +42,7 @@ public class SecurityConfig {
                 .formLogin(FormLoginConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/sign-up/**", "/sign-in/**").permitAll()
+                        .requestMatchers("/oauth/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/teams/**").permitAll()
                         .anyRequest().hasAnyRole("회원", "관리자", "팀장")
                 )

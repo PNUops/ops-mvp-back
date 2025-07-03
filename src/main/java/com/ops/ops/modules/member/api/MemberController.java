@@ -18,12 +18,15 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "Member", description = "회원 관련 기능")
@@ -97,6 +100,27 @@ public class MemberController {
     @GetMapping("/sign-in/{studentId}/email-find")
     public ResponseEntity<EmailFindResponse> getMyEmail(@Parameter(description = "학번") @PathVariable String studentId) {
         final EmailFindResponse response = memberQueryService.getMyEmail(studentId);
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "구글 로그인 시작", description = "사용자를 구글 OAuth 인증 페이지로 리다이렉트하여 구글 로그인을 시작합니다.")
+    @ApiResponse(responseCode = "302", description = "구글 OAuth 인증 페이지로 리다이렉트")
+    @GetMapping("/oauth/google")
+    public ResponseEntity<Void> googleOAuthRedirect() {
+        final String redirectURL = memberCommandService.getGoogleOAuthRedirectURL();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Location", redirectURL);
+
+        return new ResponseEntity<>(headers, HttpStatus.FOUND);
+    }
+
+    @Operation(summary = "구글 로그인 콜백 처리", description = "구글 OAuth 인증 완료 후 콜백을 처리하여 회원가입/로그인을 진행합니다.")
+    @ApiResponse(responseCode = "200", description = "구글 로그인 성공")
+    @GetMapping("/oauth/google/callback")
+    public ResponseEntity<SignInResponse> googleOAuthCallback(
+        @Parameter(description = "구글 OAuth 인가 코드") @RequestParam("code") final String code) {
+        final SignInResponse response = memberCommandService.getGoogleOAuthCallback(code);
         return ResponseEntity.ok(response);
     }
 }

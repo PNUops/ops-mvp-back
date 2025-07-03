@@ -9,9 +9,14 @@ import static com.ops.ops.modules.member.exception.MemberExceptionType.ALREADY_E
 import static com.ops.ops.modules.member.exception.MemberExceptionType.CANNOT_CHANGE_SAME_PASSWORD;
 import static com.ops.ops.modules.member.exception.MemberExceptionType.CANNOT_MATCH_PASSWORD;
 import static com.ops.ops.modules.member.exception.MemberExceptionType.NOT_FOUND_MEMBER;
+import static com.ops.ops.global.util.oauth.exception.OAuthExceptionType.*;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.ops.ops.global.security.JwtProvider;
 import com.ops.ops.global.util.MailUtil;
+import com.ops.ops.global.util.oauth.component.GoogleOauth;
+import com.ops.ops.global.util.oauth.exception.OAuthException;
+import com.ops.ops.global.util.oauth.model.GoogleUser;
 import com.ops.ops.modules.member.application.dto.request.EmailAuthConfirmRequest;
 import com.ops.ops.modules.member.application.dto.request.EmailAuthRequest;
 import com.ops.ops.modules.member.application.dto.request.PasswordUpdateRequest;
@@ -27,13 +32,16 @@ import com.ops.ops.modules.member.exception.EmailAuthException;
 import com.ops.ops.modules.member.exception.MemberException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -45,6 +53,7 @@ public class MemberCommandService {
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
     private final MailUtil mailUtil;
+    private final GoogleOauth googleOauth;
 
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
     private static final int AUTH_CODE_LENGTH = 10;
@@ -110,6 +119,99 @@ public class MemberCommandService {
         checkEqualPassword(request.newPassword(), member);
         member.updatePassword(passwordEncoder.encode(request.newPassword()));
         emailAuthRepository.delete(emailAuth);
+    }
+
+    public String getGoogleOAuthRedirectURL() {
+        try {
+            return googleOauth.getOauthRedirectURL();
+        } catch (Exception e) {
+            log.error("Google OAuth redirect URL 생성 실패: {}", e.getMessage());
+            throw new OAuthException(SOCIAL_LOGIN_SERVER_ERROR);
+        }
+    }
+
+    public SignInResponse getGoogleOAuthCallback(final String code) {
+        try {
+            final GoogleUser googleUser = googleOauth.getUserInfoByCode(code, GoogleUser.class);
+
+            return memberRepository.findByEmail(googleUser.email())
+                .map(existingMember -> processExistingMemberLogin(existingMember))
+                .orElseGet(() -> processNewMemberSignUp(googleUser));
+
+        } catch (JsonProcessingException e) {
+            log.error("구글 사용자 정보 파싱 실패: {}", e.getMessage());
+            throw new OAuthException(FAILED_TO_GET_SOCIAL_USER_INFO);
+        } catch (Exception e) {
+            log.error("구글 OAuth 콜백 처리 중 오류 발생: {}", e.getMessage());
+            throw new OAuthException(SOCIAL_LOGIN_SERVER_ERROR);
+        }
+    }
+
+    private SignInResponse processExistingMemberLogin(final Member member) {
+        final List<String> roles = member.getRoles().stream()
+            .map(MemberRoleType::toString)
+            .toList();
+        final String token = jwtProvider.createToken(String.valueOf(member.getId()), roles, member.getName());
+
+        return SignInResponse.from(member, token);
+    }
+
+    private SignInResponse processNewMemberSignUp(final GoogleUser googleUser) {
+        log.info("신규 회원 구글 회원가입: {}", googleUser.email());
+
+        try {
+            final String randomPassword = generateRandomPassword();
+
+            final String tempStudentId = "TEMP_" + System.currentTimeMillis();
+
+            Member tempMember = memberRepository.save(Member.builder()
+                .name(googleUser.name())
+                .studentId(tempStudentId)
+                .email(googleUser.email())
+                .password(randomPassword)
+                .roles(new HashSet<>(Set.of(ROLE_회원)))
+                .build());
+
+            final String actualStudentId = generateStudentIdWithMemberId(tempMember.getId());
+            tempMember.updateStudentId(actualStudentId);
+            final Member newMember = memberRepository.save(tempMember);
+
+            log.info("구글 회원가입 완료: ID={}, Email={}, StudentId={}",
+                newMember.getId(), newMember.getEmail(), newMember.getStudentId());
+
+            final List<String> roles = newMember.getRoles().stream()
+                .map(MemberRoleType::toString)
+                .toList();
+            final String token = jwtProvider.createToken(
+                String.valueOf(newMember.getId()), roles, newMember.getName());
+
+            return SignInResponse.from(newMember, token);
+
+        } catch (Exception e) {
+            log.error("구글 회원가입 처리 중 상세 오류: {}", e.getMessage(), e);
+            throw new OAuthException(SOCIAL_LOGIN_SERVER_ERROR);
+        }
+    }
+
+    private String generateStudentIdWithMemberId(final Long memberId) {
+        String memberIdStr = String.valueOf(memberId);
+        String last7Digits = memberIdStr.length() > 7
+            ? memberIdStr.substring(memberIdStr.length() - 7)
+            : String.format("%07d", memberId);
+
+        return "99" + last7Digits;
+    }
+
+    private String generateRandomPassword() {
+        final int passwordLength = 32;
+        final String passwordPool = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
+
+        StringBuilder password = new StringBuilder();
+        for (int i = 0; i < passwordLength; i++) {
+            password.append(passwordPool.charAt(SECURE_RANDOM.nextInt(passwordPool.length())));
+        }
+
+        return passwordEncoder.encode(password.toString());
     }
 
     private void registerNewMember(final String name, final String studentId, final String email,
