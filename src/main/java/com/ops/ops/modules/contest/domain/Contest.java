@@ -1,6 +1,8 @@
 package com.ops.ops.modules.contest.domain;
 
 import com.ops.ops.global.base.BaseEntity;
+import com.ops.ops.modules.team.domain.Team;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -35,15 +37,15 @@ public class Contest extends BaseEntity {
     @Column(nullable = false)
     private Boolean isDeleted;
 
-    @OneToMany(mappedBy = "contest")
-    private List<ContestTeam> contestTeams = new ArrayList<>();
+    @OneToMany(mappedBy = "contest", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Team> teams = new ArrayList<>();
 
     @Builder
-    public Contest(final String contestName, final Boolean isCurrent, final List<ContestTeam> contestTeams) {
+    public Contest(final String contestName, final Boolean isCurrent, final List<Team> teams) {
         this.contestName = contestName;
         this.isDeleted = false;
         this.isCurrent = isCurrent;
-        this.contestTeams = contestTeams;
+        this.teams = teams;
     }
 
     public static Contest of(final String contestName, final Boolean isCurrent) {
