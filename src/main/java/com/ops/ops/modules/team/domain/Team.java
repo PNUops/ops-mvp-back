@@ -1,16 +1,20 @@
 package com.ops.ops.modules.team.domain;
 
 import com.ops.ops.global.base.BaseEntity;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Getter
@@ -39,6 +43,9 @@ public class Team extends BaseEntity {
     private String githubPath;
 
     @Column
+    private String productionPath;
+
+    @Column
     private String youTubePath;
 
     @Column(nullable = false)
@@ -52,11 +59,13 @@ public class Team extends BaseEntity {
 
     @Builder
     public Team(final String leaderName, final String teamName, final String projectName, final String overview,
+                final String productionPath,
                 final String githubPath, final String youTubePath, final List<TeamMember> teamMembers) {
         this.leaderName = leaderName;
         this.teamName = teamName;
         this.projectName = projectName;
         this.overview = overview;
+        this.productionPath = productionPath;
         this.githubPath = githubPath;
         this.youTubePath = youTubePath;
         this.isDeleted = false;
@@ -64,7 +73,9 @@ public class Team extends BaseEntity {
         this.teamMembers = teamMembers;
     }
 
-    public void updateDetail(final String newOverview, final String newGithubPath, final String newYouTubePath) {
+    public void updateDetail(final String newOverview, final String productionPath, final String newGithubPath,
+                             final String newYouTubePath) {
+        this.productionPath = productionPath;
         this.overview = newOverview;
         this.githubPath = newGithubPath;
         this.youTubePath = newYouTubePath;
