@@ -148,7 +148,6 @@ public class TeamCommandService {
         teamRepository.delete(team);
     }
 
-    @Transactional
     public void createTeam(TeamCreateRequest request, Member member) {
         final Contest contest = contestCommandService.validateAndGetContestById(request.contestId());
         if (contest.getIsCurrent()) {
@@ -158,15 +157,14 @@ public class TeamCommandService {
         final Team team = Team.of(request.leaderName(), request.teamName(), request.projectName(), request.overview(),
                 request.productionPath(), request.githubPath(), request.youTubePath()
         );
-        teamRepository.save(team);
+        teamRepository.saveAndFlush(team);
 
         final ContestTeam contestTeam = new ContestTeam(team.getId(), contest);
         contestTeamRepository.save(contestTeam);
 
-        final Member leader = memberRepository.save(Member.createFake(request.leaderName()));
+        final Member leader = memberRepository.saveAndFlush(Member.createFake(request.leaderName()));
 
         final TeamMember teamLeader = team.addTeamMember(leader.getId());
         teamMemberRepository.save(teamLeader);
     }
-
 }

@@ -155,7 +155,10 @@ public class TeamController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/teams")
+    @Operation(summary = "팀 등록", description = "팀을 등록합니다.")
+    @ApiResponse(responseCode = "201", description = "팀 등록 성공")
+    @PostMapping
+    @Secured("ROLE_관리자")
     public ResponseEntity<Void> createTeam(
             @RequestBody @Validated TeamCreateRequest request,
             @LoginMember final Member member
