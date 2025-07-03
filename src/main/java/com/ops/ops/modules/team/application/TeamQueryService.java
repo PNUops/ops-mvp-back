@@ -4,6 +4,8 @@ import static com.ops.ops.modules.file.domain.FileImageType.THUMBNAIL;
 import static com.ops.ops.modules.team.exception.TeamExceptionType.NOT_FOUND_TEAM;
 
 import com.ops.ops.global.util.FileStorageUtil;
+import com.ops.ops.modules.contest.domain.Contest;
+import com.ops.ops.modules.contest.domain.dao.ContestTeamRepository;
 import com.ops.ops.modules.file.domain.File;
 import com.ops.ops.modules.file.domain.FileImageType;
 import com.ops.ops.modules.file.domain.dao.FileRepository;
@@ -47,12 +49,15 @@ public class TeamQueryService {
     private final TeamLikeRepository teamLikeRepository;
     private final TeamMemberRepository teamMemberRepository;
     private final MemberQueryService memberQueryService;
+    private final ContestTeamRepository contestTeamRepository;
 
     public TeamDetailResponse getTeamDetail(final Long teamId, final Member member) {
         Team team = teamRepository.findById(teamId)
                 .orElseThrow(() -> new TeamException(TeamExceptionType.NOT_FOUND_TEAM));
 
-        List<String> participants = getParticipantsByTeamId(teamId);
+        Contest contest = contestTeamRepository.findContestByTeamId(teamId);
+
+        List<TeamDetailResponse.TeamMemberResponse> teamMembers = getTeamMembersByTeamId(teamId);
         Long leaderId = getLeaderIdByTeamId(teamId);
         List<Long> previewIds = fileRepository.findAllByTeamIdAndType(teamId, FileImageType.PREVIEW)
                 .stream()
@@ -65,7 +70,7 @@ public class TeamQueryService {
                 .orElse(false)
                 : false;
 
-        return TeamDetailResponse.from(team, leaderId, participants, previewIds, isLiked);
+        return TeamDetailResponse.from(contest, team, leaderId, teamMembers, previewIds, isLiked);
     }
 
     private Long getLeaderIdByTeamId(final Long teamId) {
@@ -77,12 +82,14 @@ public class TeamQueryService {
         return getLeaderIdByIds(memberIds);
     }
 
-    private List<String> getParticipantsByTeamId(final Long teamId) {
+    private List<TeamDetailResponse.TeamMemberResponse> getTeamMembersByTeamId(final Long teamId) {
         List<TeamMember> participants = teamMemberRepository.findAllByTeamId(teamId);
         List<Long> memberIds = participants.stream()
                 .map(TeamMember::getMemberId)
                 .toList();
-        return memberQueryService.getMemberNamesByIds(memberIds);
+        return memberRepository.findAllById(memberIds).stream()
+                .map(member -> new TeamDetailResponse.TeamMemberResponse(member.getId(), member.getName()))
+                .toList();
     }
 
     private Long getLeaderIdByIds(List<Long> memberIds) {
