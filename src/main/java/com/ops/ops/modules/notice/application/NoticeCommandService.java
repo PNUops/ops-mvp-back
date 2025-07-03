@@ -29,6 +29,10 @@ public class NoticeCommandService {
         notice.updateNotice(request.title(), request.description());
     }
 
+    public void deleteNotice(final Long noticeId) {
+        noticeRepository.delete(getValidateExistNotice(noticeId));
+    }
+
     private Notice getValidateExistNotice(final Long noticeId) {
         return noticeRepository.findById(noticeId).orElseThrow(() -> new NoticeException(NOT_FOUND_NOTICE));
     }
