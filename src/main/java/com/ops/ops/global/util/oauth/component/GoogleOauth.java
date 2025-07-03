@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ops.ops.global.util.oauth.exception.OAuthException;
-import com.ops.ops.global.util.oauth.token.GoogleOAuthToken;
+import com.ops.ops.global.util.oauth.dto.GoogleOAuthToken;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

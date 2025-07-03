@@ -16,7 +16,7 @@ import com.ops.ops.global.security.JwtProvider;
 import com.ops.ops.global.util.MailUtil;
 import com.ops.ops.global.util.oauth.component.GoogleOauth;
 import com.ops.ops.global.util.oauth.exception.OAuthException;
-import com.ops.ops.global.util.oauth.model.GoogleUser;
+import com.ops.ops.global.util.oauth.dto.GoogleUser;
 import com.ops.ops.modules.member.application.dto.request.EmailAuthConfirmRequest;
 import com.ops.ops.modules.member.application.dto.request.EmailAuthRequest;
 import com.ops.ops.modules.member.application.dto.request.PasswordUpdateRequest;
