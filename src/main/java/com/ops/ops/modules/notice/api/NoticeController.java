@@ -72,7 +72,7 @@ public class NoticeController {
     @Operation(summary = "공지시항 목록 조회", description = "공지사항 목록을 조회합니다. (메인페이지)")
     @ApiResponse(responseCode = "200", description = "공지사항 목록 조회 성공")
     @GetMapping
-    public ResponseEntity<List<NoticeSummaryResponse>> getNotices() {
-        return ResponseEntity.ok(noticeQueryService.getNotices());
+    public ResponseEntity<List<NoticeSummaryResponse>> getAllNotices() {
+        return ResponseEntity.ok(noticeQueryService.getAllNotices());
     }
 }
