@@ -137,4 +137,10 @@ public class TeamCommandService {
                 request.youTubePath()
         );
     }
+
+    public void deleteTeam(final Long teamId) {
+        final Team team = validateAndGetTeamById(teamId);
+        teamRepository.delete(team);
+    }
+
 }

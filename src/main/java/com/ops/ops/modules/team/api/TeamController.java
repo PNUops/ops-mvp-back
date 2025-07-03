@@ -13,6 +13,7 @@ import com.ops.ops.modules.team.application.dto.request.TeamDetailUpdateRequest;
 import com.ops.ops.modules.team.application.dto.response.TeamDetailResponse;
 import com.ops.ops.modules.team.application.dto.response.TeamSubmissionStatusResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -138,6 +139,17 @@ public class TeamController {
             @LoginMember final Member member
     ) {
         teamCommandService.updateTeamDetail(teamId, member, request);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "팀 삭제", description = "특정 팀을 삭제합니다. (소프트 삭제)")
+    @ApiResponse(responseCode = "204", description = "팀 삭제 성공")
+    @DeleteMapping("/{teamId}")
+    @Secured("ROLE_관리자")
+    public ResponseEntity<Void> deleteTeam(
+            @Parameter(description = "팀 ID") @PathVariable final Long teamId
+    ) {
+        teamCommandService.deleteTeam(teamId);
         return ResponseEntity.noContent().build();
     }
 }
