@@ -3,6 +3,7 @@ package com.ops.ops.modules.notice.application;
 import com.ops.ops.modules.notice.application.convenience.NoticeConvenience;
 import com.ops.ops.modules.notice.application.dto.response.NoticeDetailResponse;
 import com.ops.ops.modules.notice.application.dto.response.NoticeSummaryResponse;
+import com.ops.ops.modules.notice.domain.Notice;
 import com.ops.ops.modules.notice.domain.dao.NoticeRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +20,8 @@ public class NoticeQueryService {
     private final NoticeConvenience noticeConvenience;
 
     public NoticeDetailResponse getNotice(final Long noticeId) {
-        return NoticeDetailResponse.from(noticeConvenience.getValidateExistNotice(noticeId));
+        final Notice notice = noticeConvenience.getValidateExistNotice(noticeId);
+        return new NoticeDetailResponse(notice.getTitle(), notice.getDescription(), notice.getUpdatedAt());
     }
 
     public List<NoticeSummaryResponse> getNotices() {
