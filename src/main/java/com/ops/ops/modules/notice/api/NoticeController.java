@@ -37,7 +37,7 @@ public class NoticeController {
     @PatchMapping("/{noticeId}")
     @Secured("ROLE_관리자")
     public ResponseEntity<Void> updateNotice(@Valid @RequestBody final NoticeRequest request,
-                                             @PathVariable Long noticeId) {
+                                             @PathVariable final Long noticeId) {
         noticeCommandService.updateNotice(request, noticeId);
         return ResponseEntity.noContent().build();
     }
