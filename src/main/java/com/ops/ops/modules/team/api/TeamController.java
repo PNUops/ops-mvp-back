@@ -76,14 +76,17 @@ public class TeamController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "팀 썸네일 저장", description = "팀의 썸네일 이미지를 저장합니다.")
-    @ApiResponse(responseCode = "201", description = "팀 썸네일 저장 완료")
+    @Operation(summary = "팀 상세보기 수정", description = "특정 팀의 상세보기를 수정합니다.")
+    @ApiResponse(responseCode = "204", description = "팀 상세보기 수정 성공")
+    @PatchMapping("/{teamId}")
     @Secured("ROLE_팀장")
-    @PostMapping("/{teamId}/image/thumbnail")
-    public ResponseEntity<Void> saveThumbnailImage(@PathVariable final Long teamId,
-                                                   @RequestPart("image") final MultipartFile image) {
-        teamCommandService.saveThumbnailImage(teamId, image, THUMBNAIL);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+    public ResponseEntity<Void> updateTeamDetail(
+            @PathVariable final Long teamId,
+            @Valid @RequestBody final TeamDetailUpdateRequest request,
+            @LoginMember final Member member
+    ) {
+        teamCommandService.updateTeamDetail(teamId, member.getId(), request);
+        return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = "팀 썸네일 조회", description = "팀의 썸네일을 조회합니다.")
@@ -98,6 +101,25 @@ public class TeamController {
                 .body(result.a);
     }
 
+    @Operation(summary = "팀 썸네일 등록", description = "팀의 썸네일 이미지를 저장합니다.")
+    @ApiResponse(responseCode = "201", description = "팀 썸네일 저장 완료")
+    @Secured("ROLE_팀장")
+    @PostMapping("/{teamId}/image/thumbnail")
+    public ResponseEntity<Void> saveThumbnailImage(@PathVariable final Long teamId,
+                                                   @RequestPart("image") final MultipartFile image) {
+        teamCommandService.saveThumbnailImage(teamId, image, THUMBNAIL);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @Operation(summary = "팀 썸네일 삭제", description = "팀의 썸네일 이미지를 삭제합니다.")
+    @ApiResponse(responseCode = "204", description = "팀 썸네일 삭제 성공")
+    @Secured("ROLE_팀장")
+    @DeleteMapping("/{teamId}/image/thumbnail")
+    public ResponseEntity<Void> deleteThumbnailImage(@PathVariable Long teamId) {
+        teamCommandService.deleteThumbnailImage(teamId, THUMBNAIL);
+        return ResponseEntity.noContent().build();
+    }
+
     @Operation(summary = "팀 프리뷰 조회", description = "팀의 프리뷰 이미지를 조회합니다.")
     @ApiResponse(responseCode = "200", description = "팀 프리뷰 조회 성공")
     @GetMapping("/{teamId}/image/{imageId}")
@@ -108,15 +130,6 @@ public class TeamController {
         return ResponseEntity.ok()
                 .contentType(mediaType)
                 .body(result.a);
-    }
-
-    @Operation(summary = "팀 썸네일 삭제", description = "팀의 썸네일 이미지를 삭제합니다.")
-    @ApiResponse(responseCode = "204", description = "팀 썸네일 삭제 성공")
-    @Secured("ROLE_팀장")
-    @DeleteMapping("/{teamId}/image/thumbnail")
-    public ResponseEntity<Void> deleteThumbnailImage(@PathVariable Long teamId) {
-        teamCommandService.deleteThumbnailImage(teamId, THUMBNAIL);
-        return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = "팀 프리뷰 등록", description = "팀의 프리뷰 이미지를 등록합니다.")
@@ -136,19 +149,6 @@ public class TeamController {
     public ResponseEntity<Void> deletePreviewImage(@PathVariable Long teamId,
                                                    @RequestBody PreviewDeleteRequest previewDeleteRequest) {
         teamCommandService.deletePreviewImages(teamId, previewDeleteRequest.imageIds(), PREVIEW);
-        return ResponseEntity.noContent().build();
-    }
-
-    @Operation(summary = "팀 상세보기 수정", description = "특정 팀의 상세보기를 수정합니다.")
-    @ApiResponse(responseCode = "204", description = "팀 상세보기 수정 성공")
-    @PatchMapping("/{teamId}")
-    @Secured("ROLE_팀장")
-    public ResponseEntity<Void> updateTeamDetail(
-            @PathVariable final Long teamId,
-            @Valid @RequestBody final TeamDetailUpdateRequest request,
-            @LoginMember final Member member
-    ) {
-        teamCommandService.updateTeamDetail(teamId, member.getId(), request);
         return ResponseEntity.noContent().build();
     }
 }
