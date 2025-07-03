@@ -131,13 +131,13 @@ public class TeamController {
     @Operation(summary = "팀 상세보기 수정", description = "특정 팀의 상세보기를 수정합니다.")
     @ApiResponse(responseCode = "204", description = "팀 상세보기 수정 성공")
     @PatchMapping("/{teamId}")
-    @Secured("ROLE_팀장")
+    @Secured({"ROLE_팀장", "ROLE_관리자"})
     public ResponseEntity<Void> updateTeamDetail(
             @PathVariable final Long teamId,
             @Valid @RequestBody final TeamDetailUpdateRequest request,
             @LoginMember final Member member
     ) {
-        teamCommandService.updateTeamDetail(teamId, member.getId(), request);
+        teamCommandService.updateTeamDetail(teamId, member, request);
         return ResponseEntity.noContent().build();
     }
 }

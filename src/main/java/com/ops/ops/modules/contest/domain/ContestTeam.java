@@ -42,4 +42,8 @@ public class ContestTeam extends BaseEntity {
         this.contest = contest;
         this.isDeleted = false;
     }
+
+    public boolean isContestChanged(Long newContestId) {
+        return !contest.getId().equals(newContestId);
+    }
 }

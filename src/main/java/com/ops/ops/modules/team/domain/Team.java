@@ -73,12 +73,37 @@ public class Team extends BaseEntity {
         this.teamMembers = teamMembers;
     }
 
-    public void updateDetail(final String newOverview, final String productionPath, final String newGithubPath,
+    public void updateDetail(final String newTeamName, final String newProjectName, final String newLeaderName,
+                             final String newOverview, final String newProductionPath, final String newGithubPath,
                              final String newYouTubePath) {
-        this.productionPath = productionPath;
+        this.teamName = newTeamName;
+        this.projectName = newProjectName;
+        this.leaderName = newLeaderName;
         this.overview = newOverview;
+        this.productionPath = newProductionPath;
         this.githubPath = newGithubPath;
         this.youTubePath = newYouTubePath;
         this.isSubmitted = true;
+    }
+
+    public boolean isTeamNameChanged(String newTeamName) {
+        return !this.teamName.equals(newTeamName);
+    }
+
+    public boolean isProjectNameChanged(String newProjectName) {
+        return !this.projectName.equals(newProjectName);
+    }
+
+    public boolean isLeaderNameChanged(String newLeaderName) {
+        return !this.leaderName.equals(newLeaderName);
+    }
+
+    public TeamMember addTeamMember(Long memberId) {
+        TeamMember newLeader = TeamMember.builder()
+                .memberId(memberId)
+                .team(this)
+                .build();
+        this.teamMembers.add(newLeader);
+        return newLeader;
     }
 }
