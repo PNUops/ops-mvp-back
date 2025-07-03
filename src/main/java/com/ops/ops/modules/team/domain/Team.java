@@ -9,6 +9,18 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
+import com.ops.ops.modules.contest.domain.Contest;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -57,10 +69,17 @@ public class Team extends BaseEntity {
     @OneToMany(mappedBy = "team")
     private List<TeamMember> teamMembers = new ArrayList<>();
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "contest_id", nullable = false)
+    private Contest contest;
+
+
     @Builder
     public Team(final String leaderName, final String teamName, final String projectName, final String overview,
                 final String productionPath,
                 final String githubPath, final String youTubePath, final List<TeamMember> teamMembers) {
+                final String githubPath, final String youTubePath, final List<TeamMember> teamMembers,
+                final Contest contest) {
         this.leaderName = leaderName;
         this.teamName = teamName;
         this.projectName = projectName;
@@ -71,6 +90,7 @@ public class Team extends BaseEntity {
         this.isDeleted = false;
         this.isSubmitted = false;
         this.teamMembers = teamMembers;
+        this.contest = contest;
     }
 
     public static Team of(String leaderName, String teamName, String projectName, String overview,

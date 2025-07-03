@@ -3,7 +3,6 @@ package com.ops.ops.modules.contest.application;
 import com.ops.ops.modules.contest.application.dto.response.ContestResponse;
 import com.ops.ops.modules.contest.domain.Contest;
 import com.ops.ops.modules.contest.domain.dao.ContestRepository;
-import com.ops.ops.modules.contest.domain.dao.ContestTeamRepository;
 import com.ops.ops.modules.contest.exception.ContestException;
 import com.ops.ops.modules.contest.exception.ContestExceptionType;
 import com.ops.ops.modules.member.domain.Member;
@@ -19,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ContestQueryService {
     private final ContestRepository contestRepository;
-    private final ContestTeamRepository contestTeamRepository;
     private final TeamQueryService teamQueryService;
 
     public List<ContestResponse> getAllContests() {
@@ -36,8 +34,8 @@ public class ContestQueryService {
 
 
     public List<TeamSummaryResponse> getContestTeamSummaries(final Long contestId, final Member member) {
-        List<Long> contestTeamIds = contestTeamRepository.findTeamIdsByContestId(contestId);
-        return teamQueryService.getAllTeamSummaries(contestTeamIds, member);
+        List<Long> teamIds = contestRepository.findTeamIdsById(contestId);
+        return teamQueryService.getAllTeamSummaries(teamIds, member);
     }
 
     public List<TeamSummaryResponse> getCurrentContestTeamSummaries(final Member member) {
@@ -48,6 +46,6 @@ public class ContestQueryService {
     public List<Long> findTeamIdsOfCurrentContest() {
         Contest contest = contestRepository.findByIsCurrentTrue()
                 .orElseThrow(() -> new ContestException(ContestExceptionType.NOT_FOUND_CURRENT_CONTEST));
-        return contestTeamRepository.findTeamIdsByContestId(contest.getId());
+        return contestRepository.findTeamIdsById(contest.getId());
     }
 }
