@@ -1,6 +1,7 @@
 package com.ops.ops.modules.contest.domain.dao;
 
 import com.ops.ops.modules.contest.domain.Contest;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -10,4 +11,6 @@ public interface ContestRepository extends JpaRepository<Contest, Long> {
     boolean existsByContestName(String contestName);
 
     Optional<Contest> findByIsCurrentTrue();
+
+    List<Long> findTeamIdsById(Long contestId);
 }
