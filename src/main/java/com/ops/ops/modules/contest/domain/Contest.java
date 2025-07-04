@@ -2,14 +2,11 @@ package com.ops.ops.modules.contest.domain;
 
 import com.ops.ops.global.base.BaseEntity;
 import com.ops.ops.modules.team.domain.Team;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -37,15 +34,11 @@ public class Contest extends BaseEntity {
     @Column(nullable = false)
     private Boolean isDeleted;
 
-    @OneToMany(mappedBy = "contest", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Team> teams = new ArrayList<>();
-
     @Builder
     public Contest(final String contestName, final Boolean isCurrent, final List<Team> teams) {
         this.contestName = contestName;
         this.isDeleted = false;
         this.isCurrent = isCurrent;
-        this.teams = teams;
     }
 
     public void updateContestName(final String newContestName) {
