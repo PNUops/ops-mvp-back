@@ -172,12 +172,7 @@ public class MemberCommandService {
                 .roles(Set.of(ROLE_회원))
                 .build());
 
-            final String actualStudentId = generateStudentIdWithMemberId(tempMember.getId());
-            tempMember.updateStudentId(actualStudentId);
             final Member newMember = memberRepository.save(tempMember);
-
-            log.info("구글 회원가입 완료: ID={}, Email={}, StudentId={}",
-                newMember.getId(), newMember.getEmail(), newMember.getStudentId());
 
             final List<String> roles = newMember.getRoles().stream()
                 .map(MemberRoleType::toString)
@@ -191,15 +186,6 @@ public class MemberCommandService {
             log.error("구글 회원가입 처리 중 상세 오류: {}", e.getMessage(), e);
             throw new OAuthException(SOCIAL_LOGIN_SERVER_ERROR);
         }
-    }
-
-    private String generateStudentIdWithMemberId(final Long memberId) {
-        String memberIdStr = String.valueOf(memberId);
-        String last7Digits = memberIdStr.length() > 7
-            ? memberIdStr.substring(memberIdStr.length() - 7)
-            : String.format("%07d", memberId);
-
-        return "99" + last7Digits;
     }
 
     private String generateRandomPassword() {

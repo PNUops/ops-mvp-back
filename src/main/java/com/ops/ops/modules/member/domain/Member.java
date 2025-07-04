@@ -75,9 +75,6 @@ public class Member extends BaseEntity {
         this.password = newPassword;
     }
 
-    public void updateStudentId(final String studentId) {
-        this.studentId = studentId;
-    }
 
     public boolean isEqual(final String newPassword) {
         return this.password.equals(newPassword);
