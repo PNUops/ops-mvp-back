@@ -107,7 +107,7 @@ public class GoogleOauth implements SocialOauth {
 	private GoogleOAuthToken getAccessToken(ResponseEntity<String> response) {
 		try {
 			GoogleOAuthToken oAuthToken = objectMapper.readValue(response.getBody(), GoogleOAuthToken.class);
-			if (oAuthToken == null || oAuthToken.accessToken() == null) {
+			if (oAuthToken == null || oAuthToken.access_token() == null) {
 				throw new OAuthException(FAILED_TO_GET_ACCESS_TOKEN);
 			}
 			return oAuthToken;
@@ -121,7 +121,7 @@ public class GoogleOauth implements SocialOauth {
 		String GOOGLE_USERINFO_REQUEST_URL = "https://www.googleapis.com/oauth2/v1/userinfo";
 
 		HttpHeaders headers = new HttpHeaders();
-		headers.add("Authorization", "Bearer " + oAuthToken.accessToken());
+		headers.add("Authorization", "Bearer " + oAuthToken.access_token());
 		headers.add("Accept", MediaType.APPLICATION_JSON_VALUE);
 
 		HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(headers);

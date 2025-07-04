@@ -157,22 +157,18 @@ public class MemberCommandService {
     }
 
     private SignInResponse processNewMemberSignUp(final GoogleUser googleUser) {
-        log.info("신규 회원 구글 회원가입: {}", googleUser.email());
-
         try {
             final String randomPassword = generateRandomPassword();
 
             final String uniqueStudentId = "fake_" + UUID.randomUUID().toString().replace("-", "").substring(0, 10);
 
-            Member tempMember = memberRepository.save(Member.builder()
+            final Member newMember = memberRepository.save(Member.builder()
                 .name(googleUser.name())
                 .studentId(uniqueStudentId)
                 .email(googleUser.email())
                 .password(randomPassword)
                 .roles(Set.of(ROLE_회원))
                 .build());
-
-            final Member newMember = memberRepository.save(tempMember);
 
             final List<String> roles = newMember.getRoles().stream()
                 .map(MemberRoleType::toString)
