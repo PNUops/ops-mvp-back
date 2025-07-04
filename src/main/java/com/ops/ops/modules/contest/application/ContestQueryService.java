@@ -37,17 +37,17 @@ public class ContestQueryService {
 
 
     public List<TeamSummaryResponse> getContestTeamSummaries(final Long contestId, final Member member) {
-        List<Team> teams = teamRepository.findAllByContestId(contestId);
+        final List<Team> teams = teamRepository.findAllByContestId(contestId);
         return teamQueryService.getAllTeamSummaries(teams, member);
     }
 
     public List<TeamSummaryResponse> getCurrentContestTeamSummaries(final Member member) {
-        List<Team> teams = findTeamsOfCurrentContest();
+        final List<Team> teams = findTeamsOfCurrentContest();
         return teamQueryService.getAllTeamSummaries(teams, member);
     }
 
     public List<Team> findTeamsOfCurrentContest() {
-        Contest contest = contestRepository.findByIsCurrentTrue()
+        final Contest contest = contestRepository.findByIsCurrentTrue()
                 .orElseThrow(() -> new ContestException(ContestExceptionType.NOT_FOUND_CURRENT_CONTEST));
         return teamRepository.findAllByContestId(contest.getId());
     }
