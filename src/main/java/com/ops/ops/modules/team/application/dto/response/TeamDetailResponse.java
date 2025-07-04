@@ -1,6 +1,7 @@
 package com.ops.ops.modules.team.application.dto.response;
 
 import com.ops.ops.modules.contest.domain.Contest;
+import com.ops.ops.modules.team.application.dto.TeamMemberResponse;
 import com.ops.ops.modules.team.domain.Team;
 import java.util.List;
 
@@ -45,6 +46,4 @@ public record TeamDetailResponse(
                 isLiked
         );
     }
-
-    public record TeamMemberResponse(Long teamMemberId, String teamMemberName) {}
 }

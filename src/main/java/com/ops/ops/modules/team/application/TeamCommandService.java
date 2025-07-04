@@ -112,7 +112,8 @@ public class TeamCommandService {
 
         Contest newContest = contestRepository.findById(request.contestId())
                 .orElseThrow(() -> new ContestException(ContestExceptionType.NOT_FOUND_CONTEST));
-        team.changeContest(newContest, member, request.teamName(), request.projectName(), request.leaderName());
+        team.changeContest(newContest, member, request.teamName(), request.projectName(), request.leaderName(),
+                contestRepository);
 
         if (team.isLeaderNameChanged(request.leaderName())) {
             changeToFakeLeader(team, request.leaderName());
@@ -132,7 +133,7 @@ public class TeamCommandService {
         contest.validateTeamCreatable();
 
         final Team team = Team.of(request.leaderName(), request.teamName(), request.projectName(), request.overview(),
-                request.productionPath(), request.githubPath(), request.youTubePath(), contest
+                request.productionPath(), request.githubPath(), request.youTubePath(), request.contestId()
         );
         teamRepository.save(team);
 

@@ -2,6 +2,7 @@ package com.ops.ops.modules.team.domain;
 
 import com.ops.ops.global.base.BaseEntity;
 import com.ops.ops.modules.contest.domain.Contest;
+import com.ops.ops.modules.contest.domain.dao.ContestRepository;
 import com.ops.ops.modules.contest.exception.ContestException;
 import com.ops.ops.modules.contest.exception.ContestExceptionType;
 import com.ops.ops.modules.member.domain.Member;
@@ -70,10 +71,8 @@ public class Team extends BaseEntity {
 
     @Builder
     public Team(final String leaderName, final String teamName, final String projectName, final String overview,
-                final String githubPath, final String youTubePath, final List<TeamMember> teamMembers,
-                final Long contestId) {
                 final String productionPath, final String githubPath, final String youTubePath,
-                final List<TeamMember> teamMembers, final Contest contest) {
+                final List<TeamMember> teamMembers, final Long contestId) {
         this.leaderName = leaderName;
         this.teamName = teamName;
         this.projectName = projectName;
@@ -88,8 +87,7 @@ public class Team extends BaseEntity {
     }
 
     public static Team of(String leaderName, String teamName, String projectName, String overview,
-                          String productionPath, String githubPath, String youTubePath, final Contest contest
-    ) {
+                          String productionPath, String githubPath, String youTubePath, final Long contestId) {
         return Team.builder()
                 .leaderName(leaderName)
                 .teamName(teamName)
@@ -99,7 +97,7 @@ public class Team extends BaseEntity {
                 .githubPath(githubPath)
                 .youTubePath(youTubePath)
                 .teamMembers(new ArrayList<>())
-                .contest(contest)
+                .contestId(contestId)
                 .build();
     }
 
@@ -115,7 +113,7 @@ public class Team extends BaseEntity {
     }
 
     public boolean isContestChanged(Long newContestId) {
-        return !this.contest.getId().equals(newContestId);
+        return !this.contestId.equals(newContestId);
     }
 
     public boolean isTeamInfoChanged(String newTeamName, String newProjectName, String newLeaderName) {
@@ -153,8 +151,9 @@ public class Team extends BaseEntity {
     }
 
     public void changeContest(Contest newContest, Member member, String newTeamName, String newProjectName,
-                              String newLeaderName) {
-        Contest beforeContest = this.contest;
+                              String newLeaderName, ContestRepository contestRepository) {
+        Contest beforeContest = contestRepository.findById(this.contestId)
+                .orElseThrow(() -> new ContestException(ContestExceptionType.NOT_FOUND_CONTEST));
 
         if (beforeContest.getIsCurrent()) {
             if (isContestChanged(newContest.getId())) {
@@ -176,6 +175,6 @@ public class Team extends BaseEntity {
             }
         }
 
-        this.contest = newContest;
+        this.contestId = newContest.getId();
     }
 }
