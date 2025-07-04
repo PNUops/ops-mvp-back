@@ -1,13 +1,11 @@
 package com.ops.ops.modules.contest.domain;
 
 import com.ops.ops.global.base.BaseEntity;
-import com.ops.ops.modules.team.domain.Team;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -35,9 +33,13 @@ public class Contest extends BaseEntity {
     private Boolean isDeleted;
 
     @Builder
-    public Contest(final String contestName, final Boolean isCurrent, final List<Team> teams) {
+    public Contest(final String contestName, final Boolean isCurrent) {
         this.contestName = contestName;
-        this.isDeleted = false;
         this.isCurrent = isCurrent;
+        this.isDeleted = false;
+    }
+
+    public void updateContestName(final String newContestName) {
+        this.contestName = newContestName;
     }
 }
