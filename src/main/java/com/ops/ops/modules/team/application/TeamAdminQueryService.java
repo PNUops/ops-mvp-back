@@ -1,5 +1,9 @@
 package com.ops.ops.modules.team.application;
 
+import com.ops.ops.modules.contest.domain.Contest;
+import com.ops.ops.modules.contest.domain.dao.ContestRepository;
+import com.ops.ops.modules.contest.exception.ContestException;
+import com.ops.ops.modules.contest.exception.ContestExceptionType;
 import com.ops.ops.modules.member.domain.dao.MemberRepository;
 import com.ops.ops.modules.team.application.dto.TeamLikeCountDto;
 import com.ops.ops.modules.team.application.dto.TeamRank;
@@ -27,9 +31,13 @@ public class TeamAdminQueryService {
 	private final TeamRepository teamRepository;
 	private final TeamLikeRepository teamLikeRepository;
 	private final MemberRepository memberRepository;
+	private final ContestRepository contestRepository;
 
 	public List<TeamSubmissionStatusResponse> getAllTeamSubmissions() {
-		return teamRepository.findAll()
+		Contest currentContest = contestRepository.findByIsCurrentTrue()
+			.orElseThrow(() -> new ContestException(ContestExceptionType.NOT_FOUND_CONTEST));
+
+		return teamRepository.findByContestId(currentContest.getId())
 			.stream()
 			.map(TeamSubmissionStatusResponse::fromEntity)
 			.collect(Collectors.toList());
@@ -47,9 +55,14 @@ public class TeamAdminQueryService {
 	}
 
 	public TeamVoteRateResponse getVoteRate() {
+		Contest currentContest = contestRepository.findByIsCurrentTrue()
+			.orElseThrow(() -> new ContestException(ContestExceptionType.NOT_FOUND_CONTEST));
+		
+		List<Team> currentTeams = teamRepository.findByContestId(currentContest.getId());
+		
 		long totalMemberCount = memberRepository.count();
-		long votedMemberCount = teamLikeRepository.countDistinctMemberIdsByIsLikedTrue();
-		long totalVoteCount = teamLikeRepository.countByIsLikedTrue();
+		long votedMemberCount = teamLikeRepository.countDistinctMemberIdsByIsLikedTrueAndTeams(currentTeams);
+		long totalVoteCount = teamLikeRepository.countByIsLikedTrueAndTeams(currentTeams);
 
 		double voteRate = 0.0;
 		if (totalMemberCount > 0) {
@@ -60,7 +73,11 @@ public class TeamAdminQueryService {
 	}
 
 	private Map<Long, Integer> getTeamLikeCountMap() {
-		List<TeamLikeCountDto> likedList = teamLikeRepository.findTeamLikeCountGrouped();
+		Contest currentContest = contestRepository.findByIsCurrentTrue()
+			.orElseThrow(() -> new ContestException(ContestExceptionType.NOT_FOUND_CONTEST));
+		
+		List<Team> currentTeams = teamRepository.findByContestId(currentContest.getId());
+		List<TeamLikeCountDto> likedList = teamLikeRepository.findTeamLikeCountGroupedByTeams(currentTeams);
 
 		Map<Long, Integer> teamLikeCountMap = new HashMap<>();
 		for (TeamLikeCountDto dto : likedList) {
@@ -70,8 +87,11 @@ public class TeamAdminQueryService {
 	}
 
 	private List<TeamRank> getTeamRankList(Map<Long, Integer> teamLikeCountMap) {
+		Contest currentContest = contestRepository.findByIsCurrentTrue()
+			.orElseThrow(() -> new ContestException(ContestExceptionType.NOT_FOUND_CONTEST));
+		
 		List<TeamRank> teamRankList = new ArrayList<>();
-		List<Team> teamList = teamRepository.findAll();
+		List<Team> teamList = teamRepository.findByContestId(currentContest.getId());
 
 		for (Team team : teamList) {
 			if (team.getIsDeleted()) {
