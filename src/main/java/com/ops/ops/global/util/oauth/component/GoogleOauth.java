@@ -104,10 +104,10 @@ public class GoogleOauth implements SocialOauth {
 		}
 	}
 
-	private GoogleOAuthToken getAccessToken(ResponseEntity<String> response) throws JsonProcessingException {
+	private GoogleOAuthToken getAccessToken(ResponseEntity<String> response) {
 		try {
 			GoogleOAuthToken oAuthToken = objectMapper.readValue(response.getBody(), GoogleOAuthToken.class);
-			if (oAuthToken == null || oAuthToken.access_token() == null) {
+			if (oAuthToken == null || oAuthToken.accessToken() == null) {
 				throw new OAuthException(FAILED_TO_GET_ACCESS_TOKEN);
 			}
 			return oAuthToken;
@@ -121,20 +121,19 @@ public class GoogleOauth implements SocialOauth {
 		String GOOGLE_USERINFO_REQUEST_URL = "https://www.googleapis.com/oauth2/v1/userinfo";
 
 		HttpHeaders headers = new HttpHeaders();
-		headers.add("Authorization", "Bearer " + oAuthToken.access_token());
+		headers.add("Authorization", "Bearer " + oAuthToken.accessToken());
 		headers.add("Accept", MediaType.APPLICATION_JSON_VALUE);
 
-		HttpEntity<MultiValueMap<String, String>> request = new HttpEntity(headers);
+		HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(headers);
 		try {
-			ResponseEntity<String> response = restTemplate.exchange(GOOGLE_USERINFO_REQUEST_URL, HttpMethod.GET, request, String.class);
-			return response;
+			return restTemplate.exchange(GOOGLE_USERINFO_REQUEST_URL, HttpMethod.GET, request, String.class);
 		} catch (RestClientException e) {
 			log.error("Google User Info Request Server Error: {}", e.getMessage());
 			throw new OAuthException(FAILED_TO_GET_SOCIAL_USER_INFO);
 		}
 	}
 
-	private <T> T getUserInfo(ResponseEntity<String> userInfoRes, Class<T> userType) throws JsonProcessingException {
+	private <T> T getUserInfo(ResponseEntity<String> userInfoRes, Class<T> userType) {
 		try {
 			T googleUser = objectMapper.readValue(userInfoRes.getBody(), userType);
 			if (googleUser == null) {

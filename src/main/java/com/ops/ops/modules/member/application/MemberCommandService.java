@@ -32,7 +32,6 @@ import com.ops.ops.modules.member.exception.EmailAuthException;
 import com.ops.ops.modules.member.exception.MemberException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
@@ -135,7 +134,7 @@ public class MemberCommandService {
             final GoogleUser googleUser = googleOauth.getUserInfoByCode(code, GoogleUser.class);
 
             return memberRepository.findByEmail(googleUser.email())
-                .map(existingMember -> processExistingMemberLogin(existingMember))
+                .map(this::processExistingMemberLogin)
                 .orElseGet(() -> processNewMemberSignUp(googleUser));
 
         } catch (JsonProcessingException e) {
@@ -169,7 +168,7 @@ public class MemberCommandService {
                 .studentId(tempStudentId)
                 .email(googleUser.email())
                 .password(randomPassword)
-                .roles(new HashSet<>(Set.of(ROLE_회원)))
+                .roles(Set.of(ROLE_회원))
                 .build());
 
             final String actualStudentId = generateStudentIdWithMemberId(tempMember.getId());
