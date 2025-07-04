@@ -114,8 +114,7 @@ public class TeamQueryService {
                 .orElseThrow(() -> new TeamException(NOT_FOUND_TEAM));
     }
 
-    public List<TeamSummaryResponse> getAllTeamSummaries(final List<Long> teamIds, final Member member) {
-        List<Team> teams = teamRepository.findAllById(teamIds);
+    public List<TeamSummaryResponse> getAllTeamSummaries(final List<Team> teams, final Member member) {
         Collections.shuffle(teams);
 
         final Map<Long, Boolean> likeMap =
