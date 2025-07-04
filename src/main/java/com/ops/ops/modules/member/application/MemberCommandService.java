@@ -135,8 +135,8 @@ public class MemberCommandService {
             final GoogleUser googleUser = googleOauth.getUserInfoByCode(code, GoogleUser.class);
 
             return memberRepository.findByEmail(googleUser.email())
-                .map(this::processExistingMemberLogin)
-                .orElseGet(() -> processNewMemberSignUp(googleUser));
+                .map(this::processExistingMemberLogin) // 기존 회원 로그인 처리
+                .orElseGet(() -> processNewMemberSignUp(googleUser)); // 새로운 회원 가입 처리
 
         } catch (JsonProcessingException e) {
             log.error("구글 사용자 정보 파싱 실패: {}", e.getMessage());

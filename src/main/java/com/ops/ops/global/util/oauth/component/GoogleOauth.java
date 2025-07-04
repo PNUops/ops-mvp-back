@@ -60,10 +60,8 @@ public class GoogleOauth implements SocialOauth {
 		String parameterString = params.entrySet().stream()
 			.map(x -> x.getKey() + "=" + x.getValue())
 			.collect(Collectors.joining("&"));
-		String redirectURL = GOOGLE_SNS_URL + "?" + parameterString;
-		log.info("구글 소셜 OAuth Redirect URL 확인용 : {}", redirectURL);
 
-		return redirectURL;
+		return GOOGLE_SNS_URL + "?" + parameterString;
 	}
 
 	@Override
@@ -106,6 +104,7 @@ public class GoogleOauth implements SocialOauth {
 
 	private GoogleOAuthToken getAccessToken(ResponseEntity<String> response) {
 		try {
+			// 구글 OAuth 토큰 응답 파싱
 			GoogleOAuthToken oAuthToken = objectMapper.readValue(response.getBody(), GoogleOAuthToken.class);
 			if (oAuthToken == null || oAuthToken.access_token() == null) {
 				throw new OAuthException(FAILED_TO_GET_ACCESS_TOKEN);
