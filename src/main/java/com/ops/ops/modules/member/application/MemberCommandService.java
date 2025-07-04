@@ -34,6 +34,7 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -161,11 +162,11 @@ public class MemberCommandService {
         try {
             final String randomPassword = generateRandomPassword();
 
-            final String tempStudentId = "TEMP_" + System.currentTimeMillis();
+            final String uniqueStudentId = "fake_" + UUID.randomUUID().toString().replace("-", "").substring(0, 10);
 
             Member tempMember = memberRepository.save(Member.builder()
                 .name(googleUser.name())
-                .studentId(tempStudentId)
+                .studentId(uniqueStudentId)
                 .email(googleUser.email())
                 .password(randomPassword)
                 .roles(Set.of(ROLE_회원))
