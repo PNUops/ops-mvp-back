@@ -3,8 +3,7 @@ package com.ops.ops.modules.contest.api;
 import com.ops.ops.global.security.annotation.LoginMember;
 import com.ops.ops.modules.contest.application.ContestCommandService;
 import com.ops.ops.modules.contest.application.ContestQueryService;
-import com.ops.ops.modules.contest.application.dto.request.ContestCreateRequest;
-import com.ops.ops.modules.contest.application.dto.request.ContestUpdateRequest;
+import com.ops.ops.modules.contest.application.dto.request.ContestRequest;
 import com.ops.ops.modules.contest.application.dto.response.ContestResponse;
 import com.ops.ops.modules.member.domain.Member;
 import com.ops.ops.modules.team.application.dto.response.TeamSummaryResponse;
@@ -48,7 +47,7 @@ public class ContestController {
     @PostMapping
     @Secured("ROLE_관리자")
     public ResponseEntity<Void> createContest(
-            @Valid @RequestBody final ContestCreateRequest request
+            @Valid @RequestBody final ContestRequest request
     ) {
         contestCommandService.createContest(request.contestName());
         return ResponseEntity.status(HttpStatus.CREATED).build();
@@ -60,7 +59,7 @@ public class ContestController {
     @Secured("ROLE_관리자")
     public ResponseEntity<Void> updateContest(
             @PathVariable final Long contestId,
-            @Valid @RequestBody final ContestUpdateRequest request
+            @Valid @RequestBody final ContestRequest request
     ) {
         contestCommandService.updateContest(contestId, request.contestName());
         return ResponseEntity.noContent().build();

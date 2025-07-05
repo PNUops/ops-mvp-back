@@ -5,6 +5,7 @@ import com.ops.ops.modules.contest.domain.dao.ContestRepository;
 import com.ops.ops.modules.contest.exception.ContestException;
 import com.ops.ops.modules.contest.exception.ContestExceptionType;
 import com.ops.ops.modules.team.domain.dao.TeamRepository;
+import com.ops.ops.modules.team.domain.dao.TeamRepository;
 import java.util.ArrayList;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,11 +21,10 @@ public class ContestCommandService {
     public void createContest(final String contestName) {
         validateDuplicateContestName(contestName);
         // 만약 제 6회 창의융합 대회를 직접 등록하는 상황일 때 isCurrent를 true로 설정하도록
-        boolean isCurrent = contestName.contains("6회") && contestName.contains("창의융합");
+        final boolean isCurrent = contestName.contains("6회") && contestName.contains("창의융합");
         final Contest contest = Contest.builder()
                 .contestName(contestName)
                 .isCurrent(isCurrent)
-                .teams(new ArrayList<>())
                 .build();
         contestRepository.save(contest);
     }
