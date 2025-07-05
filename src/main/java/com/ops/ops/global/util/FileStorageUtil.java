@@ -90,17 +90,18 @@ public class FileStorageUtil {
             final Path targetFile = uploadDir.resolve(randomFilename);
 //            multipartFile.transferTo(targetFile.toFile());
             Path webpFilePath = getWebpFilePath(targetFile);
-            fileEncodingUtil.convertToWebpAndSave(multipartFile, webpFilePath);
 
             final Path relativePath = RESOURCE_PATH.relativize(webpFilePath);
             final String filePathForDb = relativePath.toString().replace("\\", "/");
 
-            return fileRepository.save(File.builder()
+            File savedFile = fileRepository.save(File.builder()
                     .name(originalFilename)
                     .filePath(filePathForDb)
                     .teamId(teamId)
                     .type(type)
                     .build());
+            fileEncodingUtil.convertToWebpAndSave(multipartFile, webpFilePath, savedFile.getId());
+            return savedFile;
 
         } catch (IOException e) {
             throw new FileSaveFailedException("로컬 디스크에 파일을 저장하는 중 오류가 발생했습니다.", e);
