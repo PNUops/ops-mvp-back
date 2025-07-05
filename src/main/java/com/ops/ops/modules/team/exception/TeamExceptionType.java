@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 public enum TeamExceptionType implements BaseExceptionType {
     NOT_FOUND_TEAM(HttpStatus.NOT_FOUND, "팀을 찾을 수 없습니다."),
     NOT_TEAM_LEADER(HttpStatus.FORBIDDEN, "해당 팀의 팀장 권한이 없습니다."),
-    ;
+    NOT_FOUND_TEAM_MEMBER(HttpStatus.NOT_FOUND, "팀원을 찾을 수 없습니다.");
 
     private final HttpStatus httpStatus;
     private final String errorMessage;

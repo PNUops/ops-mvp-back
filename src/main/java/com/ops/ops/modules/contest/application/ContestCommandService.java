@@ -1,12 +1,11 @@
 package com.ops.ops.modules.contest.application;
 
+import com.ops.ops.modules.contest.application.convenience.ContestConvenience;
 import com.ops.ops.modules.contest.domain.Contest;
 import com.ops.ops.modules.contest.domain.dao.ContestRepository;
 import com.ops.ops.modules.contest.exception.ContestException;
 import com.ops.ops.modules.contest.exception.ContestExceptionType;
 import com.ops.ops.modules.team.domain.dao.TeamRepository;
-import com.ops.ops.modules.team.domain.dao.TeamRepository;
-import java.util.ArrayList;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ContestCommandService {
     private final ContestRepository contestRepository;
     private final TeamRepository teamRepository;
+    private final ContestConvenience contestConvenience;
 
     public void createContest(final String contestName) {
         validateDuplicateContestName(contestName);
@@ -37,17 +37,12 @@ public class ContestCommandService {
 
     public void updateContest(final Long contestId, final String newContestName) {
         validateDuplicateContestName(newContestName);
-        final Contest contest = validateAndGetContestById(contestId);
+        final Contest contest = contestConvenience.getValidateExistContest(contestId);
         contest.updateContestName(newContestName);
     }
 
-    private Contest validateAndGetContestById(final Long contestId) {
-        return contestRepository.findById(contestId)
-                .orElseThrow(() -> new ContestException(ContestExceptionType.NOT_FOUND_CONTEST));
-    }
-
     public void deleteContest(final Long contestId) {
-        final Contest contest = validateAndGetContestById(contestId);
+        final Contest contest = contestConvenience.getValidateExistContest(contestId);
         if (teamRepository.existsByContestId(contestId)) {
             throw new ContestException(ContestExceptionType.CONTEST_HAS_TEAMS);
         }
