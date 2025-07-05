@@ -12,6 +12,7 @@ import com.ops.ops.modules.contest.exception.ContestExceptionType;
 import com.ops.ops.modules.file.domain.FileImageType;
 import com.ops.ops.modules.file.domain.dao.FileRepository;
 import com.ops.ops.modules.file.exception.FileException;
+import com.ops.ops.modules.member.application.MemberCommandService;
 import com.ops.ops.modules.member.domain.Member;
 import com.ops.ops.modules.member.domain.MemberRoleType;
 import com.ops.ops.modules.member.domain.dao.MemberRepository;
@@ -39,6 +40,7 @@ public class TeamCommandService {
     private final MemberRepository memberRepository;
     private final TeamMemberRepository teamMemberRepository;
     private final ContestConvenience contestConvenience;
+    private final MemberCommandService memberCommandService;
 
     public void saveThumbnailImage(final Long teamId, final MultipartFile image, final FileImageType thumbnailType) {
         validateExistTeam(teamId);
@@ -155,7 +157,8 @@ public class TeamCommandService {
     }
 
     private void assignFakeLeader(final String leaderName, final Team team) {
-        final Member fakeLeader = memberRepository.saveAndFlush(Member.createFake(leaderName));
+        final Member fakeLeader = memberCommandService.createFakeMember(leaderName);
+        memberRepository.saveAndFlush(fakeLeader);
         final TeamMember teamLeader = team.addTeamMember(fakeLeader.getId());
         teamMemberRepository.save(teamLeader);
     }
