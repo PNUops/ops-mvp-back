@@ -78,8 +78,7 @@ public class Member extends BaseEntity {
     public boolean isEqual(final String newPassword) {
         return this.password.equals(newPassword);
     }
-
-
+    
     public static boolean isFake(Member member) {
         return member.getEmail() != null && member.getStudentId().startsWith("fake_");
     }

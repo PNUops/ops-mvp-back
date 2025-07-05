@@ -82,7 +82,7 @@ public class Team extends BaseEntity {
     }
 
     public static Team of(String leaderName, String teamName, String projectName, String overview,
-                          String productionPath, String githubPath, String youTubePath, final Long contestId) {
+                          String productionPath, String githubPath, String youTubePath, Long contestId) {
         return Team.builder()
                 .leaderName(leaderName)
                 .teamName(teamName)
@@ -96,11 +96,10 @@ public class Team extends BaseEntity {
                 .build();
     }
 
-    public void updateDetail(final String newleaderName, final String newTeamName, final String newProjectName,
-                             final String newOverview,
-                             final String newProductionPath, final String newGithubPath, final String newYouTubePath,
-                             final Long newContestId) {
-        this.leaderName = newleaderName;
+    public void updateDetail(final String newLeaderName, final String newTeamName, final String newProjectName,
+                             final String newOverview, final String newProductionPath, final String newGithubPath,
+                             final String newYouTubePath, final Long newContestId) {
+        this.leaderName = newLeaderName;
         this.teamName = newTeamName;
         this.projectName = newProjectName;
         this.overview = newOverview;

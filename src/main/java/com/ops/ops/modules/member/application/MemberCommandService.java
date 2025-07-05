@@ -29,7 +29,6 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -198,16 +197,5 @@ public class MemberCommandService {
         if (member.isEqual(newPassword)) {
             throw new MemberException(CANNOT_CHANGE_SAME_PASSWORD);
         }
-    }
-
-    public Member createFakeMember(final String name) {
-        final String unique = UUID.randomUUID().toString().replace("-", "").substring(0, 10);
-        return memberRepository.save(Member.builder()
-                .name(name)
-                .studentId("fake_" + unique)
-                .email("fake_" + unique + "@placeholder.com")
-                .password("!FAKE_USER!")
-                .roles(Set.of(ROLE_회원))
-                .build());
     }
 }
