@@ -1,7 +1,5 @@
 package com.ops.ops.modules.team.api;
 
-import com.ops.ops.global.security.annotation.LoginMember;
-import com.ops.ops.modules.member.domain.Member;
 import com.ops.ops.modules.team.application.TeamMemberCommandService;
 import com.ops.ops.modules.team.application.dto.request.TeamMemberCreateRequest;
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,8 +32,7 @@ public class TeamMemberController {
     @PostMapping
     public ResponseEntity<Void> createTeamMember(
             @PathVariable final Long teamId,
-            @Valid @RequestBody final TeamMemberCreateRequest request,
-            @LoginMember final Member member
+            @Valid @RequestBody final TeamMemberCreateRequest request
     ) {
         teamMemberCommandService.createTeamMember(teamId, request.teamMemberName());
         return ResponseEntity.status(HttpStatus.CREATED).build();
@@ -46,8 +43,7 @@ public class TeamMemberController {
     @DeleteMapping("/{memberId}")
     public ResponseEntity<Void> deleteTeamMember(
             @Parameter(description = "팀 ID") @PathVariable final Long teamId,
-            @Parameter(description = "멤버 ID") @PathVariable final Long memberId,
-            @LoginMember final Member member
+            @Parameter(description = "멤버 ID") @PathVariable final Long memberId
     ) {
         teamMemberCommandService.deleteTeamMember(teamId, memberId);
         return ResponseEntity.noContent().build();
