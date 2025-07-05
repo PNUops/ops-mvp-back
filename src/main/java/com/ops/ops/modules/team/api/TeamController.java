@@ -163,7 +163,7 @@ public class TeamController {
             @RequestBody @Validated TeamCreateRequest request,
             @LoginMember final Member member
     ) {
-        teamCommandService.createTeam(request, member);
+        teamCommandService.createTeam(request);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }

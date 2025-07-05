@@ -45,6 +45,4 @@ public record TeamDetailResponse(
                 isLiked
         );
     }
-
-    public record TeamMemberResponse(Long teamMemberId, String teamMemberName) {}
 }

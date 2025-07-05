@@ -8,6 +8,8 @@ import com.ops.ops.modules.contest.exception.ContestExceptionType;
 import com.ops.ops.modules.member.domain.Member;
 import com.ops.ops.modules.team.application.TeamQueryService;
 import com.ops.ops.modules.team.application.dto.response.TeamSummaryResponse;
+import com.ops.ops.modules.team.domain.Team;
+import com.ops.ops.modules.team.domain.dao.TeamRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ContestQueryService {
     private final ContestRepository contestRepository;
+    private final TeamRepository teamRepository;
     private final TeamQueryService teamQueryService;
 
     public List<ContestResponse> getAllContests() {
@@ -34,18 +37,18 @@ public class ContestQueryService {
 
 
     public List<TeamSummaryResponse> getContestTeamSummaries(final Long contestId, final Member member) {
-        List<Long> teamIds = contestRepository.findTeamIdsById(contestId);
-        return teamQueryService.getAllTeamSummaries(teamIds, member);
+        final List<Team> teams = teamRepository.findAllByContestId(contestId);
+        return teamQueryService.getAllTeamSummaries(teams, member);
     }
 
     public List<TeamSummaryResponse> getCurrentContestTeamSummaries(final Member member) {
-        List<Long> contestTeamIds = findTeamIdsOfCurrentContest();
-        return teamQueryService.getAllTeamSummaries(contestTeamIds, member);
+        final List<Team> teams = findTeamsOfCurrentContest();
+        return teamQueryService.getAllTeamSummaries(teams, member);
     }
 
-    public List<Long> findTeamIdsOfCurrentContest() {
-        Contest contest = contestRepository.findByIsCurrentTrue()
+    public List<Team> findTeamsOfCurrentContest() {
+        final Contest contest = contestRepository.findByIsCurrentTrue()
                 .orElseThrow(() -> new ContestException(ContestExceptionType.NOT_FOUND_CURRENT_CONTEST));
-        return contestRepository.findTeamIdsById(contest.getId());
+        return teamRepository.findAllByContestId(contest.getId());
     }
 }

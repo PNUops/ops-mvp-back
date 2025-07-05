@@ -1,22 +1,15 @@
 package com.ops.ops.modules.team.domain;
 
 import com.ops.ops.global.base.BaseEntity;
-import com.ops.ops.modules.contest.domain.Contest;
-import com.ops.ops.modules.contest.exception.ContestException;
-import com.ops.ops.modules.contest.exception.ContestExceptionType;
 import com.ops.ops.modules.member.domain.Member;
-import com.ops.ops.modules.member.domain.MemberRoleType;
 import com.ops.ops.modules.member.domain.dao.MemberRepository;
 import com.ops.ops.modules.team.exception.TeamException;
 import com.ops.ops.modules.team.exception.TeamExceptionType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
@@ -68,15 +61,13 @@ public class Team extends BaseEntity {
     @OneToMany(mappedBy = "team")
     private List<TeamMember> teamMembers = new ArrayList<>();
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "contest_id", nullable = false)
-    private Contest contest;
-
+    @Column(nullable = false)
+    private Long contestId;
 
     @Builder
     public Team(final String leaderName, final String teamName, final String projectName, final String overview,
                 final String productionPath, final String githubPath, final String youTubePath,
-                final List<TeamMember> teamMembers, final Contest contest) {
+                final List<TeamMember> teamMembers, final Long contestId) {
         this.leaderName = leaderName;
         this.teamName = teamName;
         this.projectName = projectName;
@@ -87,12 +78,11 @@ public class Team extends BaseEntity {
         this.isDeleted = false;
         this.isSubmitted = false;
         this.teamMembers = teamMembers;
-        this.contest = contest;
+        this.contestId = contestId;
     }
 
     public static Team of(String leaderName, String teamName, String projectName, String overview,
-                          String productionPath, String githubPath, String youTubePath, final Contest contest
-    ) {
+                          String productionPath, String githubPath, String youTubePath, final Long contestId) {
         return Team.builder()
                 .leaderName(leaderName)
                 .teamName(teamName)
@@ -102,12 +92,15 @@ public class Team extends BaseEntity {
                 .githubPath(githubPath)
                 .youTubePath(youTubePath)
                 .teamMembers(new ArrayList<>())
-                .contest(contest)
+                .contestId(contestId)
                 .build();
     }
 
-    public void updateDetail(final String newTeamName, final String newProjectName, final String newOverview,
-                             final String newProductionPath, final String newGithubPath, final String newYouTubePath) {
+    public void updateDetail(final String newleaderName, final String newTeamName, final String newProjectName,
+                             final String newOverview,
+                             final String newProductionPath, final String newGithubPath, final String newYouTubePath,
+                             final Long newContestId) {
+        this.leaderName = newleaderName;
         this.teamName = newTeamName;
         this.projectName = newProjectName;
         this.overview = newOverview;
@@ -115,10 +108,11 @@ public class Team extends BaseEntity {
         this.githubPath = newGithubPath;
         this.youTubePath = newYouTubePath;
         this.isSubmitted = true;
+        this.contestId = newContestId;
     }
 
     public boolean isContestChanged(Long newContestId) {
-        return !this.contest.getId().equals(newContestId);
+        return !this.contestId.equals(newContestId);
     }
 
     public boolean isTeamInfoChanged(String newTeamName, String newProjectName, String newLeaderName) {
@@ -137,11 +131,6 @@ public class Team extends BaseEntity {
                 .build();
         this.teamMembers.add(newLeader);
         return newLeader;
-    }
-
-    public TeamMember changeLeaderTo(Member newLeader, String oldLeaderName) {
-        this.leaderName = newLeader.getName();
-        return this.addTeamMember(newLeader.getId());
     }
 
     public TeamMember findTeamMemberByName(String memberName, MemberRepository memberRepository) {

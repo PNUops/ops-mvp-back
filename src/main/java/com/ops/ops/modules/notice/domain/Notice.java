@@ -1,4 +1,4 @@
-package com.ops.ops.modules.contest.domain;
+package com.ops.ops.modules.notice.domain;
 
 import com.ops.ops.global.base.BaseEntity;
 import jakarta.persistence.Column;
@@ -17,33 +17,27 @@ import org.hibernate.annotations.SQLRestriction;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @SQLRestriction("is_deleted = false")
-@SQLDelete(sql = "UPDATE contest SET is_deleted = true where id = ?")
-public class Contest extends BaseEntity {
+@SQLDelete(sql = "UPDATE notice SET is_deleted = true where id = ?")
+public class Notice extends BaseEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
-    private String contestName;
+    private String title;
 
     @Column(nullable = false)
-    private Boolean isCurrent;
-
-    @Column(nullable = false)
-    private Boolean isDeleted;
+    private String description;
 
     @Builder
-    public Contest(final String contestName, final Boolean isCurrent) {
-        this.contestName = contestName;
-        this.isCurrent = isCurrent;
-        this.isDeleted = false;
+    public Notice(final String title, final String description) {
+        this.title = title;
+        this.description = description;
     }
 
-    public void updateContestName(final String newContestName) {
-        this.contestName = newContestName;
-    }
-
-    public boolean isTeamCreatable() {
-        return !this.isCurrent;
+    public void updateNotice(final String title, final String description) {
+        this.title = title;
+        this.description = description;
     }
 }
