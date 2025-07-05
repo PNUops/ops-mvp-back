@@ -35,11 +35,18 @@ public class File extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private FileImageType type;
 
+    @Column(nullable = false)
+    private boolean isWebpConverted = false;
+
     @Builder
     private File(final String name, final String filePath, final Long teamId, final FileImageType type) {
         this.name = name;
         this.filePath = filePath;
         this.teamId = teamId;
         this.type = type;
+    }
+
+    public void updateIsWebpConverted(boolean isWebpConverted) {
+        this.isWebpConverted = isWebpConverted;
     }
 }

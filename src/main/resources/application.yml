@@ -33,6 +33,11 @@ spring:
           starttls:
             enable: true
 
+  servlet:
+    multipart:
+      max-file-size: 2MB
+      max-request-size: 12MB
+
 file:
   upload-dir: ${user.dir}/file/
 
