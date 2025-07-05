@@ -12,7 +12,6 @@ import com.ops.ops.modules.contest.exception.ContestExceptionType;
 import com.ops.ops.modules.file.domain.FileImageType;
 import com.ops.ops.modules.file.domain.dao.FileRepository;
 import com.ops.ops.modules.file.exception.FileException;
-import com.ops.ops.modules.member.application.convenience.MemberConvenience;
 import com.ops.ops.modules.member.domain.Member;
 import com.ops.ops.modules.member.domain.MemberRoleType;
 import com.ops.ops.modules.team.application.dto.request.TeamCreateRequest;
@@ -36,7 +35,6 @@ public class TeamCommandService {
     private final FileStorageUtil fileStorageUtil;
     private final TeamMemberCommandService teamMemberCommandService;
     private final ContestConvenience contestConvenience;
-    private final MemberConvenience memberConvenience;
 
     public void saveThumbnailImage(final Long teamId, final MultipartFile image, final FileImageType thumbnailType) {
         validateExistTeam(teamId);

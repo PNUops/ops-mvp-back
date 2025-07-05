@@ -4,6 +4,8 @@ import static com.ops.ops.modules.member.domain.MemberRoleType.ROLE_회원;
 
 import com.ops.ops.modules.member.domain.Member;
 import com.ops.ops.modules.member.domain.dao.MemberRepository;
+import com.ops.ops.modules.member.exception.MemberException;
+import com.ops.ops.modules.member.exception.MemberExceptionType;
 import java.util.Set;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +18,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class MemberConvenience {
 
     final private MemberRepository memberRepository;
+
+    public Member getValidateExistMember(final Long memberId) {
+        return memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberException(MemberExceptionType.NOT_FOUND_MEMBER));
+    }
 
     public Member createFakeMember(final String name) {
         final String unique = UUID.randomUUID().toString().replace("-", "").substring(0, 10);

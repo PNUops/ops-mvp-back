@@ -1,11 +1,8 @@
 package com.ops.ops.modules.team.application;
 
-import static com.ops.ops.modules.member.exception.MemberExceptionType.NOT_FOUND_MEMBER;
-
 import com.ops.ops.modules.member.application.convenience.MemberConvenience;
 import com.ops.ops.modules.member.domain.Member;
 import com.ops.ops.modules.member.domain.dao.MemberRepository;
-import com.ops.ops.modules.member.exception.MemberException;
 import com.ops.ops.modules.team.domain.Team;
 import com.ops.ops.modules.team.domain.TeamMember;
 import com.ops.ops.modules.team.domain.dao.TeamMemberRepository;
@@ -30,14 +27,13 @@ public class TeamMemberCommandService {
 
     public void deleteTeamMember(final Long teamId, final Long memberId) {
         final Team team = teamCommandService.validateAndGetTeamById(teamId);
-        final Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new MemberException(NOT_FOUND_MEMBER));
+        final Member member = memberConvenience.getValidateExistMember(memberId);
         validateMemberBelongsToTeam(team, memberId);
         removeFakeTeamMemberByName(team, member.getName());
     }
 
     private void validateMemberBelongsToTeam(final Team team, final Long memberId) {
-        final TeamMember teamMember = teamMemberRepository.findByMemberIdAndTeam(memberId, team)
+        teamMemberRepository.findByMemberIdAndTeam(memberId, team)
                 .orElseThrow(() -> new TeamException(TeamExceptionType.NOT_FOUND_TEAM_MEMBER));
     }
 
@@ -56,7 +52,8 @@ public class TeamMemberCommandService {
     }
 
     public void assignFakeTeamMember(final Team team, final String newTeamMemberName) {
-        final Member newMember = memberRepository.saveAndFlush(memberConvenience.createFakeMember(newTeamMemberName));
+        final Member newMember = memberConvenience.createFakeMember(newTeamMemberName);
+        memberRepository.save(newMember);
         final TeamMember newTeamMember = team.addTeamMember(newMember.getId());
         teamMemberRepository.save(newTeamMember);
     }
