@@ -1,7 +1,9 @@
 package com.ops.ops.global.util.oauth.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public record GoogleOAuthToken(
-	String access_token
+	@JsonProperty("access_token")
+	String accessToken
 ) {
 }

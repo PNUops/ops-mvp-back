@@ -57,8 +57,8 @@ public class MemberCommandService {
 
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
     private static final int AUTH_CODE_LENGTH = 10;
-    private static final char[] AUTH_CODE_POOL =
-            "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789".toCharArray();
+    private static final char[] AUTH_CODE_POOL = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789".toCharArray();
+    private static final String PASSWORD_POOL = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
 
     public void signUp(final SignUpRequest request) {
         final String encodingPassword = passwordEncoder.encode(request.password());
@@ -158,25 +158,8 @@ public class MemberCommandService {
 
     private SignInResponse processNewMemberSignUp(final GoogleUser googleUser) {
         try {
-            final String randomPassword = generateRandomPassword();
-
-            final String uniqueStudentId = "fake_" + UUID.randomUUID().toString().replace("-", "").substring(0, 10);
-
-            final Member newMember = memberRepository.save(Member.builder()
-                .name(googleUser.name())
-                .studentId(uniqueStudentId)
-                .email(googleUser.email())
-                .password(randomPassword)
-                .roles(Set.of(ROLE_회원))
-                .build());
-
-            final List<String> roles = newMember.getRoles().stream()
-                .map(MemberRoleType::toString)
-                .toList();
-            final String token = jwtProvider.createToken(
-                String.valueOf(newMember.getId()), roles, newMember.getName());
-
-            return SignInResponse.from(newMember, token);
+            final Member newMember = getRegisterNewMember(googleUser.name(), googleUser.email());
+            return processExistingMemberLogin(newMember);
 
         } catch (Exception e) {
             log.error("구글 회원가입 처리 중 상세 오류: {}", e.getMessage(), e);
@@ -184,13 +167,25 @@ public class MemberCommandService {
         }
     }
 
+    private Member getRegisterNewMember(final String name, final String email) {
+        final String randomPassword = generateRandomPassword();
+        final String uniqueStudentId = "fake_" + UUID.randomUUID().toString().replace("-", "").substring(0, 10);
+
+        return memberRepository.save(Member.builder()
+            .name(name)
+            .studentId(uniqueStudentId)
+            .email(email)
+            .password(randomPassword)
+            .roles(Set.of(ROLE_회원))
+            .build());
+    }
+
     private String generateRandomPassword() {
         final int passwordLength = 32;
-        final String passwordPool = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
 
         StringBuilder password = new StringBuilder();
         for (int i = 0; i < passwordLength; i++) {
-            password.append(passwordPool.charAt(SECURE_RANDOM.nextInt(passwordPool.length())));
+            password.append(PASSWORD_POOL.charAt(SECURE_RANDOM.nextInt(PASSWORD_POOL.length())));
         }
 
         return passwordEncoder.encode(password.toString());

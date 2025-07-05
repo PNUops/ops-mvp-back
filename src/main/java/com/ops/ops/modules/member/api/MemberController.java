@@ -26,7 +26,6 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "Member", description = "회원 관련 기능")
@@ -118,8 +117,7 @@ public class MemberController {
     @Operation(summary = "구글 로그인 콜백 처리", description = "구글 OAuth 인증 완료 후 콜백을 처리하여 회원가입/로그인을 진행합니다.")
     @ApiResponse(responseCode = "200", description = "구글 로그인 성공")
     @GetMapping("/oauth/google/callback")
-    public ResponseEntity<SignInResponse> googleOAuthCallback(
-        @Parameter(description = "구글 OAuth 인가 코드") @RequestParam("code") final String code) {
+    public ResponseEntity<SignInResponse> googleOAuthCallback(final String code) {
         final SignInResponse response = memberCommandService.getGoogleOAuthCallback(code);
         return ResponseEntity.ok(response);
     }
