@@ -20,7 +20,6 @@ public class FileEncodingUtil {
     @Async("imageTaskExecutor")
     @Transactional
     public void convertToWebpAndSave(MultipartFile multipartFile, Path webpFilePath, Long fileId) {
-        long startTime = System.currentTimeMillis(); // 시작 시간 기록
         try {
             ImmutableImage image = ImmutableImage.loader().fromStream(multipartFile.getInputStream());
             WebpWriter writer = WebpWriter.DEFAULT.withQ(80);
@@ -29,9 +28,6 @@ public class FileEncodingUtil {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        long endTime = System.currentTimeMillis(); // 종료 시간 기록
-        long duration = endTime - startTime; // 실행 시간 계산
-        System.out.println("convertToWebpAndSave 실행 시간: " + duration + "ms");
 
         fileRepository.findById(fileId).ifPresent(file -> file.updateIsWebpConverted(true));
     }

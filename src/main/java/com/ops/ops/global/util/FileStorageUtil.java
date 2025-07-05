@@ -88,7 +88,6 @@ public class FileStorageUtil {
 
             final String randomFilename = UUID.randomUUID() + extension;
             final Path targetFile = uploadDir.resolve(randomFilename);
-//            multipartFile.transferTo(targetFile.toFile());
             Path webpFilePath = getWebpFilePath(targetFile);
 
             final Path relativePath = RESOURCE_PATH.relativize(webpFilePath);

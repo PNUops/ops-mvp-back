@@ -97,6 +97,7 @@ public class TeamQueryService {
         validateAndGetTeamById(teamId);
         final File findFile = fileRepository.findByTeamIdAndType(teamId, THUMBNAIL).orElseThrow(() -> new FileException(
                 FileExceptionType.NOT_EXISTS_THUMBNAIL));
+        checkImageConverted(findFile);
         return fileStorageUtil.findFileAndType(findFile.getId());
     }
 
@@ -104,7 +105,14 @@ public class TeamQueryService {
         validateAndGetTeamById(teamId);
         final File findFile = fileRepository.findById(imageId).orElseThrow(() -> new FileException(
                 FileExceptionType.NOT_EXISTS_PREVIEW));
+        checkImageConverted(findFile);
         return fileStorageUtil.findFileAndType(findFile.getId());
+    }
+
+    private void checkImageConverted(File findFile) {
+        if (!findFile.isWebpConverted()) {
+            throw new FileException(FileExceptionType.NOT_WEBP_CONVERTED);
+        }
     }
 
     public Team validateAndGetTeamById(final Long teamId) {
