@@ -53,16 +53,16 @@ public class TeamQueryService {
     private final ContestRepository contestRepository;
 
     public TeamDetailResponse getTeamDetail(final Long teamId, final Member member) {
-        Team team = teamRepository.findById(teamId)
+        final Team team = teamRepository.findById(teamId)
                 .orElseThrow(() -> new TeamException(TeamExceptionType.NOT_FOUND_TEAM));
 
-        Contest contest = contestRepository.findById(team.getContestId())
+        final Contest contest = contestRepository.findById(team.getContestId())
                 .orElseThrow(() -> new ContestException(ContestExceptionType.NOT_FOUND_CONTEST));
 
-        List<TeamMemberResponse> teamMembers = getTeamMembersByTeamId(teamId);
-        Long leaderId = getLeaderIdByTeamId(teamId);
+        final List<TeamMemberResponse> teamMembers = getTeamMembersByTeamId(teamId);
+        final Long leaderId = getLeaderIdByTeamId(teamId);
 
-        List<Long> previewIds = fileRepository.findAllByTeamIdAndType(teamId, FileImageType.PREVIEW)
+        final List<Long> previewIds = fileRepository.findAllByTeamIdAndType(teamId, FileImageType.PREVIEW)
                 .stream()
                 .map(File::getId)
                 .toList();
