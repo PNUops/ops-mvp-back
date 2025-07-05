@@ -16,6 +16,7 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.misc.Pair;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -26,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class FileStorageUtil {
 
     private static final Path ROOT_PATH = Paths.get(System.getProperty("user.dir"));
@@ -120,7 +122,7 @@ public class FileStorageUtil {
                 throw new FileDeleteFailedException("물리 파일 삭제에 실패했습니다. 경로=" + fullPath, e);
             }
         } else {
-            throw new FileNotFoundException("삭제하려는 물리 파일이 존재하지 않습니다: " + fullPath);
+            log.error("삭제하려는 물리 파일이 존재하지 않습니다: {}", fullPath);
         }
     }
 }
