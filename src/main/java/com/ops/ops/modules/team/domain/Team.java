@@ -1,10 +1,6 @@
 package com.ops.ops.modules.team.domain;
 
 import com.ops.ops.global.base.BaseEntity;
-import com.ops.ops.modules.member.domain.Member;
-import com.ops.ops.modules.member.domain.dao.MemberRepository;
-import com.ops.ops.modules.team.exception.TeamException;
-import com.ops.ops.modules.team.exception.TeamExceptionType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -130,16 +126,5 @@ public class Team extends BaseEntity {
                 .build();
         this.teamMembers.add(newLeader);
         return newLeader;
-    }
-
-    public TeamMember findTeamMemberByName(String memberName, MemberRepository memberRepository) {
-        return this.teamMembers.stream()
-                .filter(tm -> !tm.getIsDeleted())
-                .filter(tm -> memberRepository.findById(tm.getMemberId())
-                        .map(Member::getName)
-                        .map(name -> name.equals(memberName))
-                        .orElse(false))
-                .findFirst()
-                .orElseThrow(() -> new TeamException(TeamExceptionType.NOT_FOUND_TEAM_MEMBER));
     }
 }
