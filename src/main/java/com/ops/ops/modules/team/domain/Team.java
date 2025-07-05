@@ -1,10 +1,6 @@
 package com.ops.ops.modules.team.domain;
 
 import com.ops.ops.global.base.BaseEntity;
-import com.ops.ops.modules.member.domain.Member;
-import com.ops.ops.modules.member.domain.dao.MemberRepository;
-import com.ops.ops.modules.team.exception.TeamException;
-import com.ops.ops.modules.team.exception.TeamExceptionType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -131,56 +127,5 @@ public class Team extends BaseEntity {
                 .build();
         this.teamMembers.add(newLeader);
         return newLeader;
-    }
-
-    public TeamMember findTeamMemberByName(String memberName, MemberRepository memberRepository) {
-        return this.teamMembers.stream()
-                .filter(tm -> !tm.getIsDeleted())
-                .filter(tm -> memberRepository.findById(tm.getMemberId())
-                        .map(Member::getName)
-                        .map(name -> name.equals(memberName))
-                        .orElse(false))
-                .findFirst()
-                .orElseThrow(() -> new TeamException(TeamExceptionType.NOT_FOUND_TEAM_MEMBER));
-    }
-
-    public void changeContest(Contest newContest, Member member, String newTeamName, String newProjectName,
-                              String newLeaderName) {
-        Contest beforeContest = this.contest;
-
-        if (beforeContest.getIsCurrent()) {
-            if (isContestChanged(newContest.getId())) {
-                throw new ContestException(ContestExceptionType.CANNOT_CHANGE_CONTEST_FOR_CURRENT);
-            }
-            if (isTeamInfoChanged(newTeamName, newProjectName, newLeaderName)) {
-                throw new ContestException(ContestExceptionType.CANNOT_UPDATE_TEAM_INFO_FOR_CURRENT);
-            }
-        }
-
-        if (!beforeContest.getIsCurrent()) {
-            boolean isAdmin = member != null && member.getRoles().stream().anyMatch(r -> r == MemberRoleType.ROLE_관리자);
-            if (!isAdmin) {
-                throw new ContestException(ContestExceptionType.ADMIN_ONLY_FOR_PAST_CONTEST);
-            }
-
-            if (newContest.getIsCurrent()) {
-                throw new ContestException(ContestExceptionType.CANNOT_CREATE_TEAM_OF_CURRENT_CONTEST);
-            }
-        }
-
-        this.contest = newContest;
-    }
-
-    public void validateDuplicatedMemberName(String newMemberName, MemberRepository memberRepository) {
-        boolean duplicated = this.teamMembers.stream()
-                .filter(tm -> !tm.getIsDeleted())
-                .anyMatch(tm -> memberRepository.findById(tm.getMemberId())
-                        .map(Member::getName)
-                        .filter(name -> name.equals(newMemberName))
-                        .isPresent());
-
-        if (duplicated) {
-            throw new TeamException(TeamExceptionType.DUPLICATED_MEMBER_NAME);
-        }
     }
 }

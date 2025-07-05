@@ -1,14 +1,20 @@
 package com.ops.ops.modules.team.application;
 
+import static com.ops.ops.modules.member.exception.MemberExceptionType.NOT_FOUND_MEMBER;
+
+import com.ops.ops.modules.member.application.MemberQueryService;
 import com.ops.ops.modules.member.domain.Member;
 import com.ops.ops.modules.member.domain.dao.MemberRepository;
 import com.ops.ops.modules.member.exception.MemberException;
-import com.ops.ops.modules.member.exception.MemberExceptionType;
 import com.ops.ops.modules.team.domain.Team;
 import com.ops.ops.modules.team.domain.TeamMember;
 import com.ops.ops.modules.team.domain.dao.TeamMemberRepository;
 import com.ops.ops.modules.team.exception.TeamException;
 import com.ops.ops.modules.team.exception.TeamExceptionType;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,39 +26,66 @@ public class TeamMemberCommandService {
     private final TeamCommandService teamCommandService;
     private final TeamMemberRepository teamMemberRepository;
     private final MemberRepository memberRepository;
+    private final MemberQueryService memberQueryService;
 
     public void deleteTeamMember(final Long teamId, final Long memberId) {
         final Team team = teamCommandService.validateAndGetTeamById(teamId);
-        final TeamMember teamMember = validateAndGetMemberById(memberId);
-        validateMemberBelongsToTeam(teamMember, team);
-        teamMemberRepository.delete(teamMember);
+        final Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberException(NOT_FOUND_MEMBER));
+        validateMemberBelongsToTeam(team, memberId);
+        removeFakeTeamMemberByName(team, member.getName());
     }
 
-    private TeamMember validateAndGetMemberById(final Long memberId) {
-        memberRepository.findById(memberId)
-                .orElseThrow(() -> new MemberException(MemberExceptionType.NOT_FOUND_MEMBER));
-
-        return teamMemberRepository.findByMemberId(memberId)
+    private void validateMemberBelongsToTeam(final Team team, final Long memberId) {
+        final TeamMember teamMember = teamMemberRepository.findByMemberIdAndTeam(memberId, team)
                 .orElseThrow(() -> new TeamException(TeamExceptionType.NOT_FOUND_TEAM_MEMBER));
-    }
-
-    private void validateMemberBelongsToTeam(final TeamMember teamMember, final Team team) {
-        if (!teamMember.getTeam().equals(team)) {
-            throw new TeamException(TeamExceptionType.NOT_FOUND_TEAM_MEMBER_IN_TEAM);
-        }
     }
 
     public void createTeamMember(final Long teamId, final String newTeamMemberName) {
         final Team team = teamCommandService.validateAndGetTeamById(teamId);
-        team.validateDuplicatedMemberName(newTeamMemberName, memberRepository);
+        validateDuplicatedTeamMemberName(team, newTeamMemberName);
+        assignFakeTeamMember(team, newTeamMemberName);
+    }
 
-        // 가짜 멤버 생성 및 저장
-        Member fakeMember = memberRepository.save(Member.createFake(newTeamMemberName));
+    public void removeFakeTeamMemberByName(final Team team, final String teamMemberName) {
+        final TeamMember teamMember = findTeamMemberByName(team, teamMemberName);
+        teamMemberRepository.delete(teamMember);
+        memberRepository.findById(teamMember.getMemberId())
+                .filter(Member::isFake)
+                .ifPresent(memberRepository::delete);
+    }
 
-        // 팀에 추가 및 TeamMember 생성
-        TeamMember fakeTeamMember = team.addTeamMember(fakeMember.getId());
+    public void assignFakeTeamMember(final Team team, final String newTeamMemberName) {
+        final Member newMember = memberRepository.saveAndFlush(Member.createFake(newTeamMemberName));
+        final TeamMember newTeamMember = team.addTeamMember(newMember.getId());
+        teamMemberRepository.save(newTeamMember);
+    }
+    
+    public void validateDuplicatedTeamMemberName(Team team, String newMemberName) {
+        final boolean duplicated = team.getTeamMembers().stream()
+                .anyMatch(tm -> memberRepository.findById(tm.getMemberId())
+                        .map(Member::getName)
+                        .filter(name -> name.equals(newMemberName))
+                        .isPresent());
+        if (duplicated) {
+            throw new TeamException(TeamExceptionType.DUPLICATED_MEMBER_NAME);
+        }
+    }
 
-        // 새 TeamMember 저장
-        teamMemberRepository.save(fakeTeamMember);
+    public TeamMember findTeamMemberByName(Team team, String memberName) {
+        final List<Long> memberIds = team.getTeamMembers().stream()
+                .map(TeamMember::getMemberId)
+                .toList();
+
+        final Map<Long, Member> memberMap = memberRepository.findAllById(memberIds).stream()
+                .collect(Collectors.toMap(Member::getId, Function.identity()));
+
+        return team.getTeamMembers().stream()
+                .filter(tm -> {
+                    Member member = memberMap.get(tm.getMemberId());
+                    return member != null && member.getName().equals(memberName);
+                })
+                .findFirst()
+                .orElseThrow(() -> new TeamException(TeamExceptionType.NOT_FOUND_TEAM_MEMBER));
     }
 }
