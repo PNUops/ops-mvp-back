@@ -12,6 +12,7 @@ import com.ops.ops.modules.contest.exception.ContestExceptionType;
 import com.ops.ops.modules.file.domain.FileImageType;
 import com.ops.ops.modules.file.domain.dao.FileRepository;
 import com.ops.ops.modules.file.exception.FileException;
+import com.ops.ops.modules.member.application.convenience.MemberConvenience;
 import com.ops.ops.modules.member.domain.Member;
 import com.ops.ops.modules.member.domain.MemberRoleType;
 import com.ops.ops.modules.team.application.dto.request.TeamCreateRequest;
@@ -35,6 +36,7 @@ public class TeamCommandService {
     private final FileStorageUtil fileStorageUtil;
     private final TeamMemberCommandService teamMemberCommandService;
     private final ContestConvenience contestConvenience;
+    private final MemberConvenience memberConvenience;
 
     public void saveThumbnailImage(final Long teamId, final MultipartFile image, final FileImageType thumbnailType) {
         validateExistTeam(teamId);
@@ -113,26 +115,36 @@ public class TeamCommandService {
 
     private void validateTeamContestChange(final Team team, final Contest newContest, final Member member,
                                            final String newTeamName, final String newProjectName,
-                                           final String newLeaderName
-    ) {
-        final Contest OldContest = contestConvenience.getValidateExistContest(team.getContestId());
-
-        if (OldContest.getIsCurrent()) {
-            if (team.isContestChanged(newContest.getId())) {
-                throw new ContestException(ContestExceptionType.CANNOT_CHANGE_CONTEST_FOR_CURRENT);
-            }
-            if (team.isTeamInfoChanged(newTeamName, newProjectName, newLeaderName)) {
-                throw new ContestException(ContestExceptionType.CANNOT_UPDATE_TEAM_INFO_FOR_CURRENT);
-            }
+                                           final String newLeaderName) {
+        final Contest oldContest = contestConvenience.getValidateExistContest(team.getContestId());
+        if (oldContest.getIsCurrent()) {
+            validateCurrentContest(team, newContest, newTeamName, newProjectName, newLeaderName);
         } else {
-            boolean isAdmin = member != null && member.getRoles().contains(MemberRoleType.ROLE_관리자);
-            if (!isAdmin) {
-                throw new ContestException(ContestExceptionType.ADMIN_ONLY_FOR_PAST_CONTEST);
-            }
-            if (newContest.getIsCurrent()) {
-                throw new ContestException(ContestExceptionType.CANNOT_CREATE_TEAM_OF_CURRENT_CONTEST);
-            }
+            validatePastContest(newContest, member);
         }
+    }
+
+    private void validateCurrentContest(final Team team, final Contest newContest, final String newTeamName,
+                                        final String newProjectName, final String newLeaderName) {
+        if (team.isContestChanged(newContest.getId())) {
+            throw new ContestException(ContestExceptionType.CANNOT_CHANGE_CONTEST_FOR_CURRENT);
+        }
+        if (team.isTeamInfoChanged(newTeamName, newProjectName, newLeaderName)) {
+            throw new ContestException(ContestExceptionType.CANNOT_UPDATE_TEAM_INFO_FOR_CURRENT);
+        }
+    }
+
+    private void validatePastContest(final Contest newContest, final Member member) {
+        if (!isAdmin(member)) {
+            throw new ContestException(ContestExceptionType.ADMIN_ONLY_FOR_PAST_CONTEST);
+        }
+        if (newContest.getIsCurrent()) {
+            throw new ContestException(ContestExceptionType.CANNOT_CREATE_TEAM_OF_CURRENT_CONTEST);
+        }
+    }
+
+    private boolean isAdmin(final Member member) {
+        return member != null && member.getRoles().contains(MemberRoleType.ROLE_관리자);
     }
 
     private void updateLeaderIfChanged(Team team, String newLeaderName) {

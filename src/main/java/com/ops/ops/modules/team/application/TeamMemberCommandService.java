@@ -2,7 +2,7 @@ package com.ops.ops.modules.team.application;
 
 import static com.ops.ops.modules.member.exception.MemberExceptionType.NOT_FOUND_MEMBER;
 
-import com.ops.ops.modules.member.application.MemberQueryService;
+import com.ops.ops.modules.member.application.convenience.MemberConvenience;
 import com.ops.ops.modules.member.domain.Member;
 import com.ops.ops.modules.member.domain.dao.MemberRepository;
 import com.ops.ops.modules.member.exception.MemberException;
@@ -26,7 +26,7 @@ public class TeamMemberCommandService {
     private final TeamCommandService teamCommandService;
     private final TeamMemberRepository teamMemberRepository;
     private final MemberRepository memberRepository;
-    private final MemberQueryService memberQueryService;
+    private final MemberConvenience memberConvenience;
 
     public void deleteTeamMember(final Long teamId, final Long memberId) {
         final Team team = teamCommandService.validateAndGetTeamById(teamId);
@@ -56,11 +56,11 @@ public class TeamMemberCommandService {
     }
 
     public void assignFakeTeamMember(final Team team, final String newTeamMemberName) {
-        final Member newMember = memberRepository.saveAndFlush(Member.createFake(newTeamMemberName));
+        final Member newMember = memberRepository.saveAndFlush(memberConvenience.createFakeMember(newTeamMemberName));
         final TeamMember newTeamMember = team.addTeamMember(newMember.getId());
         teamMemberRepository.save(newTeamMember);
     }
-    
+
     public void validateDuplicatedTeamMemberName(Team team, String newMemberName) {
         final boolean duplicated = team.getTeamMembers().stream()
                 .anyMatch(tm -> memberRepository.findById(tm.getMemberId())

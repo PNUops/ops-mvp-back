@@ -12,10 +12,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -80,18 +78,7 @@ public class Member extends BaseEntity {
     public boolean isEqual(final String newPassword) {
         return this.password.equals(newPassword);
     }
-
-    public static Member createFake(String name) {
-        String unique = UUID.randomUUID().toString().replace("-", "").substring(0, 10);
-        return Member.builder()
-                .name(name)
-                .email("fake_" + unique + "@placeholder.com")
-                .password("!FAKE_USER!")
-                .studentId("fake_" + unique)
-                .roles(Collections.emptySet())
-                .build();
-    }
-
+    
     public static boolean isFake(Member member) {
         return member.getEmail() != null && member.getStudentId().startsWith("fake_");
     }
