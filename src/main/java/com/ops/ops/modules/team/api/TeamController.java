@@ -68,16 +68,6 @@ public class TeamController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "팀 썸네일 저장", description = "팀의 썸네일 이미지를 저장합니다.")
-    @ApiResponse(responseCode = "201", description = "팀 썸네일 저장 완료")
-    @Secured("ROLE_팀장")
-    @PostMapping("/{teamId}/image/thumbnail")
-    public ResponseEntity<Void> saveThumbnailImage(@PathVariable final Long teamId,
-                                                   @RequestPart("image") final MultipartFile image) {
-        teamCommandService.saveThumbnailImage(teamId, image, THUMBNAIL);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
-    }
-
     @Operation(summary = "팀 썸네일 조회", description = "팀의 썸네일을 조회합니다.")
     @ApiResponse(responseCode = "200", description = "팀 썸네일 조회 성공")
     @GetMapping("/{teamId}/image/thumbnail")
@@ -90,6 +80,25 @@ public class TeamController {
                 .body(result.a);
     }
 
+    @Operation(summary = "팀 썸네일 등록", description = "팀의 썸네일 이미지를 저장합니다.")
+    @ApiResponse(responseCode = "201", description = "팀 썸네일 저장 완료")
+    @Secured("ROLE_팀장")
+    @PostMapping("/{teamId}/image/thumbnail")
+    public ResponseEntity<Void> saveThumbnailImage(@PathVariable final Long teamId,
+                                                   @RequestPart("image") final MultipartFile image) {
+        teamCommandService.saveThumbnailImage(teamId, image, THUMBNAIL);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @Operation(summary = "팀 썸네일 삭제", description = "팀의 썸네일 이미지를 삭제합니다.")
+    @ApiResponse(responseCode = "204", description = "팀 썸네일 삭제 성공")
+    @Secured("ROLE_팀장")
+    @DeleteMapping("/{teamId}/image/thumbnail")
+    public ResponseEntity<Void> deleteThumbnailImage(@PathVariable Long teamId) {
+        teamCommandService.deleteThumbnailImage(teamId, THUMBNAIL);
+        return ResponseEntity.noContent().build();
+    }
+
     @Operation(summary = "팀 프리뷰 조회", description = "팀의 프리뷰 이미지를 조회합니다.")
     @ApiResponse(responseCode = "200", description = "팀 프리뷰 조회 성공")
     @GetMapping("/{teamId}/image/{imageId}")
@@ -100,15 +109,6 @@ public class TeamController {
         return ResponseEntity.ok()
                 .contentType(mediaType)
                 .body(result.a);
-    }
-
-    @Operation(summary = "팀 썸네일 삭제", description = "팀의 썸네일 이미지를 삭제합니다.")
-    @ApiResponse(responseCode = "204", description = "팀 썸네일 삭제 성공")
-    @Secured("ROLE_팀장")
-    @DeleteMapping("/{teamId}/image/thumbnail")
-    public ResponseEntity<Void> deleteThumbnailImage(@PathVariable Long teamId) {
-        teamCommandService.deleteThumbnailImage(teamId, THUMBNAIL);
-        return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = "팀 프리뷰 등록", description = "팀의 프리뷰 이미지를 등록합니다.")
