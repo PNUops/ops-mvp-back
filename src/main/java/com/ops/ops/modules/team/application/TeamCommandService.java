@@ -128,7 +128,7 @@ public class TeamCommandService {
         teamRepository.delete(team);
     }
 
-    public void createTeam(TeamCreateRequest request, Member member) {
+    public void createTeam(TeamCreateRequest request) {
         final Contest contest = contestCommandService.validateAndGetContestById(request.contestId());
         if (!contest.isTeamCreatable()) {
             throw new ContestException(ContestExceptionType.CANNOT_CREATE_TEAM_OF_CURRENT_CONTEST);
