@@ -2,7 +2,6 @@ package com.ops.ops.modules.team.application;
 
 import static com.ops.ops.modules.file.domain.FileImageType.PREVIEW;
 import static com.ops.ops.modules.file.exception.FileExceptionType.EXCEED_PREVIEW_LIMIT;
-import static com.ops.ops.modules.team.exception.TeamExceptionType.NOT_FOUND_TEAM;
 
 import com.ops.ops.global.util.FileStorageUtil;
 import com.ops.ops.modules.contest.application.convenience.ContestConvenience;
@@ -14,11 +13,11 @@ import com.ops.ops.modules.file.domain.dao.FileRepository;
 import com.ops.ops.modules.file.exception.FileException;
 import com.ops.ops.modules.member.domain.Member;
 import com.ops.ops.modules.member.domain.MemberRoleType;
+import com.ops.ops.modules.team.application.convenience.TeamConvenience;
 import com.ops.ops.modules.team.application.dto.request.TeamCreateRequest;
 import com.ops.ops.modules.team.application.dto.request.TeamDetailUpdateRequest;
 import com.ops.ops.modules.team.domain.Team;
 import com.ops.ops.modules.team.domain.dao.TeamRepository;
-import com.ops.ops.modules.team.exception.TeamException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -35,6 +34,7 @@ public class TeamCommandService {
     private final FileStorageUtil fileStorageUtil;
     private final TeamMemberCommandService teamMemberCommandService;
     private final ContestConvenience contestConvenience;
+    private final TeamConvenience teamConvenience;
 
     public void saveThumbnailImage(final Long teamId, final MultipartFile image, final FileImageType thumbnailType) {
         validateExistTeam(teamId);
@@ -72,12 +72,11 @@ public class TeamCommandService {
     }
 
     private void validateExistTeam(final Long teamId) {
-        teamRepository.findById(teamId).orElseThrow(() -> new TeamException(NOT_FOUND_TEAM));
+        teamConvenience.getValidateExistTeam(teamId);
     }
 
     public Team validateAndGetTeamById(final Long teamId) {
-        return teamRepository.findById(teamId)
-                .orElseThrow(() -> new TeamException(NOT_FOUND_TEAM));
+        return teamConvenience.getValidateExistTeam(teamId);
     }
 
     public void deleteTeam(final Long teamId) {

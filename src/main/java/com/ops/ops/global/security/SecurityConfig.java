@@ -43,6 +43,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/sign-up/**", "/sign-in/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/teams/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/contests/**").permitAll()
                         .anyRequest().hasAnyRole("회원", "관리자", "팀장")
                 )
                 .exceptionHandling(exceptions -> exceptions

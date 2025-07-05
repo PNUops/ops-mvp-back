@@ -3,6 +3,7 @@ package com.ops.ops.modules.team.application;
 import com.ops.ops.modules.member.application.convenience.MemberConvenience;
 import com.ops.ops.modules.member.domain.Member;
 import com.ops.ops.modules.member.domain.dao.MemberRepository;
+import com.ops.ops.modules.team.application.convenience.TeamConvenience;
 import com.ops.ops.modules.team.domain.Team;
 import com.ops.ops.modules.team.domain.TeamMember;
 import com.ops.ops.modules.team.domain.dao.TeamMemberRepository;
@@ -20,13 +21,13 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Transactional
 public class TeamMemberCommandService {
-    private final TeamCommandService teamCommandService;
     private final TeamMemberRepository teamMemberRepository;
     private final MemberRepository memberRepository;
     private final MemberConvenience memberConvenience;
+    private final TeamConvenience teamConvenience;
 
     public void deleteTeamMember(final Long teamId, final Long memberId) {
-        final Team team = teamCommandService.validateAndGetTeamById(teamId);
+        final Team team = teamConvenience.getValidateExistTeam(teamId);
         final Member member = memberConvenience.getValidateExistMember(memberId);
         validateMemberBelongsToTeam(team, memberId);
         removeFakeTeamMemberByName(team, member.getName());
@@ -38,7 +39,7 @@ public class TeamMemberCommandService {
     }
 
     public void createTeamMember(final Long teamId, final String newTeamMemberName) {
-        final Team team = teamCommandService.validateAndGetTeamById(teamId);
+        final Team team = teamConvenience.getValidateExistTeam(teamId);
         validateDuplicatedTeamMemberName(team, newTeamMemberName);
         assignFakeTeamMember(team, newTeamMemberName);
     }
