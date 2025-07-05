@@ -1,8 +1,6 @@
 package com.ops.ops.modules.contest.domain;
 
 import com.ops.ops.global.base.BaseEntity;
-import com.ops.ops.modules.contest.exception.ContestException;
-import com.ops.ops.modules.contest.exception.ContestExceptionType;
 import com.ops.ops.modules.team.domain.Team;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -47,9 +45,7 @@ public class Contest extends BaseEntity {
         this.contestName = newContestName;
     }
 
-    public void validateTeamCreatable() {
-        if (this.isCurrent) {
-            throw new ContestException(ContestExceptionType.CANNOT_CREATE_TEAM_OF_CURRENT_CONTEST);
-        }
+    public boolean isTeamCreatable() {
+        return !this.isCurrent;
     }
 }

@@ -130,7 +130,9 @@ public class TeamCommandService {
 
     public void createTeam(TeamCreateRequest request, Member member) {
         final Contest contest = contestCommandService.validateAndGetContestById(request.contestId());
-        contest.validateTeamCreatable();
+        if (!contest.isTeamCreatable()) {
+            throw new ContestException(ContestExceptionType.CANNOT_CREATE_TEAM_OF_CURRENT_CONTEST);
+        }
 
         final Team team = Team.of(request.leaderName(), request.teamName(), request.projectName(), request.overview(),
                 request.productionPath(), request.githubPath(), request.youTubePath(), request.contestId()
