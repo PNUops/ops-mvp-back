@@ -1,12 +1,7 @@
 package com.ops.ops.modules.team.domain;
 
 import com.ops.ops.global.base.BaseEntity;
-import com.ops.ops.modules.contest.domain.Contest;
-import com.ops.ops.modules.contest.domain.dao.ContestRepository;
-import com.ops.ops.modules.contest.exception.ContestException;
-import com.ops.ops.modules.contest.exception.ContestExceptionType;
 import com.ops.ops.modules.member.domain.Member;
-import com.ops.ops.modules.member.domain.MemberRoleType;
 import com.ops.ops.modules.member.domain.dao.MemberRepository;
 import com.ops.ops.modules.team.exception.TeamException;
 import com.ops.ops.modules.team.exception.TeamExceptionType;
@@ -101,8 +96,11 @@ public class Team extends BaseEntity {
                 .build();
     }
 
-    public void updateDetail(final String newTeamName, final String newProjectName, final String newOverview,
-                             final String newProductionPath, final String newGithubPath, final String newYouTubePath) {
+    public void updateDetail(final String newleaderName, final String newTeamName, final String newProjectName,
+                             final String newOverview,
+                             final String newProductionPath, final String newGithubPath, final String newYouTubePath,
+                             final Long newContestId) {
+        this.leaderName = newleaderName;
         this.teamName = newTeamName;
         this.projectName = newProjectName;
         this.overview = newOverview;
@@ -110,6 +108,7 @@ public class Team extends BaseEntity {
         this.githubPath = newGithubPath;
         this.youTubePath = newYouTubePath;
         this.isSubmitted = true;
+        this.contestId = newContestId;
     }
 
     public boolean isContestChanged(Long newContestId) {
@@ -134,11 +133,6 @@ public class Team extends BaseEntity {
         return newLeader;
     }
 
-    public TeamMember changeLeaderTo(Member newLeader, String oldLeaderName) {
-        this.leaderName = newLeader.getName();
-        return this.addTeamMember(newLeader.getId());
-    }
-
     public TeamMember findTeamMemberByName(String memberName, MemberRepository memberRepository) {
         return this.teamMembers.stream()
                 .filter(tm -> !tm.getIsDeleted())
@@ -148,33 +142,5 @@ public class Team extends BaseEntity {
                         .orElse(false))
                 .findFirst()
                 .orElseThrow(() -> new TeamException(TeamExceptionType.NOT_FOUND_TEAM_MEMBER));
-    }
-
-    public void changeContest(Contest newContest, Member member, String newTeamName, String newProjectName,
-                              String newLeaderName, ContestRepository contestRepository) {
-        Contest beforeContest = contestRepository.findById(this.contestId)
-                .orElseThrow(() -> new ContestException(ContestExceptionType.NOT_FOUND_CONTEST));
-
-        if (beforeContest.getIsCurrent()) {
-            if (isContestChanged(newContest.getId())) {
-                throw new ContestException(ContestExceptionType.CANNOT_CHANGE_CONTEST_FOR_CURRENT);
-            }
-            if (isTeamInfoChanged(newTeamName, newProjectName, newLeaderName)) {
-                throw new ContestException(ContestExceptionType.CANNOT_UPDATE_TEAM_INFO_FOR_CURRENT);
-            }
-        }
-
-        if (!beforeContest.getIsCurrent()) {
-            boolean isAdmin = member != null && member.getRoles().stream().anyMatch(r -> r == MemberRoleType.ROLE_관리자);
-            if (!isAdmin) {
-                throw new ContestException(ContestExceptionType.ADMIN_ONLY_FOR_PAST_CONTEST);
-            }
-
-            if (newContest.getIsCurrent()) {
-                throw new ContestException(ContestExceptionType.CANNOT_CREATE_TEAM_OF_CURRENT_CONTEST);
-            }
-        }
-
-        this.contestId = newContest.getId();
     }
 }

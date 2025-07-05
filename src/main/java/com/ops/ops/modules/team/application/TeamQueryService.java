@@ -4,10 +4,8 @@ import static com.ops.ops.modules.file.domain.FileImageType.THUMBNAIL;
 import static com.ops.ops.modules.team.exception.TeamExceptionType.NOT_FOUND_TEAM;
 
 import com.ops.ops.global.util.FileStorageUtil;
+import com.ops.ops.modules.contest.application.convenience.ContestConvenience;
 import com.ops.ops.modules.contest.domain.Contest;
-import com.ops.ops.modules.contest.domain.dao.ContestRepository;
-import com.ops.ops.modules.contest.exception.ContestException;
-import com.ops.ops.modules.contest.exception.ContestExceptionType;
 import com.ops.ops.modules.file.domain.File;
 import com.ops.ops.modules.file.domain.FileImageType;
 import com.ops.ops.modules.file.domain.dao.FileRepository;
@@ -50,14 +48,13 @@ public class TeamQueryService {
     private final MemberRepository memberRepository;
     private final TeamLikeRepository teamLikeRepository;
     private final TeamMemberRepository teamMemberRepository;
-    private final ContestRepository contestRepository;
+    private final ContestConvenience contestConvenience;
 
     public TeamDetailResponse getTeamDetail(final Long teamId, final Member member) {
         final Team team = teamRepository.findById(teamId)
                 .orElseThrow(() -> new TeamException(TeamExceptionType.NOT_FOUND_TEAM));
 
-        final Contest contest = contestRepository.findById(team.getContestId())
-                .orElseThrow(() -> new ContestException(ContestExceptionType.NOT_FOUND_CONTEST));
+        final Contest contest = contestConvenience.getValidateExistContest(team.getContestId());
 
         final List<TeamMemberResponse> teamMembers = getTeamMembersByTeamId(teamId);
         final Long leaderId = getLeaderIdByTeamId(teamId);
