@@ -41,10 +41,10 @@ public class SecurityConfig {
                 .httpBasic(HttpBasicConfigurer::disable)
                 .formLogin(FormLoginConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/sign-up/**", "/sign-in/**").permitAll()
-                        .requestMatchers("/oauth/**").permitAll()
+                        .requestMatchers("/sign-up/**", "/sign-in/**", "/oauth/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/teams/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/contests/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/notices/**").permitAll()
                         .anyRequest().hasAnyRole("회원", "관리자", "팀장")
                 )
                 .exceptionHandling(exceptions -> exceptions
