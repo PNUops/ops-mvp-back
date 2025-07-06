@@ -30,10 +30,14 @@ public class Notice extends BaseEntity {
     @Column(nullable = false)
     private String description;
 
+    @Column(nullable = false)
+    private Boolean isDeleted;
+
     @Builder
     public Notice(final String title, final String description) {
         this.title = title;
         this.description = description;
+        this.isDeleted = false;
     }
 
     public void updateNotice(final String title, final String description) {
