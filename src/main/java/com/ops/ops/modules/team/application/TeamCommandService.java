@@ -19,6 +19,7 @@ import com.ops.ops.modules.team.application.dto.request.TeamDetailUpdateRequest;
 import com.ops.ops.modules.team.domain.Team;
 import com.ops.ops.modules.team.domain.dao.TeamRepository;
 import java.util.List;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -107,7 +108,7 @@ public class TeamCommandService {
                 request.productionPath(), request.githubPath(), request.youTubePath(), request.contestId());
         teamRepository.save(team);
 
-        teamMemberCommandService.assignFakeTeamMember(team, request.leaderName());
+        teamMemberCommandService.assignFakeTeamMember(team, request.leaderName(), Set.of(MemberRoleType.ROLE_팀장));
     }
 
     private void validateTeamContestChange(final Team team, final Contest newContest, final Member member,
@@ -146,8 +147,8 @@ public class TeamCommandService {
 
     private void updateLeaderIfChanged(Team team, String newLeaderName) {
         if (team.isLeaderNameChanged(newLeaderName)) {
-            teamMemberCommandService.removeFakeTeamMemberByName(team, newLeaderName);
-            teamMemberCommandService.assignFakeTeamMember(team, newLeaderName);
+            teamMemberCommandService.removeFakeTeamMemberByName(team, team.getLeaderName());
+            teamMemberCommandService.assignFakeTeamMember(team, newLeaderName, Set.of(MemberRoleType.ROLE_팀장));
         }
     }
 }

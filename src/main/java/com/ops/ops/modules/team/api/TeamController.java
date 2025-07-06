@@ -160,8 +160,7 @@ public class TeamController {
     @PostMapping
     @Secured("ROLE_관리자")
     public ResponseEntity<Void> createTeam(
-            @RequestBody @Validated TeamCreateRequest request,
-            @LoginMember final Member member
+            @RequestBody @Validated TeamCreateRequest request
     ) {
         teamCommandService.createTeam(request);
         return ResponseEntity.status(HttpStatus.CREATED).build();

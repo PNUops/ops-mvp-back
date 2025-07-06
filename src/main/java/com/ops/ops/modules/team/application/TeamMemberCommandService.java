@@ -2,6 +2,7 @@ package com.ops.ops.modules.team.application;
 
 import com.ops.ops.modules.member.application.convenience.MemberConvenience;
 import com.ops.ops.modules.member.domain.Member;
+import com.ops.ops.modules.member.domain.MemberRoleType;
 import com.ops.ops.modules.member.domain.dao.MemberRepository;
 import com.ops.ops.modules.team.application.convenience.TeamConvenience;
 import com.ops.ops.modules.team.domain.Team;
@@ -11,6 +12,7 @@ import com.ops.ops.modules.team.exception.TeamException;
 import com.ops.ops.modules.team.exception.TeamExceptionType;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -41,7 +43,7 @@ public class TeamMemberCommandService {
     public void createTeamMember(final Long teamId, final String newTeamMemberName) {
         final Team team = teamConvenience.getValidateExistTeam(teamId);
         validateDuplicatedTeamMemberName(team, newTeamMemberName);
-        assignFakeTeamMember(team, newTeamMemberName);
+        assignFakeTeamMember(team, newTeamMemberName, Set.of(MemberRoleType.ROLE_회원));
     }
 
     public void removeFakeTeamMemberByName(final Team team, final String teamMemberName) {
@@ -52,8 +54,8 @@ public class TeamMemberCommandService {
                 .ifPresent(memberRepository::delete);
     }
 
-    public void assignFakeTeamMember(final Team team, final String newTeamMemberName) {
-        final Member newMember = memberConvenience.createFakeMember(newTeamMemberName);
+    public void assignFakeTeamMember(final Team team, final String newTeamMemberName, final Set<MemberRoleType> roles) {
+        final Member newMember = memberConvenience.createFakeMember(newTeamMemberName, roles);
         memberRepository.save(newMember);
         final TeamMember newTeamMember = new TeamMember(newMember.getId(), team);
         teamMemberRepository.save(newTeamMember);
