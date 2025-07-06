@@ -16,6 +16,7 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.misc.Pair;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -26,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class FileStorageUtil {
 
     private static final Path ROOT_PATH = Paths.get(System.getProperty("user.dir"));
@@ -33,6 +35,7 @@ public class FileStorageUtil {
     private static final Path DEFAULT_FILE_PATH = RESOURCE_PATH.resolve("files");
 
     private final FileRepository fileRepository;
+    private final FileEncodingUtil fileEncodingUtil;
 
     static {
         try {
@@ -46,9 +49,10 @@ public class FileStorageUtil {
                 .orElseThrow(() -> new FileException(FileExceptionType.NOT_EXISTS_MATCHING_IMAGE_ID));
         final ByteArrayResource findResource =
                 findPhysicalFile(RESOURCE_PATH.resolve(findFile.getFilePath()).normalize());
-        final String mimeType = new MimetypesFileTypeMap()
+        MimetypesFileTypeMap mimeTypesMap = new MimetypesFileTypeMap();
+        mimeTypesMap.addMimeTypes("image/webp webp WEBP");
+        final String mimeType = mimeTypesMap
                 .getContentType(RESOURCE_PATH.resolve(findFile.getFilePath()).normalize().toFile());
-
         return new Pair<>(findResource, mimeType);
     }
 
@@ -86,21 +90,30 @@ public class FileStorageUtil {
 
             final String randomFilename = UUID.randomUUID() + extension;
             final Path targetFile = uploadDir.resolve(randomFilename);
-            multipartFile.transferTo(targetFile.toFile());
+            Path webpFilePath = getWebpFilePath(targetFile);
 
-            final Path relativePath = RESOURCE_PATH.relativize(targetFile);
+            final Path relativePath = RESOURCE_PATH.relativize(webpFilePath);
             final String filePathForDb = relativePath.toString().replace("\\", "/");
 
-            return fileRepository.save(File.builder()
+            File savedFile = fileRepository.save(File.builder()
                     .name(originalFilename)
                     .filePath(filePathForDb)
                     .teamId(teamId)
                     .type(type)
                     .build());
+            fileEncodingUtil.convertToWebpAndSave(multipartFile, webpFilePath, savedFile.getId());
+            return savedFile;
 
         } catch (IOException e) {
             throw new FileSaveFailedException("로컬 디스크에 파일을 저장하는 중 오류가 발생했습니다.", e);
         }
+    }
+
+    private Path getWebpFilePath(Path filePath) {
+        String fileName = filePath.getFileName().toString();
+        int lastDotIndex = fileName.lastIndexOf('.');
+        String newFileName = fileName.substring(0, lastDotIndex) + ".webp";
+        return filePath.getParent().resolve(newFileName);
     }
 
     public void deleteFile(final Long fileId) {
@@ -120,7 +133,7 @@ public class FileStorageUtil {
                 throw new FileDeleteFailedException("물리 파일 삭제에 실패했습니다. 경로=" + fullPath, e);
             }
         } else {
-            throw new FileNotFoundException("삭제하려는 물리 파일이 존재하지 않습니다: " + fullPath);
+            log.error("삭제하려는 물리 파일이 존재하지 않습니다: {}", fullPath);
         }
     }
 }

@@ -43,6 +43,9 @@ public class Team extends BaseEntity {
     private String githubPath;
 
     @Column
+    private String productionPath;
+
+    @Column
     private String youTubePath;
 
     @Column(nullable = false)
@@ -59,24 +62,58 @@ public class Team extends BaseEntity {
 
     @Builder
     public Team(final String leaderName, final String teamName, final String projectName, final String overview,
-                final String githubPath, final String youTubePath, final List<TeamMember> teamMembers,
-                final Long contestId) {
+                final String productionPath, final String githubPath, final String youTubePath, final Long contestId) {
         this.leaderName = leaderName;
         this.teamName = teamName;
         this.projectName = projectName;
         this.overview = overview;
+        this.productionPath = productionPath;
         this.githubPath = githubPath;
         this.youTubePath = youTubePath;
         this.isDeleted = false;
         this.isSubmitted = false;
-        this.teamMembers = teamMembers;
+        this.teamMembers = new ArrayList<>();
         this.contestId = contestId;
     }
 
-    public void updateDetail(final String newOverview, final String newGithubPath, final String newYouTubePath) {
+    public static Team of(String leaderName, String teamName, String projectName, String overview,
+                          String productionPath, String githubPath, String youTubePath, Long contestId) {
+        return Team.builder()
+                .leaderName(leaderName)
+                .teamName(teamName)
+                .projectName(projectName)
+                .overview(overview)
+                .productionPath(productionPath)
+                .githubPath(githubPath)
+                .youTubePath(youTubePath)
+                .contestId(contestId)
+                .build();
+    }
+
+    public void updateDetail(final String newLeaderName, final String newTeamName, final String newProjectName,
+                             final String newOverview, final String newProductionPath, final String newGithubPath,
+                             final String newYouTubePath, final Long newContestId) {
+        this.leaderName = newLeaderName;
+        this.teamName = newTeamName;
+        this.projectName = newProjectName;
         this.overview = newOverview;
+        this.productionPath = newProductionPath;
         this.githubPath = newGithubPath;
         this.youTubePath = newYouTubePath;
         this.isSubmitted = true;
+        this.contestId = newContestId;
+    }
+
+    public boolean isContestChanged(Long newContestId) {
+        return !this.contestId.equals(newContestId);
+    }
+
+    public boolean isTeamInfoChanged(String newTeamName, String newProjectName, String newLeaderName) {
+        return !this.teamName.equals(newTeamName) || !this.projectName.equals(newProjectName)
+                || !this.leaderName.equals(newLeaderName);
+    }
+
+    public boolean isLeaderNameChanged(String newLeaderName) {
+        return !this.getLeaderName().equals(newLeaderName);
     }
 }
