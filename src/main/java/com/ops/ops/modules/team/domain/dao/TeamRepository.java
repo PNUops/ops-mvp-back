@@ -10,4 +10,5 @@ import java.util.List;
 public interface TeamRepository extends JpaRepository<Team, Long> {
     boolean existsByContestId(Long contestId);
     List<Team> findByContestId(Long contestId);
+    List<Team> findAllByContestId(Long contestId);
 }
