@@ -118,13 +118,4 @@ public class Team extends BaseEntity {
     public boolean isLeaderNameChanged(String newLeaderName) {
         return !this.getLeaderName().equals(newLeaderName);
     }
-
-    public TeamMember addTeamMember(Long memberId) {
-        TeamMember newLeader = TeamMember.builder()
-                .memberId(memberId)
-                .team(this)
-                .build();
-        this.teamMembers.add(newLeader);
-        return newLeader;
-    }
 }
