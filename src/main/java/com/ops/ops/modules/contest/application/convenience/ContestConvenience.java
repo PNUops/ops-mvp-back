@@ -19,4 +19,11 @@ public class ContestConvenience {
         return contestRepository.findById(contestId)
                 .orElseThrow(() -> new ContestException(ContestExceptionType.NOT_FOUND_CONTEST));
     }
+
+    public void validateNotCurrentContest(final Long contestId) {
+        Contest contest = getValidateExistContest(contestId);
+        if (contest.getIsCurrent()) {
+            throw new ContestException(ContestExceptionType.CANNOT_UPDATE_TEAM_INFO_FOR_CURRENT);
+        }
+    }
 }

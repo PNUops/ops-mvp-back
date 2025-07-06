@@ -1,5 +1,6 @@
 package com.ops.ops.modules.team.application;
 
+import com.ops.ops.modules.contest.application.convenience.ContestConvenience;
 import com.ops.ops.modules.member.application.convenience.MemberConvenience;
 import com.ops.ops.modules.member.domain.Member;
 import com.ops.ops.modules.member.domain.MemberRoleType;
@@ -27,6 +28,7 @@ public class TeamMemberCommandService {
     private final MemberRepository memberRepository;
     private final MemberConvenience memberConvenience;
     private final TeamConvenience teamConvenience;
+    private final ContestConvenience contestConvenience;
 
     public void deleteTeamMember(final Long teamId, final Long memberId) {
         final Team team = teamConvenience.getValidateExistTeam(teamId);
@@ -42,11 +44,13 @@ public class TeamMemberCommandService {
 
     public void createTeamMember(final Long teamId, final String newTeamMemberName) {
         final Team team = teamConvenience.getValidateExistTeam(teamId);
+        contestConvenience.validateNotCurrentContest(team.getContestId());
         validateDuplicatedTeamMemberName(team, newTeamMemberName);
         assignFakeTeamMember(team, newTeamMemberName, Set.of(MemberRoleType.ROLE_회원));
     }
 
     public void removeFakeTeamMemberByName(final Team team, final String teamMemberName) {
+        contestConvenience.validateNotCurrentContest(team.getContestId());
         final TeamMember teamMember = findTeamMemberByName(team, teamMemberName);
         teamMemberRepository.delete(teamMember);
         memberRepository.findById(teamMember.getMemberId())
