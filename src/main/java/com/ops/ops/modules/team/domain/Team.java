@@ -62,8 +62,7 @@ public class Team extends BaseEntity {
 
     @Builder
     public Team(final String leaderName, final String teamName, final String projectName, final String overview,
-                final String productionPath, final String githubPath, final String youTubePath,
-                final List<TeamMember> teamMembers, final Long contestId) {
+                final String productionPath, final String githubPath, final String youTubePath, final Long contestId) {
         this.leaderName = leaderName;
         this.teamName = teamName;
         this.projectName = projectName;
@@ -73,7 +72,7 @@ public class Team extends BaseEntity {
         this.youTubePath = youTubePath;
         this.isDeleted = false;
         this.isSubmitted = false;
-        this.teamMembers = teamMembers;
+        this.teamMembers = new ArrayList<>();
         this.contestId = contestId;
     }
 
@@ -87,7 +86,6 @@ public class Team extends BaseEntity {
                 .productionPath(productionPath)
                 .githubPath(githubPath)
                 .youTubePath(youTubePath)
-                .teamMembers(new ArrayList<>())
                 .contestId(contestId)
                 .build();
     }

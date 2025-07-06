@@ -55,10 +55,7 @@ public class TeamMemberCommandService {
     public void assignFakeTeamMember(final Team team, final String newTeamMemberName) {
         final Member newMember = memberConvenience.createFakeMember(newTeamMemberName);
         memberRepository.save(newMember);
-        final TeamMember newTeamMember = TeamMember.builder()
-                .team(team)
-                .memberId(newMember.getId())
-                .build();
+        final TeamMember newTeamMember = new TeamMember(newMember.getId(), team);
         teamMemberRepository.save(newTeamMember);
     }
 

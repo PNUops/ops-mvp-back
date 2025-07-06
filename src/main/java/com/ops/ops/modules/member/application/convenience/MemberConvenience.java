@@ -6,6 +6,7 @@ import com.ops.ops.modules.member.domain.Member;
 import com.ops.ops.modules.member.domain.dao.MemberRepository;
 import com.ops.ops.modules.member.exception.MemberException;
 import com.ops.ops.modules.member.exception.MemberExceptionType;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -26,12 +27,12 @@ public class MemberConvenience {
 
     public Member createFakeMember(final String name) {
         final String unique = UUID.randomUUID().toString().replace("-", "").substring(0, 10);
-        return memberRepository.save(Member.builder()
+        return Member.builder()
                 .name(name)
                 .studentId("fake_" + unique)
                 .email("fake_" + unique + "@placeholder.com")
                 .password("!FAKE_USER!")
-                .roles(Set.of(ROLE_회원))
-                .build());
+                .roles(new HashSet<>(Set.of(ROLE_회원)))
+                .build();
     }
 }
