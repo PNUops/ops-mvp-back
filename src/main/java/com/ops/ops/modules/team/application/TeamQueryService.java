@@ -83,11 +83,15 @@ public class TeamQueryService {
     }
 
     private List<TeamMemberResponse> getTeamMembersByTeamId(final Long teamId) {
-        List<TeamMember> participants = teamMemberRepository.findAllByTeamId(teamId);
-        List<Long> memberIds = participants.stream()
+        List<TeamMember> teamMembers = teamMemberRepository.findAllByTeamId(teamId);
+        List<Long> memberIds = teamMembers.stream()
                 .map(TeamMember::getMemberId)
                 .toList();
+        if (memberIds.isEmpty()) {
+            return List.of();
+        }
         return memberRepository.findAllById(memberIds).stream()
+                .filter(member -> !member.isTeamLeader())
                 .map(member -> new TeamMemberResponse(member.getId(), member.getName()))
                 .toList();
     }
