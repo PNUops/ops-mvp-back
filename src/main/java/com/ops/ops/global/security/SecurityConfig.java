@@ -42,9 +42,9 @@ public class SecurityConfig {
                 .formLogin(FormLoginConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/sign-up/**", "/sign-in/**", "/oauth/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/teams/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/contests/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/notices/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/teams/**", "/api/teams/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/contests/**", "/api/contests/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/notices/**", "/api/notices/**").permitAll()
                         .anyRequest().hasAnyRole("회원", "관리자", "팀장")
                 )
                 .exceptionHandling(exceptions -> exceptions
