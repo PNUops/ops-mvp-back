@@ -11,6 +11,7 @@ import com.ops.ops.modules.team.application.TeamQueryService;
 import com.ops.ops.modules.team.application.dto.request.PreviewDeleteRequest;
 import com.ops.ops.modules.team.application.dto.request.TeamCreateRequest;
 import com.ops.ops.modules.team.application.dto.request.TeamDetailUpdateRequest;
+import com.ops.ops.modules.team.application.dto.response.TeamCreateResponse;
 import com.ops.ops.modules.team.application.dto.response.TeamDetailResponse;
 import com.ops.ops.modules.team.application.dto.response.TeamSubmissionStatusResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -159,11 +160,10 @@ public class TeamController {
     @ApiResponse(responseCode = "201", description = "팀 등록 성공")
     @PostMapping
     @Secured("ROLE_관리자")
-    public ResponseEntity<Void> createTeam(
-            @RequestBody @Validated TeamCreateRequest request,
-            @LoginMember final Member member
+    public ResponseEntity<TeamCreateResponse> createTeam(
+            @RequestBody @Validated TeamCreateRequest request
     ) {
-        teamCommandService.createTeam(request);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        TeamCreateResponse response = teamCommandService.createTeam(request);
+        return ResponseEntity.ok(response);
     }
 }

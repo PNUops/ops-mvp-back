@@ -17,7 +17,7 @@ public record TeamDetailResponse(
         List<Long> previewIds,
         String productionPath,
         String githubPath,
-        String youtubePath,
+        String youTubePath,
         boolean isLiked
 ) {
     public static TeamDetailResponse from(
