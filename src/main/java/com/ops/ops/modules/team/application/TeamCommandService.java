@@ -16,6 +16,7 @@ import com.ops.ops.modules.member.domain.MemberRoleType;
 import com.ops.ops.modules.team.application.convenience.TeamConvenience;
 import com.ops.ops.modules.team.application.dto.request.TeamCreateRequest;
 import com.ops.ops.modules.team.application.dto.request.TeamDetailUpdateRequest;
+import com.ops.ops.modules.team.application.dto.response.TeamCreateResponse;
 import com.ops.ops.modules.team.domain.Team;
 import com.ops.ops.modules.team.domain.dao.TeamRepository;
 import java.util.List;
@@ -98,7 +99,7 @@ public class TeamCommandService {
                 request.productionPath(), request.githubPath(), request.youTubePath(), request.contestId());
     }
 
-    public void createTeam(TeamCreateRequest request) {
+    public TeamCreateResponse createTeam(TeamCreateRequest request) {
         final Contest contest = contestConvenience.getValidateExistContest(request.contestId());
         if (!contest.isTeamCreatable()) {
             throw new ContestException(ContestExceptionType.CANNOT_CREATE_TEAM_OF_CURRENT_CONTEST);
@@ -109,6 +110,8 @@ public class TeamCommandService {
         teamRepository.save(team);
 
         teamMemberCommandService.assignFakeTeamMember(team, request.leaderName(), Set.of(MemberRoleType.ROLE_팀장));
+
+        return TeamCreateResponse.from(team);
     }
 
     private void validateTeamContestChange(final Team team, final Contest newContest, final Member member,
