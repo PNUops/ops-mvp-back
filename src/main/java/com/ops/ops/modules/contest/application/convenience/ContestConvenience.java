@@ -1,6 +1,7 @@
 package com.ops.ops.modules.contest.application.convenience;
 
 import static com.ops.ops.modules.contest.exception.ContestExceptionType.CANNOT_UPDATE_TEAM_INFO_FOR_CURRENT;
+import static com.ops.ops.modules.contest.exception.ContestExceptionType.CONTEST_NAME_ALREADY_EXIST;
 import static com.ops.ops.modules.contest.exception.ContestExceptionType.NOT_FOUND_CONTEST;
 
 import com.ops.ops.modules.contest.domain.Contest;
@@ -18,12 +19,10 @@ public class ContestConvenience {
     private final ContestRepository contestRepository;
 
     public Contest getValidateExistContest(final Long contestId) {
-        return contestRepository.findById(contestId)
-                .orElseThrow(() -> new ContestException(NOT_FOUND_CONTEST));
+        return contestRepository.findById(contestId).orElseThrow(() -> new ContestException(NOT_FOUND_CONTEST));
     }
 
-    public void validateNotCurrentContest(final Long contestId) {
-        Contest contest = getValidateExistContest(contestId);
+    public void validateCurrentContest(final Contest contest) {
         if (contest.getIsCurrent()) {
             throw new ContestException(CANNOT_UPDATE_TEAM_INFO_FOR_CURRENT);
         }
@@ -31,5 +30,11 @@ public class ContestConvenience {
 
     public Contest get6thContest() {
         return contestRepository.findByIsCurrentTrue().orElseThrow(() -> new ContestException(NOT_FOUND_CONTEST));
+    }
+
+    public void validateDuplicateContestName(String contestName) {
+        if (contestRepository.existsByContestName(contestName)) {
+            throw new ContestException(CONTEST_NAME_ALREADY_EXIST);
+        }
     }
 }

@@ -20,6 +20,7 @@ import com.ops.ops.modules.member.application.convenience.MemberConvenience;
 import com.ops.ops.modules.member.domain.Member;
 import com.ops.ops.modules.member.exception.MemberException;
 import com.ops.ops.modules.team.application.convenience.TeamConvenience;
+import com.ops.ops.modules.team.application.convenience.TeamLikeConvenience;
 import com.ops.ops.modules.team.application.dto.response.TeamDetailResponse;
 import com.ops.ops.modules.team.application.dto.response.TeamMemberResponse;
 import com.ops.ops.modules.team.application.dto.response.TeamSubmissionStatusResponse;
@@ -32,10 +33,7 @@ import com.ops.ops.modules.team.domain.dao.TeamMemberRepository;
 import com.ops.ops.modules.team.domain.dao.TeamRepository;
 import com.ops.ops.modules.team.exception.TeamException;
 import com.ops.ops.modules.team.exception.TeamMemberException;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.antlr.v4.runtime.misc.Pair;
 import org.springframework.core.io.Resource;
@@ -57,6 +55,7 @@ public class TeamQueryService {
     private final ContestConvenience contestConvenience;
     private final MemberConvenience memberConvenience;
     private final TeamConvenience teamConvenience;
+    private final TeamLikeConvenience teamLikeConvenience;
 
     public TeamDetailResponse getTeamDetail(final Long teamId, final Member member) {
         final Team team = teamRepository.findById(teamId)
@@ -94,15 +93,7 @@ public class TeamQueryService {
     }
 
     public List<TeamSummaryResponse> getAllTeamSummaries(final List<Team> teams, final Member member) {
-        Collections.shuffle(teams);
-
-        final Map<Long, Boolean> likeMap =
-                (member != null) ? teamLikeRepository.findAllByMemberIdAndTeamIn(member.getId(), teams).stream()
-                        .collect(Collectors.toMap(tl -> tl.getTeam().getId(), TeamLike::getIsLiked))
-                        : Collections.emptyMap();
-
-        return teams.stream().map(team -> TeamSummaryResponse.from(team, likeMap.getOrDefault(team.getId(), false)))
-                .toList();
+        return teamLikeConvenience.getAllTeamSummaries(teams, member);
     }
 
     public TeamSubmissionStatusResponse getSubmissionStatus(final Member member) {

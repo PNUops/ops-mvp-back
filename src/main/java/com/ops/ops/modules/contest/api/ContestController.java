@@ -1,5 +1,7 @@
 package com.ops.ops.modules.contest.api;
 
+import static org.springframework.http.HttpStatus.CREATED;
+
 import com.ops.ops.global.security.annotation.LoginMember;
 import com.ops.ops.modules.contest.application.ContestCommandService;
 import com.ops.ops.modules.contest.application.ContestQueryService;
@@ -14,7 +16,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -50,7 +51,7 @@ public class ContestController {
             @Valid @RequestBody final ContestRequest request
     ) {
         contestCommandService.createContest(request.contestName());
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        return ResponseEntity.status(CREATED).build();
     }
 
     @Operation(summary = "대회 수정", description = "특정 대회의 정보를 수정합니다.")
