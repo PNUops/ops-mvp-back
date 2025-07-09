@@ -24,7 +24,6 @@ import com.ops.ops.modules.team.application.convenience.TeamLikeConvenience;
 import com.ops.ops.modules.team.application.dto.response.TeamDetailResponse;
 import com.ops.ops.modules.team.application.dto.response.TeamMemberResponse;
 import com.ops.ops.modules.team.application.dto.response.TeamSubmissionStatusResponse;
-import com.ops.ops.modules.team.application.dto.response.TeamSummaryResponse;
 import com.ops.ops.modules.team.domain.Team;
 import com.ops.ops.modules.team.domain.TeamLike;
 import com.ops.ops.modules.team.domain.TeamMember;
@@ -90,10 +89,6 @@ public class TeamQueryService {
         final File findFile = fileRepository.findById(imageId).orElseThrow(() -> new FileException(NOT_EXISTS_PREVIEW));
         checkImageConverted(findFile);
         return fileStorageUtil.findFileAndType(findFile.getId());
-    }
-
-    public List<TeamSummaryResponse> getAllTeamSummaries(final List<Team> teams, final Member member) {
-        return teamLikeConvenience.getAllTeamSummaries(teams, member);
     }
 
     public TeamSubmissionStatusResponse getSubmissionStatus(final Member member) {
