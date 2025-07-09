@@ -1,9 +1,11 @@
 package com.ops.ops.modules.contest.application.convenience;
 
+import static com.ops.ops.modules.contest.exception.ContestExceptionType.CANNOT_UPDATE_TEAM_INFO_FOR_CURRENT;
+import static com.ops.ops.modules.contest.exception.ContestExceptionType.NOT_FOUND_CONTEST;
+
 import com.ops.ops.modules.contest.domain.Contest;
 import com.ops.ops.modules.contest.domain.dao.ContestRepository;
 import com.ops.ops.modules.contest.exception.ContestException;
-import com.ops.ops.modules.contest.exception.ContestExceptionType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,13 +19,17 @@ public class ContestConvenience {
 
     public Contest getValidateExistContest(final Long contestId) {
         return contestRepository.findById(contestId)
-                .orElseThrow(() -> new ContestException(ContestExceptionType.NOT_FOUND_CONTEST));
+                .orElseThrow(() -> new ContestException(NOT_FOUND_CONTEST));
     }
 
     public void validateNotCurrentContest(final Long contestId) {
         Contest contest = getValidateExistContest(contestId);
         if (contest.getIsCurrent()) {
-            throw new ContestException(ContestExceptionType.CANNOT_UPDATE_TEAM_INFO_FOR_CURRENT);
+            throw new ContestException(CANNOT_UPDATE_TEAM_INFO_FOR_CURRENT);
         }
+    }
+
+    public Contest get6thContest() {
+        return contestRepository.findByIsCurrentTrue().orElseThrow(() -> new ContestException(NOT_FOUND_CONTEST));
     }
 }

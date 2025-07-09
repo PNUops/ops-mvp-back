@@ -68,4 +68,8 @@ public class MemberConvenience {
                 .roles(roles)
                 .build();
     }
+
+    public long countTotalMember() {
+        return memberRepository.count();
+    }
 }

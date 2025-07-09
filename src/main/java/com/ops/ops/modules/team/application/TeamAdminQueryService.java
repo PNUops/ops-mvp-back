@@ -1,19 +1,16 @@
 package com.ops.ops.modules.team.application;
 
+import com.ops.ops.modules.contest.application.convenience.ContestConvenience;
 import com.ops.ops.modules.contest.domain.Contest;
-import com.ops.ops.modules.contest.domain.dao.ContestRepository;
-import com.ops.ops.modules.contest.exception.ContestException;
-import com.ops.ops.modules.contest.exception.ContestExceptionType;
-import com.ops.ops.modules.member.domain.dao.MemberRepository;
+import com.ops.ops.modules.member.application.convenience.MemberConvenience;
 import com.ops.ops.modules.team.application.dto.TeamLikeCountDto;
 import com.ops.ops.modules.team.application.dto.TeamRank;
 import com.ops.ops.modules.team.application.dto.response.TeamLikeRankingResponse;
+import com.ops.ops.modules.team.application.dto.response.TeamSubmissionStatusResponse;
 import com.ops.ops.modules.team.application.dto.response.TeamVoteRateResponse;
 import com.ops.ops.modules.team.domain.Team;
 import com.ops.ops.modules.team.domain.dao.TeamLikeRepository;
 import com.ops.ops.modules.team.domain.dao.TeamRepository;
-import com.ops.ops.modules.team.application.dto.response.TeamSubmissionStatusResponse;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,12 +27,12 @@ public class TeamAdminQueryService {
 
 	private final TeamRepository teamRepository;
 	private final TeamLikeRepository teamLikeRepository;
-	private final MemberRepository memberRepository;
-	private final ContestRepository contestRepository;
+
+	private final MemberConvenience memberConvenience;
+	private final ContestConvenience contestConvenience;
 
 	public List<TeamSubmissionStatusResponse> getAllTeamSubmissions() {
-		Contest currentContest = contestRepository.findByIsCurrentTrue()
-			.orElseThrow(() -> new ContestException(ContestExceptionType.NOT_FOUND_CONTEST));
+		final Contest currentContest = contestConvenience.get6thContest();
 
 		return teamRepository.findByContestId(currentContest.getId())
 			.stream()
@@ -55,12 +52,11 @@ public class TeamAdminQueryService {
 	}
 
 	public TeamVoteRateResponse getVoteRate() {
-		Contest currentContest = contestRepository.findByIsCurrentTrue()
-			.orElseThrow(() -> new ContestException(ContestExceptionType.NOT_FOUND_CONTEST));
+		final Contest currentContest = contestConvenience.get6thContest();
 		
 		List<Team> currentTeams = teamRepository.findByContestId(currentContest.getId());
 		
-		long totalMemberCount = memberRepository.count();
+		long totalMemberCount = memberConvenience.countTotalMember();
 		long votedMemberCount = teamLikeRepository.countDistinctMemberIdsByIsLikedTrueAndTeams(currentTeams);
 		long totalVoteCount = teamLikeRepository.countByIsLikedTrueAndTeams(currentTeams);
 
@@ -73,8 +69,7 @@ public class TeamAdminQueryService {
 	}
 
 	private Map<Long, Integer> getTeamLikeCountMap() {
-		Contest currentContest = contestRepository.findByIsCurrentTrue()
-			.orElseThrow(() -> new ContestException(ContestExceptionType.NOT_FOUND_CONTEST));
+		final Contest currentContest = contestConvenience.get6thContest();
 		
 		List<Team> currentTeams = teamRepository.findByContestId(currentContest.getId());
 		List<TeamLikeCountDto> likedList = teamLikeRepository.findTeamLikeCountGroupedByTeams(currentTeams);
@@ -87,8 +82,7 @@ public class TeamAdminQueryService {
 	}
 
 	private List<TeamRank> getTeamRankList(Map<Long, Integer> teamLikeCountMap) {
-		Contest currentContest = contestRepository.findByIsCurrentTrue()
-			.orElseThrow(() -> new ContestException(ContestExceptionType.NOT_FOUND_CONTEST));
+		final Contest currentContest = contestConvenience.get6thContest();
 		
 		List<TeamRank> teamRankList = new ArrayList<>();
 		List<Team> teamList = teamRepository.findByContestId(currentContest.getId());
