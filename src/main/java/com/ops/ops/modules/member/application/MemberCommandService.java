@@ -1,22 +1,20 @@
 package com.ops.ops.modules.member.application;
 
 
+import static com.ops.ops.global.util.oauth.exception.OAuthExceptionType.FAILED_TO_GET_SOCIAL_USER_INFO;
+import static com.ops.ops.global.util.oauth.exception.OAuthExceptionType.SOCIAL_LOGIN_SERVER_ERROR;
 import static com.ops.ops.modules.member.domain.MemberRoleType.ROLE_회원;
-import static com.ops.ops.modules.member.exception.EmailAuthExceptionType.NOT_PUSAN_UNIVERSITY_EMAIL;
 import static com.ops.ops.modules.member.exception.EmailAuthExceptionType.NOT_VERIFIED_EMAIL_AUTH;
-import static com.ops.ops.modules.member.exception.MemberExceptionType.ALREADY_EXIST_EMAIL;
-import static com.ops.ops.modules.member.exception.MemberExceptionType.ALREADY_EXIST_STUDENT_ID;
 import static com.ops.ops.modules.member.exception.MemberExceptionType.CANNOT_CHANGE_SAME_PASSWORD;
 import static com.ops.ops.modules.member.exception.MemberExceptionType.CANNOT_MATCH_PASSWORD;
-import static com.ops.ops.modules.member.exception.MemberExceptionType.NOT_FOUND_MEMBER;
-import static com.ops.ops.global.util.oauth.exception.OAuthExceptionType.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.ops.ops.global.security.JwtProvider;
 import com.ops.ops.global.util.MailUtil;
 import com.ops.ops.global.util.oauth.component.GoogleOauth;
-import com.ops.ops.global.util.oauth.exception.OAuthException;
 import com.ops.ops.global.util.oauth.dto.GoogleUser;
+import com.ops.ops.global.util.oauth.exception.OAuthException;
+import com.ops.ops.modules.member.application.convenience.MemberConvenience;
 import com.ops.ops.modules.member.application.dto.request.EmailAuthConfirmRequest;
 import com.ops.ops.modules.member.application.dto.request.EmailAuthRequest;
 import com.ops.ops.modules.member.application.dto.request.PasswordUpdateRequest;
@@ -50,6 +48,8 @@ public class MemberCommandService {
     private final MemberRepository memberRepository;
     private final EmailAuthRepository emailAuthRepository;
 
+    private final MemberConvenience memberConvenience;
+
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
     private final MailUtil mailUtil;
@@ -63,7 +63,7 @@ public class MemberCommandService {
     public void signUp(final SignUpRequest request) {
         final String encodingPassword = passwordEncoder.encode(request.password());
         final EmailAuth emailAuth = checkEmailAuth(request.email());
-        checkIsDuplicateEmail(request.email());
+        memberConvenience.checkIsDuplicateEmail(request.email());
 
         memberRepository.findByStudentIdAndName(request.studentId(), request.name())
                 .ifPresentOrElse(
@@ -76,7 +76,7 @@ public class MemberCommandService {
 
     public void signUpEmailAuth(final EmailAuthRequest request) {
         final String email = request.email();
-        validatePusanDomain(email);
+        memberConvenience.validatePusanDomain(email);
         final String code = generateRandomAuthCode();
 
         saveAuthCode(email, code);
@@ -93,7 +93,7 @@ public class MemberCommandService {
     }
 
     public SignInResponse signIn(final SignInRequest request) {
-        final Member member = getValidateExistMember(request.email());
+        final Member member = memberConvenience.getValidateExistMemberByEmail(request.email());
         checkCorrectPassword(member.getPassword(), request.password());
         final List<String> roles = member.getRoles().stream()
                 .map(MemberRoleType::toString)
@@ -103,17 +103,17 @@ public class MemberCommandService {
     }
 
     public void signInEmailAuth(final EmailAuthRequest request) {
-        validateExistMember(request.email());
+        memberConvenience.validateExistMemberByEmail(request.email());
         signUpEmailAuth(request);
     }
 
     public void confirmSignInEmailAuth(final EmailAuthConfirmRequest request) {
-        validateExistMember(request.email());
+        memberConvenience.validateExistMemberByEmail(request.email());
         confirmSignUpEmailAuth(request);
     }
 
     public void updatePassword(final PasswordUpdateRequest request) {
-        final Member member = getValidateExistMember(request.email());
+        final Member member = memberConvenience.getValidateExistMemberByEmail(request.email());
         final EmailAuth emailAuth = checkEmailAuth(request.email());
 
         checkEqualPassword(request.newPassword(), member);
@@ -193,7 +193,7 @@ public class MemberCommandService {
 
     private void registerNewMember(final String name, final String studentId, final String email,
                                    final String password) {
-        checkIsDuplicateStudentId(studentId);
+        memberConvenience.checkIsDuplicateStudentId(studentId);
 
         memberRepository.save(Member.builder()
                 .name(name)
@@ -212,18 +212,6 @@ public class MemberCommandService {
         return memberEmailAuth;
     }
 
-    private void checkIsDuplicateEmail(final String email) {
-        if (memberRepository.existsByEmail(email)) {
-            throw new MemberException(ALREADY_EXIST_EMAIL);
-        }
-    }
-
-    private void checkIsDuplicateStudentId(final String studentId) {
-        if (memberRepository.existsByStudentId(studentId)) {
-            throw new MemberException(ALREADY_EXIST_STUDENT_ID);
-        }
-    }
-
     private static String generateRandomAuthCode() {
         char[] buf = new char[AUTH_CODE_LENGTH];
         for (int i = 0; i < buf.length; i++) {
@@ -237,21 +225,6 @@ public class MemberCommandService {
         final String subject = "SW 성과관리시스템 인증코드 발송 메일입니다.";
         final String text = "인증코드는 " + authCode + " 입니다.";
         mailUtil.sendMail(userList, subject, text);
-    }
-
-    private void validatePusanDomain(final String email) {
-        if (!email.endsWith("@pusan.ac.kr")) {
-            throw new EmailAuthException(NOT_PUSAN_UNIVERSITY_EMAIL);
-        }
-    }
-
-    private Member getValidateExistMember(final String email) {
-        return memberRepository.findByEmail(email)
-                .orElseThrow(() -> new MemberException(NOT_FOUND_MEMBER));
-    }
-
-    private void validateExistMember(final String email) {
-        memberRepository.findByEmail(email).orElseThrow(() -> new MemberException(NOT_FOUND_MEMBER));
     }
 
     private void checkCorrectPassword(final String savePassword, final String inputPassword) {

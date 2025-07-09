@@ -1,8 +1,14 @@
 package com.ops.ops.modules.member.application.convenience;
 
+import static com.ops.ops.modules.member.exception.EmailAuthExceptionType.NOT_PUSAN_UNIVERSITY_EMAIL;
+import static com.ops.ops.modules.member.exception.MemberExceptionType.ALREADY_EXIST_EMAIL;
+import static com.ops.ops.modules.member.exception.MemberExceptionType.ALREADY_EXIST_STUDENT_ID;
+import static com.ops.ops.modules.member.exception.MemberExceptionType.NOT_FOUND_MEMBER;
+
 import com.ops.ops.modules.member.domain.Member;
 import com.ops.ops.modules.member.domain.MemberRoleType;
 import com.ops.ops.modules.member.domain.dao.MemberRepository;
+import com.ops.ops.modules.member.exception.EmailAuthException;
 import com.ops.ops.modules.member.exception.MemberException;
 import com.ops.ops.modules.member.exception.MemberExceptionType;
 import java.util.Set;
@@ -21,6 +27,36 @@ public class MemberConvenience {
     public Member getValidateExistMember(final Long memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberException(MemberExceptionType.NOT_FOUND_MEMBER));
+    }
+
+    public Member getValidateExistMemberByStudentId(final String studentId) {
+        return memberRepository.findByStudentId(studentId).orElseThrow(() -> new MemberException(NOT_FOUND_MEMBER));
+    }
+
+    public void validateExistMemberByEmail(final String email) {
+        memberRepository.findByEmail(email).orElseThrow(() -> new MemberException(NOT_FOUND_MEMBER));
+    }
+
+    public Member getValidateExistMemberByEmail(final String email) {
+        return memberRepository.findByEmail(email).orElseThrow(() -> new MemberException(NOT_FOUND_MEMBER));
+    }
+
+    public void validatePusanDomain(final String email) {
+        if (!email.endsWith("@pusan.ac.kr")) {
+            throw new EmailAuthException(NOT_PUSAN_UNIVERSITY_EMAIL);
+        }
+    }
+
+    public void checkIsDuplicateEmail(final String email) {
+        if (memberRepository.existsByEmail(email)) {
+            throw new MemberException(ALREADY_EXIST_EMAIL);
+        }
+    }
+
+    public void checkIsDuplicateStudentId(final String studentId) {
+        if (memberRepository.existsByStudentId(studentId)) {
+            throw new MemberException(ALREADY_EXIST_STUDENT_ID);
+        }
     }
 
     public Member createFakeMember(final String name, final Set<MemberRoleType> roles) {
