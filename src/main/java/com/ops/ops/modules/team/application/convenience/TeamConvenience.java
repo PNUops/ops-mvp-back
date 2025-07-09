@@ -33,7 +33,7 @@ public class TeamConvenience {
     }
 
     public List<Team> findAllByContestId(final Long contestId) {
-        return teamRepository.findByContestId(contestId);
+        return teamRepository.findAllByContestId(contestId);
     }
 
 }
