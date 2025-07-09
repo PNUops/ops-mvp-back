@@ -10,7 +10,6 @@ import com.ops.ops.modules.member.domain.MemberRoleType;
 import com.ops.ops.modules.member.domain.dao.MemberRepository;
 import com.ops.ops.modules.member.exception.EmailAuthException;
 import com.ops.ops.modules.member.exception.MemberException;
-import com.ops.ops.modules.member.exception.MemberExceptionType;
 import java.util.Set;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +25,7 @@ public class MemberConvenience {
 
     public Member getValidateExistMember(final Long memberId) {
         return memberRepository.findById(memberId)
-                .orElseThrow(() -> new MemberException(MemberExceptionType.NOT_FOUND_MEMBER));
+                .orElseThrow(() -> new MemberException(NOT_FOUND_MEMBER));
     }
 
     public Member getValidateExistMemberByStudentId(final String studentId) {
