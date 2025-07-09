@@ -92,13 +92,18 @@ public class TeamCommandService {
 
     public TeamCreateResponse createTeam(TeamCreateRequest request) {
         final Contest contest = contestConvenience.getValidateExistContest(request.contestId());
-        if (!contest.isTeamCreatable()) {
-            throw new ContestException(CANNOT_CREATE_TEAM_OF_CURRENT_CONTEST);
-        }
+        checkIsTeamCreatable(contest);
 
-        final Team team = Team.of(request.leaderName(), request.teamName(), request.projectName(), request.overview(),
-                request.productionPath(), request.githubPath(), request.youTubePath(), request.contestId());
-        teamRepository.save(team);
+        final Team team = teamRepository.save(Team.builder()
+                .leaderName(request.leaderName())
+                .teamName(request.teamName())
+                .projectName(request.projectName())
+                .overview(request.overview())
+                .productionPath(request.productionPath())
+                .githubPath(request.githubPath())
+                .youTubePath(request.youTubePath())
+                .contestId(contest.getId())
+                .build());
 
         teamMemberCommandService.assignFakeTeamMember(team, request.leaderName(), Set.of(ROLE_팀장));
 
@@ -151,6 +156,12 @@ public class TeamCommandService {
         if (team.isLeaderNameChanged(newLeaderName)) {
             teamMemberCommandService.removeFakeTeamMemberByName(team, team.getLeaderName());
             teamMemberCommandService.assignFakeTeamMember(team, newLeaderName, Set.of(ROLE_팀장));
+        }
+    }
+
+    private void checkIsTeamCreatable(final Contest contest) {
+        if (!contest.isTeamCreatable()) {
+            throw new ContestException(CANNOT_CREATE_TEAM_OF_CURRENT_CONTEST);
         }
     }
 }
