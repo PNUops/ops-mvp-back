@@ -44,7 +44,10 @@ public class TeamLikeCommandService {
 	}
 
 	private void saveTeamLike(Long memberId, Team team, Boolean isLiked) {
-		TeamLike teamLike = TeamLike.of(memberId, team, isLiked);
-		teamLikeRepository.save(teamLike);
+		teamLikeRepository.save(TeamLike.builder()
+						.memberId(memberId)
+						.team(team)
+						.isLiked(isLiked)
+						.build());
 	}
 }
