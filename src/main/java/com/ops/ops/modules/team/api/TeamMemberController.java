@@ -1,5 +1,7 @@
 package com.ops.ops.modules.team.api;
 
+import static org.springframework.http.HttpStatus.CREATED;
+
 import com.ops.ops.modules.team.application.TeamMemberCommandService;
 import com.ops.ops.modules.team.application.dto.request.TeamMemberCreateRequest;
 import io.swagger.v3.oas.annotations.Operation;
@@ -8,7 +10,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -35,7 +36,7 @@ public class TeamMemberController {
             @Valid @RequestBody final TeamMemberCreateRequest request
     ) {
         teamMemberCommandService.createTeamMember(teamId, request.teamMemberName());
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        return ResponseEntity.status(CREATED).build();
     }
 
     @Operation(summary = "팀원 삭제", description = "특정 팀의 팀원을 삭제합니다. (소프트 삭제)")

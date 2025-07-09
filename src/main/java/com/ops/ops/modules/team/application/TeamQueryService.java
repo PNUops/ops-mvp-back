@@ -7,7 +7,7 @@ import static com.ops.ops.modules.file.exception.FileExceptionType.NOT_WEBP_CONV
 import static com.ops.ops.modules.member.domain.MemberRoleType.ROLE_팀장;
 import static com.ops.ops.modules.member.exception.MemberExceptionType.NOT_FOUND_LEADER;
 import static com.ops.ops.modules.team.exception.TeamExceptionType.NOT_FOUND_TEAM;
-import static com.ops.ops.modules.team.exception.TeamExceptionType.NOT_FOUND_TEAM_MEMBER;
+import static com.ops.ops.modules.team.exception.TeamMemberExceptionType.NOT_FOUND_TEAM_MEMBER;
 
 import com.ops.ops.global.util.FileStorageUtil;
 import com.ops.ops.modules.contest.application.convenience.ContestConvenience;
@@ -31,6 +31,7 @@ import com.ops.ops.modules.team.domain.dao.TeamLikeRepository;
 import com.ops.ops.modules.team.domain.dao.TeamMemberRepository;
 import com.ops.ops.modules.team.domain.dao.TeamRepository;
 import com.ops.ops.modules.team.exception.TeamException;
+import com.ops.ops.modules.team.exception.TeamMemberException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -106,7 +107,7 @@ public class TeamQueryService {
 
     public TeamSubmissionStatusResponse getSubmissionStatus(final Member member) {
         TeamMember teamMember = teamMemberRepository.findByMemberId(member.getId())
-                .orElseThrow(() -> new TeamException(NOT_FOUND_TEAM_MEMBER));
+                .orElseThrow(() -> new TeamMemberException(NOT_FOUND_TEAM_MEMBER));
         Team team = teamMember.getTeam();
 
         return TeamSubmissionStatusResponse.fromEntity(team);

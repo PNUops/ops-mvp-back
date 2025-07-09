@@ -61,13 +61,13 @@ public class MemberConvenience {
 
     public Member createFakeMember(final String name, final Set<MemberRoleType> roles) {
         final String unique = UUID.randomUUID().toString().replace("-", "").substring(0, 10);
-        return Member.builder()
+        return memberRepository.save(Member.builder()
                 .name(name)
                 .studentId("fake_" + unique)
                 .email("fake_" + unique + "@placeholder.com")
                 .password("!FAKE_USER!")
                 .roles(roles)
-                .build();
+                .build());
     }
 
     public long countTotalMember() {
@@ -76,5 +76,13 @@ public class MemberConvenience {
 
     public List<Member> findAllById(final List<Long> memberIds) {
         return memberRepository.findAllById(memberIds);
+    }
+
+    public void findById(final Long memberId) {
+         memberRepository.findById(memberId).orElseThrow(() -> new MemberException(NOT_FOUND_MEMBER));
+    }
+
+    public void deleteMember(final Member member) {
+        memberRepository.delete(member);
     }
 }
