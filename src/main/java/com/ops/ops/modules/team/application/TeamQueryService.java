@@ -151,9 +151,4 @@ public class TeamQueryService {
         return TeamSubmissionStatusResponse.fromEntity(team);
     }
 
-    private void validateOwnership(Long teamId, File previewFile) {
-        if (!previewFile.getTeamId().equals(teamId)) {
-            throw new FileException(FileExceptionType.REQUEST_NOT_OWN_IMAGE);
-        }
-    }
 }
