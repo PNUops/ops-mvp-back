@@ -22,7 +22,7 @@ import org.hibernate.annotations.SQLRestriction;
 @SQLRestriction("is_deleted = false")
 @SQLDelete(sql = "UPDATE team SET is_deleted = true where id = ?")
 public class Team extends BaseEntity {
-    // 이미지 관련 추가 필요
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
