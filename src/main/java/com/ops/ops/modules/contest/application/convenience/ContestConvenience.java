@@ -32,7 +32,7 @@ public class ContestConvenience {
         return contestRepository.findByIsCurrentTrue().orElseThrow(() -> new ContestException(NOT_FOUND_CONTEST));
     }
 
-    public void validateDuplicateContestName(String contestName) {
+    public void checkDuplicateContestName(String contestName) {
         if (contestRepository.existsByContestName(contestName)) {
             throw new ContestException(CONTEST_NAME_ALREADY_EXIST);
         }

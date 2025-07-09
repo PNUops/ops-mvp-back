@@ -18,7 +18,7 @@ public class ContestCommandService {
     private final TeamConvenience teamConvenience;
 
     public void createContest(final String contestName) {
-        contestConvenience.validateDuplicateContestName(contestName);
+        contestConvenience.checkDuplicateContestName(contestName);
         // 만약 제 6회 창의융합 대회를 직접 등록하는 상황일 때 isCurrent를 true로 설정하도록
         final boolean isCurrent = contestName.contains("6회") && contestName.contains("창의융합");
         final Contest contest = Contest.builder()
@@ -29,7 +29,7 @@ public class ContestCommandService {
     }
 
     public void updateContest(final Long contestId, final String newContestName) {
-        contestConvenience.validateDuplicateContestName(newContestName);
+        contestConvenience.checkDuplicateContestName(newContestName);
         final Contest contest = contestConvenience.getValidateExistContest(contestId);
         contest.updateContestName(newContestName);
     }
