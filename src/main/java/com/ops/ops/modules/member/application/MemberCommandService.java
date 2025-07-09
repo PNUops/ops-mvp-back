@@ -135,8 +135,8 @@ public class MemberCommandService {
             final GoogleUser googleUser = googleOauth.getUserInfoByCode(code, GoogleUser.class);
 
             return memberRepository.findByEmail(googleUser.email())
-                .map(this::processExistingMemberLogin) // 기존 회원 로그인 처리
-                .orElseGet(() -> processNewMemberSignUp(googleUser)); // 새로운 회원 가입 처리
+                    .map(this::processExistingMemberLogin) // 기존 회원 로그인 처리
+                    .orElseGet(() -> processNewMemberSignUp(googleUser)); // 새로운 회원 가입 처리
 
         } catch (JsonProcessingException e) {
             log.error("구글 사용자 정보 파싱 실패: {}", e.getMessage());
@@ -149,8 +149,8 @@ public class MemberCommandService {
 
     private SignInResponse processExistingMemberLogin(final Member member) {
         final List<String> roles = member.getRoles().stream()
-            .map(MemberRoleType::toString)
-            .toList();
+                .map(MemberRoleType::toString)
+                .toList();
         final String token = jwtProvider.createToken(String.valueOf(member.getId()), roles, member.getName());
 
         return SignInResponse.from(member, token);
@@ -172,12 +172,12 @@ public class MemberCommandService {
         final String uniqueStudentId = "fake_" + UUID.randomUUID().toString().replace("-", "").substring(0, 10);
 
         return memberRepository.save(Member.builder()
-            .name(name)
-            .studentId(uniqueStudentId)
-            .email(email)
-            .password(randomPassword)
-            .roles(Set.of(ROLE_회원))
-            .build());
+                .name(name)
+                .studentId(uniqueStudentId)
+                .email(email)
+                .password(randomPassword)
+                .roles(Set.of(ROLE_회원))
+                .build());
     }
 
     private String generateRandomPassword() {
