@@ -10,6 +10,7 @@ import com.ops.ops.modules.member.domain.MemberRoleType;
 import com.ops.ops.modules.member.domain.dao.MemberRepository;
 import com.ops.ops.modules.member.exception.EmailAuthException;
 import com.ops.ops.modules.member.exception.MemberException;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -71,5 +72,9 @@ public class MemberConvenience {
 
     public long countTotalMember() {
         return memberRepository.count();
+    }
+
+    public List<Member> findAllById(final List<Long> memberIds) {
+        return memberRepository.findAllById(memberIds);
     }
 }
