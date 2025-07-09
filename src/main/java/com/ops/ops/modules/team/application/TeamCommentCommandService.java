@@ -24,9 +24,12 @@ public class TeamCommentCommandService {
 
 	public void createComment(final Long teamId, final Long memberId, final String description) {
 		final Team team = teamConvenience.getValidateExistTeam(teamId);
-		final TeamComment comment = TeamComment.of(description, memberId, team);
 
-		teamCommentRepository.save(comment);
+		teamCommentRepository.save(TeamComment.builder()
+				.description(description)
+				.memberId(memberId)
+				.team(team)
+				.build());
 	}
 
 	public void updateComment(final Long teamId, final Long commentId, final Long memberId, final String newDescription) {
