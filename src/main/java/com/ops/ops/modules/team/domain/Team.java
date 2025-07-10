@@ -22,7 +22,7 @@ import org.hibernate.annotations.SQLRestriction;
 @SQLRestriction("is_deleted = false")
 @SQLDelete(sql = "UPDATE team SET is_deleted = true where id = ?")
 public class Team extends BaseEntity {
-    // 이미지 관련 추가 필요
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -74,20 +74,6 @@ public class Team extends BaseEntity {
         this.isSubmitted = false;
         this.teamMembers = new ArrayList<>();
         this.contestId = contestId;
-    }
-
-    public static Team of(String leaderName, String teamName, String projectName, String overview,
-                          String productionPath, String githubPath, String youTubePath, Long contestId) {
-        return Team.builder()
-                .leaderName(leaderName)
-                .teamName(teamName)
-                .projectName(projectName)
-                .overview(overview)
-                .productionPath(productionPath)
-                .githubPath(githubPath)
-                .youTubePath(youTubePath)
-                .contestId(contestId)
-                .build();
     }
 
     public void updateDetail(final String newLeaderName, final String newTeamName, final String newProjectName,

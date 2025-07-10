@@ -43,6 +43,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/teams")
+@Validated
 public class TeamController {
     private final TeamQueryService teamQueryService;
     private final TeamCommandService teamCommandService;
@@ -127,7 +128,7 @@ public class TeamController {
     @Secured("ROLE_팀장")
     @DeleteMapping("/{teamId}/image")
     public ResponseEntity<Void> deletePreviewImage(@PathVariable Long teamId,
-                                                   @RequestBody PreviewDeleteRequest previewDeleteRequest) {
+                                                   @RequestBody @Valid PreviewDeleteRequest previewDeleteRequest) {
         teamCommandService.deletePreviewImages(teamId, previewDeleteRequest.imageIds(), PREVIEW);
         return ResponseEntity.noContent().build();
     }
@@ -161,7 +162,7 @@ public class TeamController {
     @PostMapping
     @Secured("ROLE_관리자")
     public ResponseEntity<TeamCreateResponse> createTeam(
-            @RequestBody @Validated TeamCreateRequest request
+            @RequestBody @Valid TeamCreateRequest request
     ) {
         TeamCreateResponse response = teamCommandService.createTeam(request);
         return ResponseEntity.ok(response);

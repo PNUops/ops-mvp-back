@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.ResponseEntity;
@@ -28,17 +29,14 @@ public class TeamLikeController {
 
     @Operation(summary = "좋아요 토글", description = "특정 팀에 대해 좋아요를 등록하거나 취소합니다.")
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "좋아요 상태 변경 성공"),
-        @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자"),
-        @ApiResponse(responseCode = "404", description = "존재하지 않는 팀 ID")
+            @ApiResponse(responseCode = "200", description = "좋아요 상태 변경 성공"),
+            @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자"),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 팀 ID")
     })
     @PatchMapping("/{teamId}/like")
-    public ResponseEntity<TeamLikeToggleResponse> toggleLike(
-            @PathVariable Long teamId,
-            @RequestBody TeamLikeToggleRequest request,
-            @LoginMember Member member) {
-        TeamLikeToggleResponse response =
-                teamLikeService.toggleLike(member.getId(), teamId, request.isLiked());
-        return ResponseEntity.ok(response);
+    public ResponseEntity<TeamLikeToggleResponse> toggleLike(@PathVariable Long teamId,
+                                                             @RequestBody @Valid TeamLikeToggleRequest request,
+                                                             @LoginMember Member member) {
+        return ResponseEntity.ok(teamLikeService.toggleLike(member.getId(), teamId, request.isLiked()));
     }
 }

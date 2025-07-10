@@ -1,5 +1,6 @@
 package com.ops.ops.modules.team.application;
 
+import com.ops.ops.modules.team.application.convenience.TeamConvenience;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -18,10 +19,11 @@ import lombok.RequiredArgsConstructor;
 public class TeamLikeCommandService {
 
 	private final TeamLikeRepository teamLikeRepository;
-	private final TeamCommandService teamCommandService;
+
+	private final TeamConvenience teamConvenience;
 
 	public TeamLikeToggleResponse toggleLike(Long memberId, Long teamId, Boolean isLiked) {
-		Team team = teamCommandService.validateAndGetTeamById(teamId);
+		Team team = teamConvenience.getValidateExistTeam(teamId);
 
 		Optional<TeamLike> teamLikeOptional = teamLikeRepository.findByMemberIdAndTeam(memberId, team);
 		if (teamLikeOptional.isEmpty()) {
@@ -41,8 +43,11 @@ public class TeamLikeCommandService {
 		return new TeamLikeToggleResponse(team.getId(), isLiked, message);
 	}
 
-	public void saveTeamLike(Long memberId, Team team, Boolean isLiked) {
-		TeamLike teamLike = TeamLike.of(memberId, team, isLiked);
-		teamLikeRepository.save(teamLike);
+	private void saveTeamLike(Long memberId, Team team, Boolean isLiked) {
+		teamLikeRepository.save(TeamLike.builder()
+						.memberId(memberId)
+						.team(team)
+						.isLiked(isLiked)
+						.build());
 	}
 }

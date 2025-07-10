@@ -39,15 +39,7 @@ public class TeamLike extends BaseEntity {
         this.team = team;
         this.isLiked = isLiked;
     }
-
-    public static TeamLike of(Long memberId, Team team, boolean isLiked) {
-        return TeamLike.builder()
-            .memberId(memberId)
-            .team(team)
-            .isLiked(isLiked)
-            .build();
-    }
-
+    
     public void setLiked(boolean liked) {
         this.isLiked = liked;
     }
