@@ -105,7 +105,7 @@ public class TeamQueryService {
         }
     }
 
-    private Long getLeaderIdByTeamId(final Long teamId) {
+    public Long getLeaderIdByTeamId(final Long teamId) {
         List<TeamMember> participants = teamMemberRepository.findAllByTeamId(teamId);
 
         List<Long> memberIds = participants.stream()

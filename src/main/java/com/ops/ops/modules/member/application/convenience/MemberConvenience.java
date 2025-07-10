@@ -1,5 +1,7 @@
 package com.ops.ops.modules.member.application.convenience;
 
+import static com.ops.ops.modules.member.domain.MemberRoleType.ROLE_팀장;
+import static com.ops.ops.modules.member.domain.MemberRoleType.ROLE_회원;
 import static com.ops.ops.modules.member.exception.EmailAuthExceptionType.NOT_PUSAN_UNIVERSITY_EMAIL;
 import static com.ops.ops.modules.member.exception.MemberExceptionType.ALREADY_EXIST_EMAIL;
 import static com.ops.ops.modules.member.exception.MemberExceptionType.ALREADY_EXIST_STUDENT_ID;
@@ -79,10 +81,16 @@ public class MemberConvenience {
     }
 
     public void findById(final Long memberId) {
-         memberRepository.findById(memberId).orElseThrow(() -> new MemberException(NOT_FOUND_MEMBER));
+        memberRepository.findById(memberId).orElseThrow(() -> new MemberException(NOT_FOUND_MEMBER));
     }
 
     public void deleteMember(final Member member) {
         memberRepository.delete(member);
+    }
+
+    public void changeLeaderRoleToRegularMember(final Long memberId) {
+        Member member = getValidateExistMember(memberId);
+        member.getRoles().remove(ROLE_팀장);
+        member.getRoles().add(ROLE_회원);
     }
 }
