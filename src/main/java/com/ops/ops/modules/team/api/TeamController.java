@@ -84,7 +84,7 @@ public class TeamController {
 
     @Operation(summary = "팀 썸네일 등록", description = "팀의 썸네일 이미지를 저장합니다.")
     @ApiResponse(responseCode = "201", description = "팀 썸네일 저장 완료")
-    @Secured("ROLE_팀장")
+    @Secured({"ROLE_팀장", "ROLE_관리자"})
     @PostMapping("/{teamId}/image/thumbnail")
     public ResponseEntity<Void> saveThumbnailImage(@PathVariable final Long teamId,
                                                    @RequestPart("image") final MultipartFile image) {
@@ -94,7 +94,7 @@ public class TeamController {
 
     @Operation(summary = "팀 썸네일 삭제", description = "팀의 썸네일 이미지를 삭제합니다.")
     @ApiResponse(responseCode = "204", description = "팀 썸네일 삭제 성공")
-    @Secured("ROLE_팀장")
+    @Secured({"ROLE_팀장", "ROLE_관리자"})
     @DeleteMapping("/{teamId}/image/thumbnail")
     public ResponseEntity<Void> deleteThumbnailImage(@PathVariable Long teamId) {
         teamCommandService.deleteThumbnailImage(teamId, THUMBNAIL);
@@ -115,7 +115,7 @@ public class TeamController {
 
     @Operation(summary = "팀 프리뷰 등록", description = "팀의 프리뷰 이미지를 등록합니다.")
     @ApiResponse(responseCode = "201", description = "팀 프리뷰 등록 성공")
-    @Secured("ROLE_팀장")
+    @Secured({"ROLE_팀장", "ROLE_관리자"})
     @PostMapping("/{teamId}/image")
     public ResponseEntity<Void> savePreviewImage(@PathVariable Long teamId,
                                                  @RequestPart("images") final List<MultipartFile> images) {
@@ -125,7 +125,7 @@ public class TeamController {
 
     @Operation(summary = "팀 프리뷰 삭제", description = "팀의 프리뷰 이미지를 삭제합니다.")
     @ApiResponse(responseCode = "204", description = "팀 프리뷰 삭제 성공")
-    @Secured("ROLE_팀장")
+    @Secured({"ROLE_팀장", "ROLE_관리자"})
     @DeleteMapping("/{teamId}/image")
     public ResponseEntity<Void> deletePreviewImage(@PathVariable Long teamId,
                                                    @RequestBody @Valid PreviewDeleteRequest previewDeleteRequest) {
