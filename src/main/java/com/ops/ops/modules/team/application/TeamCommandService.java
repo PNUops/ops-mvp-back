@@ -169,7 +169,7 @@ public class TeamCommandService {
     }
 
     private void checkIsTeamCreatable(final Contest contest) {
-        if (!contest.isTeamCreatable()) {
+        if (!contest.isCurrent()) {
             throw new ContestException(CANNOT_CREATE_TEAM_OF_CURRENT_CONTEST);
         }
     }

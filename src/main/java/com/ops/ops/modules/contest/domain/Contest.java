@@ -43,7 +43,7 @@ public class Contest extends BaseEntity {
         this.contestName = newContestName;
     }
 
-    public boolean isTeamCreatable() {
+    public boolean isCurrent() {
         return !this.isCurrent;
     }
 }
