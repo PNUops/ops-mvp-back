@@ -31,6 +31,7 @@ public class TeamMemberController {
     @Operation(summary = "팀원 등록", description = "특정 팀에 팀원을 등록합니다.")
     @ApiResponse(responseCode = "201", description = "팀원 등록 성공")
     @PostMapping
+    @Secured("ROLE_관리자")
     public ResponseEntity<Void> createTeamMember(
             @PathVariable final Long teamId,
             @Valid @RequestBody final TeamMemberCreateRequest request
@@ -42,6 +43,7 @@ public class TeamMemberController {
     @Operation(summary = "팀원 삭제", description = "특정 팀의 팀원을 삭제합니다. (소프트 삭제)")
     @ApiResponse(responseCode = "204", description = "팀원 삭제 성공")
     @DeleteMapping("/{memberId}")
+    @Secured("ROLE_관리자")
     public ResponseEntity<Void> deleteTeamMember(
             @Parameter(description = "팀 ID") @PathVariable final Long teamId,
             @Parameter(description = "멤버 ID") @PathVariable final Long memberId
