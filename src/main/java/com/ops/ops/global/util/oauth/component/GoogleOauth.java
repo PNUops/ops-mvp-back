@@ -80,15 +80,13 @@ public class GoogleOauth implements SocialOauth {
         try {
             ServletRequestAttributes attributes =
                     (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+
             if (attributes == null) {
-                log.info(
-                        "RequestAttributes가 null - 기본 콜백 URL 사용: {}",
-                        GOOGLE_SNS_CALLBACK_LOGIN_URL);
-                return GOOGLE_SNS_CALLBACK_LOGIN_URL;
+                log.error("OAuth 인증 요청이 HTTP 요청 컨텍스트 외부에서 호출됨");
+                throw new OAuthException(SOCIAL_LOGIN_SERVER_ERROR);
             }
 
             HttpServletRequest request = attributes.getRequest();
-
             String origin = request.getHeader("Origin");
             log.info("감지된 Origin 헤더: {}", origin);
 
