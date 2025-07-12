@@ -1,5 +1,7 @@
 package com.ops.ops.modules.member.domain;
 
+import static com.ops.ops.modules.member.domain.MemberRoleType.ROLE_회원;
+
 import com.ops.ops.global.base.BaseEntity;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
@@ -85,5 +87,10 @@ public class Member extends BaseEntity {
 
     public boolean isTeamLeader() {
         return roles.contains(MemberRoleType.ROLE_팀장);
+    }
+
+    public void updateRole() {
+        roles.clear();
+        roles.add(ROLE_회원);
     }
 }

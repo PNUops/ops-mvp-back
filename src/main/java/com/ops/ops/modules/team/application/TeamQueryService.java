@@ -4,8 +4,6 @@ import static com.ops.ops.modules.file.domain.FileImageType.THUMBNAIL;
 import static com.ops.ops.modules.file.exception.FileExceptionType.NOT_EXISTS_PREVIEW;
 import static com.ops.ops.modules.file.exception.FileExceptionType.NOT_EXISTS_THUMBNAIL;
 import static com.ops.ops.modules.file.exception.FileExceptionType.NOT_WEBP_CONVERTED;
-import static com.ops.ops.modules.member.domain.MemberRoleType.ROLE_팀장;
-import static com.ops.ops.modules.member.exception.MemberExceptionType.NOT_FOUND_LEADER;
 import static com.ops.ops.modules.team.exception.TeamExceptionType.NOT_FOUND_TEAM;
 import static com.ops.ops.modules.team.exception.TeamMemberExceptionType.NOT_FOUND_TEAM_MEMBER;
 
@@ -18,9 +16,9 @@ import com.ops.ops.modules.file.domain.dao.FileRepository;
 import com.ops.ops.modules.file.exception.FileException;
 import com.ops.ops.modules.member.application.convenience.MemberConvenience;
 import com.ops.ops.modules.member.domain.Member;
-import com.ops.ops.modules.member.exception.MemberException;
 import com.ops.ops.modules.team.application.convenience.TeamConvenience;
 import com.ops.ops.modules.team.application.convenience.TeamLikeConvenience;
+import com.ops.ops.modules.team.application.convenience.TeamMemberConvenience;
 import com.ops.ops.modules.team.application.dto.response.TeamDetailResponse;
 import com.ops.ops.modules.team.application.dto.response.TeamMemberResponse;
 import com.ops.ops.modules.team.application.dto.response.TeamSubmissionStatusResponse;
@@ -55,6 +53,7 @@ public class TeamQueryService {
     private final MemberConvenience memberConvenience;
     private final TeamConvenience teamConvenience;
     private final TeamLikeConvenience teamLikeConvenience;
+    private final TeamMemberConvenience teamMemberConvenience;
 
     public TeamDetailResponse getTeamDetail(final Long teamId, final Member member) {
         final Team team = teamRepository.findById(teamId)
@@ -63,7 +62,8 @@ public class TeamQueryService {
         final Contest contest = contestConvenience.getValidateExistContest(team.getContestId());
 
         final List<TeamMemberResponse> teamMembers = getTeamMembersByTeamId(teamId);
-        final Long leaderId = getLeaderIdByTeamId(teamId);
+        final List<Long> teamMemberIds = teamMemberConvenience.getTeamMemberIdsByTeamId(teamId);
+        final Long leaderId = memberConvenience.getLeaderIdByMemberIds(teamMemberIds);
 
         final List<Long> previewIds = fileRepository.findAllByTeamIdAndType(teamId, FileImageType.PREVIEW)
                 .stream()
@@ -105,15 +105,6 @@ public class TeamQueryService {
         }
     }
 
-    private Long getLeaderIdByTeamId(final Long teamId) {
-        List<TeamMember> participants = teamMemberRepository.findAllByTeamId(teamId);
-
-        List<Long> memberIds = participants.stream()
-                .map(TeamMember::getMemberId)
-                .toList();
-        return getLeaderIdByIds(memberIds);
-    }
-
     private List<TeamMemberResponse> getTeamMembersByTeamId(final Long teamId) {
         List<TeamMember> teamMembers = teamMemberRepository.findAllByTeamId(teamId);
         List<Long> memberIds = teamMembers.stream()
@@ -128,14 +119,4 @@ public class TeamQueryService {
                 .map(member -> new TeamMemberResponse(member.getId(), member.getName()))
                 .toList();
     }
-
-    private Long getLeaderIdByIds(List<Long> memberIds) {
-        return memberConvenience.findAllById(memberIds)
-                .stream()
-                .filter(member -> member.getRoles().contains(ROLE_팀장))
-                .findFirst()
-                .map(Member::getId)
-                .orElseThrow(() -> new MemberException(NOT_FOUND_LEADER));
-    }
-
 }

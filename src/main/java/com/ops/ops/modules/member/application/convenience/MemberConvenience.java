@@ -1,8 +1,10 @@
 package com.ops.ops.modules.member.application.convenience;
 
+import static com.ops.ops.modules.member.domain.MemberRoleType.ROLE_팀장;
 import static com.ops.ops.modules.member.exception.EmailAuthExceptionType.NOT_PUSAN_UNIVERSITY_EMAIL;
 import static com.ops.ops.modules.member.exception.MemberExceptionType.ALREADY_EXIST_EMAIL;
 import static com.ops.ops.modules.member.exception.MemberExceptionType.ALREADY_EXIST_STUDENT_ID;
+import static com.ops.ops.modules.member.exception.MemberExceptionType.NOT_FOUND_LEADER;
 import static com.ops.ops.modules.member.exception.MemberExceptionType.NOT_FOUND_MEMBER;
 
 import com.ops.ops.modules.member.domain.Member;
@@ -79,10 +81,19 @@ public class MemberConvenience {
     }
 
     public void findById(final Long memberId) {
-         memberRepository.findById(memberId).orElseThrow(() -> new MemberException(NOT_FOUND_MEMBER));
+        memberRepository.findById(memberId).orElseThrow(() -> new MemberException(NOT_FOUND_MEMBER));
     }
 
     public void deleteMember(final Member member) {
         memberRepository.delete(member);
+    }
+
+    public Long getLeaderIdByMemberIds(List<Long> memberIds) {
+        return findAllById(memberIds)
+                .stream()
+                .filter(member -> member.getRoles().contains(ROLE_팀장))
+                .findFirst()
+                .map(Member::getId)
+                .orElseThrow(() -> new MemberException(NOT_FOUND_LEADER));
     }
 }

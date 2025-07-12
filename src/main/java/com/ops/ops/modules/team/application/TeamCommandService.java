@@ -16,8 +16,10 @@ import com.ops.ops.modules.contest.exception.ContestException;
 import com.ops.ops.modules.file.domain.FileImageType;
 import com.ops.ops.modules.file.domain.dao.FileRepository;
 import com.ops.ops.modules.file.exception.FileException;
+import com.ops.ops.modules.member.application.convenience.MemberConvenience;
 import com.ops.ops.modules.member.domain.Member;
 import com.ops.ops.modules.team.application.convenience.TeamConvenience;
+import com.ops.ops.modules.team.application.convenience.TeamMemberConvenience;
 import com.ops.ops.modules.team.application.dto.request.TeamCreateRequest;
 import com.ops.ops.modules.team.application.dto.request.TeamDetailUpdateRequest;
 import com.ops.ops.modules.team.application.dto.response.TeamCreateResponse;
@@ -44,6 +46,8 @@ public class TeamCommandService {
 
     private final ContestConvenience contestConvenience;
     private final TeamConvenience teamConvenience;
+    private final TeamMemberConvenience teamMemberConvenience;
+    private final MemberConvenience memberConvenience;
 
     public void saveThumbnailImage(final Long teamId, final MultipartFile image, final FileImageType thumbnailType) {
         teamConvenience.validateExistTeam(teamId);
@@ -75,7 +79,12 @@ public class TeamCommandService {
     }
 
     public void deleteTeam(final Long teamId) {
-        teamRepository.delete(teamConvenience.getValidateExistTeam(teamId));
+        final Team team = teamConvenience.getValidateExistTeam(teamId);
+        final List<Long> memberIds = teamMemberConvenience.getTeamMemberIdsByTeamId(teamId);
+        final Long leaderId = memberConvenience.getLeaderIdByMemberIds(memberIds);
+        final Member leader = memberConvenience.getValidateExistMember(leaderId);
+        leader.updateRole();
+        teamRepository.delete(team);
     }
 
     public void updateTeamDetail(final Long teamId, final Member member, final TeamDetailUpdateRequest request) {
