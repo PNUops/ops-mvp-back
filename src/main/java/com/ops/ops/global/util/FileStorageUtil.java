@@ -9,6 +9,7 @@ import com.ops.ops.modules.file.domain.dao.FileRepository;
 import com.ops.ops.modules.file.exception.FileException;
 import com.ops.ops.modules.file.exception.FileExceptionType;
 import jakarta.activation.MimetypesFileTypeMap;
+import jakarta.persistence.EntityManager;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -36,6 +37,7 @@ public class FileStorageUtil {
 
     private final FileRepository fileRepository;
     private final FileEncodingUtil fileEncodingUtil;
+    private final EntityManager em;
 
     static {
         try {
@@ -90,7 +92,7 @@ public class FileStorageUtil {
 
             final String randomFilename = UUID.randomUUID() + extension;
             final Path targetFile = uploadDir.resolve(randomFilename);
-            Path webpFilePath = getWebpFilePath(targetFile);
+            final Path webpFilePath = getWebpFilePath(targetFile);
 
             final Path relativePath = RESOURCE_PATH.relativize(webpFilePath);
             final String filePathForDb = relativePath.toString().replace("\\", "/");
@@ -101,9 +103,12 @@ public class FileStorageUtil {
                     .teamId(teamId)
                     .type(type)
                     .build());
-            fileEncodingUtil.convertToWebpAndSave(multipartFile, webpFilePath, savedFile.getId());
-            return savedFile;
+            em.flush();
 
+            final byte[] fileBytes = multipartFile.getBytes();
+            fileEncodingUtil.convertToWebpAndSave(fileBytes, webpFilePath, savedFile.getId());
+
+            return savedFile;
         } catch (IOException e) {
             throw new FileSaveFailedException("로컬 디스크에 파일을 저장하는 중 오류가 발생했습니다.", e);
         }
