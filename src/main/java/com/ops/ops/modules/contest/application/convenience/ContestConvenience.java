@@ -22,8 +22,7 @@ public class ContestConvenience {
         return contestRepository.findById(contestId).orElseThrow(() -> new ContestException(NOT_FOUND_CONTEST));
     }
 
-    public void validateCurrentContest(final Long contestId) {
-        final Contest contest = getValidateExistContest(contestId);
+    public void validateCurrentContest(final Contest contest) {
         if (contest.getIsCurrent()) {
             throw new ContestException(CANNOT_UPDATE_TEAM_INFO_FOR_CURRENT);
         }

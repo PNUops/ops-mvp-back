@@ -6,6 +6,7 @@ import static com.ops.ops.modules.team.exception.TeamMemberExceptionType.NOT_FOU
 import static java.util.stream.Collectors.toMap;
 
 import com.ops.ops.modules.contest.application.convenience.ContestConvenience;
+import com.ops.ops.modules.contest.domain.Contest;
 import com.ops.ops.modules.member.application.convenience.MemberConvenience;
 import com.ops.ops.modules.member.domain.Member;
 import com.ops.ops.modules.member.domain.MemberRoleType;
@@ -45,13 +46,15 @@ public class TeamMemberCommandService {
 
     public void createTeamMember(final Long teamId, final String newTeamMemberName) {
         final Team team = teamConvenience.getValidateExistTeam(teamId);
-        contestConvenience.validateCurrentContest(team.getContestId());
+        final Contest contest = contestConvenience.getValidateExistContest(team.getContestId());
+        contestConvenience.validateCurrentContest(contest);
         checkDuplicatedTeamMemberName(team, newTeamMemberName);
         assignFakeTeamMember(team, newTeamMemberName, Set.of(ROLE_회원));
     }
 
     public void removeFakeTeamMemberByName(final Team team, final String teamMemberName) {
-        contestConvenience.validateCurrentContest(team.getContestId());
+        final Contest contest = contestConvenience.getValidateExistContest(team.getContestId());
+        contestConvenience.validateCurrentContest(contest);
         final TeamMember teamMember = findTeamMemberByName(team, teamMemberName);
         teamMemberRepository.delete(teamMember);
 
