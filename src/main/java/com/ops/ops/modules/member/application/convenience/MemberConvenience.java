@@ -1,10 +1,10 @@
 package com.ops.ops.modules.member.application.convenience;
 
 import static com.ops.ops.modules.member.domain.MemberRoleType.ROLE_팀장;
-import static com.ops.ops.modules.member.domain.MemberRoleType.ROLE_회원;
 import static com.ops.ops.modules.member.exception.EmailAuthExceptionType.NOT_PUSAN_UNIVERSITY_EMAIL;
 import static com.ops.ops.modules.member.exception.MemberExceptionType.ALREADY_EXIST_EMAIL;
 import static com.ops.ops.modules.member.exception.MemberExceptionType.ALREADY_EXIST_STUDENT_ID;
+import static com.ops.ops.modules.member.exception.MemberExceptionType.NOT_FOUND_LEADER;
 import static com.ops.ops.modules.member.exception.MemberExceptionType.NOT_FOUND_MEMBER;
 
 import com.ops.ops.modules.member.domain.Member;
@@ -88,9 +88,12 @@ public class MemberConvenience {
         memberRepository.delete(member);
     }
 
-    public void changeLeaderRoleToRegularMember(final Long memberId) {
-        Member member = getValidateExistMember(memberId);
-        member.getRoles().remove(ROLE_팀장);
-        member.getRoles().add(ROLE_회원);
+    public Long getLeaderIdByMemberIds(List<Long> memberIds) {
+        return findAllById(memberIds)
+                .stream()
+                .filter(member -> member.getRoles().contains(ROLE_팀장))
+                .findFirst()
+                .map(Member::getId)
+                .orElseThrow(() -> new MemberException(NOT_FOUND_LEADER));
     }
 }

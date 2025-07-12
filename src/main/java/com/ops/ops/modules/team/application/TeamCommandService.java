@@ -8,6 +8,7 @@ import static com.ops.ops.modules.file.domain.FileImageType.PREVIEW;
 import static com.ops.ops.modules.file.exception.FileExceptionType.EXCEED_PREVIEW_LIMIT;
 import static com.ops.ops.modules.member.domain.MemberRoleType.ROLE_관리자;
 import static com.ops.ops.modules.member.domain.MemberRoleType.ROLE_팀장;
+import static com.ops.ops.modules.member.domain.MemberRoleType.ROLE_회원;
 
 import com.ops.ops.global.util.FileStorageUtil;
 import com.ops.ops.modules.contest.application.convenience.ContestConvenience;
@@ -43,7 +44,6 @@ public class TeamCommandService {
     private final TeamRepository teamRepository;
 
     private final TeamMemberCommandService teamMemberCommandService;
-    private final TeamQueryService teamQueryService;
 
     private final ContestConvenience contestConvenience;
     private final TeamConvenience teamConvenience;
@@ -81,9 +81,10 @@ public class TeamCommandService {
 
     public void deleteTeam(final Long teamId) {
         final Team team = teamConvenience.getValidateExistTeam(teamId);
-        Long leaderMemberId = teamQueryService.getLeaderIdByTeamId(teamId);
-        memberConvenience.changeLeaderRoleToRegularMember(leaderMemberId);
-        teamMemberConvenience.deleteAllTeamMembersByTeamId(teamId);
+        final List<Long> memberIds = teamMemberConvenience.getTeamMemberIdsByTeamId(teamId);
+        final Long leaderId = memberConvenience.getLeaderIdByMemberIds(memberIds);
+        Member leader = memberConvenience.getValidateExistMember(leaderId);
+        leader.updateRoles(Set.of(ROLE_회원));
         teamRepository.delete(team);
     }
 

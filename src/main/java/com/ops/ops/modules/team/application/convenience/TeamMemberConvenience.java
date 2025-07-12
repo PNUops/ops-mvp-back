@@ -23,9 +23,11 @@ public class TeamMemberConvenience {
                 .orElseThrow(() -> new TeamMemberException(NOT_FOUND_TEAM_MEMBER));
     }
 
-    public void deleteAllTeamMembersByTeamId(Long teamId) {
-        List<TeamMember> teamMembers = teamMemberRepository.findAllByTeamId(teamId);
-        teamMemberRepository.deleteAll(teamMembers);
-    }
+    public List<Long> getTeamMemberIdsByTeamId(final Long teamId) {
+        List<TeamMember> participants = teamMemberRepository.findAllByTeamId(teamId);
 
+        return participants.stream()
+                .map(TeamMember::getMemberId)
+                .toList();
+    }
 }
