@@ -86,8 +86,8 @@ public class Member extends BaseEntity {
     public boolean isTeamLeader() {
         return roles.contains(MemberRoleType.ROLE_팀장);
     }
-
-    public void updateRoles(Set<MemberRoleType> newRoles) {
-        this.roles = new HashSet<>(newRoles);
+    public void updateRole() {
+        roles.clear();
+        roles.add(ROLE_회원);
     }
 }
