@@ -6,27 +6,28 @@ import com.sksamuel.scrimage.webp.WebpWriter;
 import java.io.IOException;
 import java.nio.file.Path;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class FileEncodingUtil {
 
     private final FileRepository fileRepository;
 
     @Async("imageTaskExecutor")
     @Transactional
-    public void convertToWebpAndSave(MultipartFile multipartFile, Path webpFilePath, Long fileId) {
+    public void convertToWebpAndSave(byte[] imageBytes, Path webpFilePath, Long fileId) {
         try {
-            ImmutableImage image = ImmutableImage.loader().fromStream(multipartFile.getInputStream());
+            ImmutableImage image = ImmutableImage.loader().fromBytes(imageBytes);
             WebpWriter writer = WebpWriter.DEFAULT.withQ(80);
 
             image.output(writer, webpFilePath);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            log.error(e.getMessage(), e);
         }
 
         fileRepository.findById(fileId).ifPresent(file -> file.updateIsWebpConverted(true));
