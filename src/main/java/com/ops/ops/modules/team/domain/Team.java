@@ -22,6 +22,8 @@ import org.hibernate.annotations.SQLRestriction;
 @SQLRestriction("is_deleted = false")
 @SQLDelete(sql = "UPDATE team SET is_deleted = true where id = ?")
 public class Team extends BaseEntity {
+
+    private static final int MAX_OVERVIEW_LENGTH = 3000;
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,7 +38,7 @@ public class Team extends BaseEntity {
     @Column(nullable = false)
     private String projectName;
 
-    @Column
+    @Column(length = MAX_OVERVIEW_LENGTH)
     private String overview;
 
     @Column
