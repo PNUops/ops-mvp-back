@@ -32,4 +32,11 @@ public class TeamLikeConvenience {
         return teams.stream().map(team -> TeamSummaryResponse.from(team, likeMap.getOrDefault(team.getId(), false)))
                 .toList();
     }
+
+    public void deleteAllByTeamId(final Long teamId) {
+        final List<TeamLike> teamLikes = teamLikeRepository.findAllByTeamId(teamId);
+        for (TeamLike teamLike : teamLikes) {
+            teamLikeRepository.delete(teamLike);
+        }
+    }
 }
