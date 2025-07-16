@@ -7,6 +7,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ops.ops.global.util.oauth.dto.GoogleOAuthToken;
 import com.ops.ops.global.util.oauth.exception.OAuthException;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -22,10 +24,9 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Collectors;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @Slf4j
 @Component
@@ -41,6 +42,9 @@ public class GoogleOauth implements SocialOauth {
     @Value("${spring.oauth2.google.callback-login-url}")
     private String GOOGLE_SNS_CALLBACK_LOGIN_URL;
 
+    @Value("${spring.oauth2.google.frontend-local-callback-login-url}")
+    private String GOOGLE_SNS_FRONTEND_LOCAL_CALLBACK_LOGIN_URL;
+
     @Value("${spring.oauth2.google.client-secret}")
     private String GOOGLE_SNS_CLIENT_SECRET;
 
@@ -52,17 +56,16 @@ public class GoogleOauth implements SocialOauth {
 
     @Override
     public String getOauthRedirectURL() {
-        Map<String, Object> params = new HashMap<>();
-        params.put("scope", GOOGLE_DATA_ACCESS_SCOPE);
-        params.put("response_type", "code");
-        params.put("client_id", GOOGLE_SNS_CLIENT_ID);
-        params.put("redirect_uri", GOOGLE_SNS_CALLBACK_LOGIN_URL);
+        String callbackUrl = determineCallbackUrl();
 
-        String parameterString = params.entrySet().stream()
-                .map(x -> x.getKey() + "=" + x.getValue())
-                .collect(Collectors.joining("&"));
-
-        return GOOGLE_SNS_URL + "?" + parameterString;
+        return UriComponentsBuilder.fromUriString(GOOGLE_SNS_URL)
+                .queryParam("scope", GOOGLE_DATA_ACCESS_SCOPE)
+                .queryParam("response_type", "code")
+                .queryParam("client_id", GOOGLE_SNS_CLIENT_ID)
+                .queryParam("redirect_uri", callbackUrl)
+                .encode()
+                .build()
+                .toUriString();
     }
 
     @Override
@@ -73,14 +76,42 @@ public class GoogleOauth implements SocialOauth {
         return getUserInfo(userInfo, userType);
     }
 
+    private String determineCallbackUrl() {
+        try {
+            ServletRequestAttributes attributes =
+                    (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+
+            if (attributes == null) {
+                log.error("OAuth 인증 요청이 HTTP 요청 컨텍스트 외부에서 호출됨");
+                throw new OAuthException(SOCIAL_LOGIN_SERVER_ERROR);
+            }
+
+            HttpServletRequest request = attributes.getRequest();
+            String origin = request.getHeader("Origin");
+            log.info("감지된 Origin 헤더: {}", origin);
+
+            if (origin != null && origin.contains("localhost:5173")) {
+                return GOOGLE_SNS_FRONTEND_LOCAL_CALLBACK_LOGIN_URL;
+            }
+
+            return GOOGLE_SNS_CALLBACK_LOGIN_URL;
+
+        } catch (Exception e) {
+            log.error("콜백 URL 결정 중 오류 발생", e);
+            return GOOGLE_SNS_CALLBACK_LOGIN_URL;
+        }
+    }
+
     private ResponseEntity<String> requestAccessToken(String code) {
         String GOOGLE_TOKEN_REQUEST_URL = "https://oauth2.googleapis.com/token";
+
+        String callbackUrl = determineCallbackUrl();
 
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("code", code);
         params.add("client_id", GOOGLE_SNS_CLIENT_ID);
         params.add("client_secret", GOOGLE_SNS_CLIENT_SECRET);
-        params.add("redirect_uri", GOOGLE_SNS_CALLBACK_LOGIN_URL);
+        params.add("redirect_uri", callbackUrl);
         params.add("grant_type", "authorization_code");
 
         HttpHeaders headers = new HttpHeaders();
@@ -89,7 +120,9 @@ public class GoogleOauth implements SocialOauth {
         HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(params, headers);
 
         try {
-            ResponseEntity<String> responseEntity = restTemplate.postForEntity(GOOGLE_TOKEN_REQUEST_URL, requestEntity, String.class);
+            ResponseEntity<String> responseEntity =
+                    restTemplate.postForEntity(
+                            GOOGLE_TOKEN_REQUEST_URL, requestEntity, String.class);
 
             if (responseEntity.getStatusCode() == HttpStatus.OK) {
                 return responseEntity;
@@ -105,8 +138,8 @@ public class GoogleOauth implements SocialOauth {
 
     private GoogleOAuthToken getAccessToken(ResponseEntity<String> response) {
         try {
-            // 구글 OAuth 토큰 응답 파싱
-            GoogleOAuthToken oAuthToken = objectMapper.readValue(response.getBody(), GoogleOAuthToken.class);
+            GoogleOAuthToken oAuthToken =
+                    objectMapper.readValue(response.getBody(), GoogleOAuthToken.class);
             if (oAuthToken == null || oAuthToken.accessToken() == null) {
                 throw new OAuthException(FAILED_TO_GET_ACCESS_TOKEN);
             }
@@ -126,7 +159,8 @@ public class GoogleOauth implements SocialOauth {
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(headers);
         try {
-            return restTemplate.exchange(GOOGLE_USERINFO_REQUEST_URL, HttpMethod.GET, request, String.class);
+            return restTemplate.exchange(
+                    GOOGLE_USERINFO_REQUEST_URL, HttpMethod.GET, request, String.class);
         } catch (RestClientException e) {
             log.error("Google User Info Request Server Error: {}", e.getMessage());
             throw new OAuthException(FAILED_TO_GET_SOCIAL_USER_INFO);
