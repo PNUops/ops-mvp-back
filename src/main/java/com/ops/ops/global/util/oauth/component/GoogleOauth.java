@@ -63,7 +63,6 @@ public class GoogleOauth implements SocialOauth {
                 .queryParam("response_type", "code")
                 .queryParam("client_id", GOOGLE_SNS_CLIENT_ID)
                 .queryParam("redirect_uri", callbackUrl)
-                .encode()
                 .build()
                 .toUriString();
     }
