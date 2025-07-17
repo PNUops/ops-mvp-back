@@ -6,6 +6,6 @@ public record NoticeSummaryResponse(
 
         Long noticeId,
         String title,
-        LocalDateTime updatedAt
+        LocalDateTime createdAt
 ) {
 }
