@@ -6,6 +6,7 @@ public record NoticeDetailResponse(
 
         String title,
         String description,
-        LocalDateTime updatedAt
+        LocalDateTime updatedAt,
+        LocalDateTime createdAt
 ) {
 }
