@@ -11,6 +11,7 @@ import com.ops.ops.modules.team.application.TeamQueryService;
 import com.ops.ops.modules.team.application.dto.request.PreviewDeleteRequest;
 import com.ops.ops.modules.team.application.dto.request.TeamCreateRequest;
 import com.ops.ops.modules.team.application.dto.request.TeamDetailUpdateRequest;
+import com.ops.ops.modules.team.application.dto.request.TeamSortRequest;
 import com.ops.ops.modules.team.application.dto.response.TeamCreateResponse;
 import com.ops.ops.modules.team.application.dto.response.TeamDetailResponse;
 import com.ops.ops.modules.team.application.dto.response.TeamSubmissionStatusResponse;
@@ -166,5 +167,14 @@ public class TeamController {
     ) {
         TeamCreateResponse response = teamCommandService.createTeam(request);
         return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "팀 정렬 변경", description = "팀 정렬 방식을 변경합니다. (ASC OR RANDOM)")
+    @ApiResponse(responseCode = "204", description = "팀 정렬 변경 성공")
+    @PatchMapping("/sort")
+    @Secured("ROLE_관리자")
+    public ResponseEntity<Void> updateTeamSort(@RequestBody @Valid final TeamSortRequest request) {
+        teamCommandService.updateTeamSort(request);
+        return ResponseEntity.noContent().build();
     }
 }

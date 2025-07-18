@@ -8,6 +8,7 @@ import static com.ops.ops.modules.file.domain.FileImageType.PREVIEW;
 import static com.ops.ops.modules.file.exception.FileExceptionType.EXCEED_PREVIEW_LIMIT;
 import static com.ops.ops.modules.member.domain.MemberRoleType.ROLE_관리자;
 import static com.ops.ops.modules.member.domain.MemberRoleType.ROLE_팀장;
+import static com.ops.ops.modules.team.exception.TeamExceptionType.EXIST_ONLY_ONE_ABOUT_TEAM_SORT;
 
 import com.ops.ops.global.util.FileStorageUtil;
 import com.ops.ops.modules.contest.application.convenience.ContestConvenience;
@@ -22,9 +23,13 @@ import com.ops.ops.modules.team.application.convenience.TeamConvenience;
 import com.ops.ops.modules.team.application.convenience.TeamMemberConvenience;
 import com.ops.ops.modules.team.application.dto.request.TeamCreateRequest;
 import com.ops.ops.modules.team.application.dto.request.TeamDetailUpdateRequest;
+import com.ops.ops.modules.team.application.dto.request.TeamSortRequest;
 import com.ops.ops.modules.team.application.dto.response.TeamCreateResponse;
 import com.ops.ops.modules.team.domain.Team;
+import com.ops.ops.modules.team.domain.TeamSort;
 import com.ops.ops.modules.team.domain.dao.TeamRepository;
+import com.ops.ops.modules.team.domain.dao.TeamSortRepository;
+import com.ops.ops.modules.team.exception.TeamException;
 import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
@@ -41,6 +46,7 @@ public class TeamCommandService {
     private final FileStorageUtil fileStorageUtil;
 
     private final TeamRepository teamRepository;
+    private final TeamSortRepository teamSortRepository;
 
     private final TeamMemberCommandService teamMemberCommandService;
 
@@ -119,6 +125,15 @@ public class TeamCommandService {
         return TeamCreateResponse.from(team);
     }
 
+    public void updateTeamSort(final TeamSortRequest request) {
+        checkExistTeamSort();
+
+        final TeamSort teamSort = teamSortRepository.findById(1L)
+                .orElseThrow(() -> new TeamException(EXIST_ONLY_ONE_ABOUT_TEAM_SORT));
+
+        teamSort.updateSortType(request.mode());
+    }
+
     private void checkPreviewLimit(Long teamId, List<MultipartFile> images) {
         long savedCount = fileRepository.countByTeamIdAndType(teamId, PREVIEW);
         if (savedCount + images.size() > 5) {
@@ -171,6 +186,12 @@ public class TeamCommandService {
     private void checkIsTeamCreatable(final Contest contest) {
         if (!contest.isTeamCreatable()) {
             throw new ContestException(CANNOT_CREATE_TEAM_OF_CURRENT_CONTEST);
+        }
+    }
+
+    private void checkExistTeamSort() {
+        if (!teamSortRepository.existsById(1L)) {
+            teamSortRepository.save(TeamSort.builder().build());
         }
     }
 }
