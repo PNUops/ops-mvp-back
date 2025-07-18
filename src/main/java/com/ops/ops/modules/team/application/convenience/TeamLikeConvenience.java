@@ -1,9 +1,11 @@
 package com.ops.ops.modules.team.application.convenience;
 
+import static com.ops.ops.modules.team.domain.SortType.RANDOM;
 import static java.util.stream.Collectors.toMap;
 
 import com.ops.ops.modules.member.domain.Member;
 import com.ops.ops.modules.team.application.dto.response.TeamSummaryResponse;
+import com.ops.ops.modules.team.domain.SortType;
 import com.ops.ops.modules.team.domain.Team;
 import com.ops.ops.modules.team.domain.TeamLike;
 import com.ops.ops.modules.team.domain.dao.TeamLikeRepository;
@@ -21,8 +23,9 @@ public class TeamLikeConvenience {
 
     private final TeamLikeRepository teamLikeRepository;
 
-    public List<TeamSummaryResponse> getAllTeamSummaries(final List<Team> teams, final Member member) {
-        Collections.shuffle(teams);
+    public List<TeamSummaryResponse> getAllTeamSummaries(final List<Team> teams, final Member member,
+                                                         final SortType mode) {
+        if (mode.equals(RANDOM)) Collections.shuffle(teams);
 
         final Map<Long, Boolean> likeMap =
                 (member != null) ? teamLikeRepository.findAllByMemberIdAndTeamIn(member.getId(), teams).stream()
