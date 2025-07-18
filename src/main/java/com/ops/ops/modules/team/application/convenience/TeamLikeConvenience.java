@@ -33,10 +33,8 @@ public class TeamLikeConvenience {
                 .toList();
     }
 
+    @Transactional
     public void deleteAllByTeamId(final Long teamId) {
-        final List<TeamLike> teamLikes = teamLikeRepository.findAllByTeamId(teamId);
-        for (TeamLike teamLike : teamLikes) {
-            teamLikeRepository.delete(teamLike);
-        }
+        teamLikeRepository.deleteAllByTeamId(teamId);
     }
 }

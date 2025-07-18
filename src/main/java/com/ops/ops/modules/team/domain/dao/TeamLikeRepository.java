@@ -6,6 +6,7 @@ import com.ops.ops.modules.team.domain.TeamLike;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 public interface TeamLikeRepository extends JpaRepository<TeamLike, Long> {
@@ -22,5 +23,8 @@ public interface TeamLikeRepository extends JpaRepository<TeamLike, Long> {
 
     List<TeamLike> findAllByMemberIdAndTeamIn(Long id, List<Team> teams);
 
-    List<TeamLike> findAllByTeamId(Long teamId);
+    @Modifying
+    @Query("DELETE FROM TeamLike tl WHERE tl.team.id = :teamId")
+    void deleteAllByTeamId(Long teamId);
+
 }

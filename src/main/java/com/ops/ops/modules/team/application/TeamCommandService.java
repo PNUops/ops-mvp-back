@@ -27,6 +27,8 @@ import com.ops.ops.modules.team.application.dto.request.TeamDetailUpdateRequest;
 import com.ops.ops.modules.team.application.dto.response.TeamCreateResponse;
 import com.ops.ops.modules.team.domain.Team;
 import com.ops.ops.modules.team.domain.dao.TeamRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
@@ -82,6 +84,9 @@ public class TeamCommandService {
         }
     }
 
+    @PersistenceContext
+    private EntityManager em;
+
     public void deleteTeam(final Long teamId) {
         final Team team = teamConvenience.getValidateExistTeam(teamId);
         final List<Long> memberIds = teamMemberConvenience.getTeamMemberIdsByTeamId(teamId);
@@ -92,7 +97,13 @@ public class TeamCommandService {
         teamCommentConvenience.deleteAllByTeamId(teamId);
         teamLikeConvenience.deleteAllByTeamId(teamId);
         teamMemberConvenience.deleteAllByTeamId(teamId);
+
+        em.flush();
+        em.clear();
+
         teamRepository.delete(team);
+
+//        team.setIsDeleted(true);
     }
 
     public void updateTeamDetail(final Long teamId, final Member member, final TeamDetailUpdateRequest request) {

@@ -5,7 +5,6 @@ import static com.ops.ops.modules.team.exception.TeamCommentExceptionType.NOT_FO
 import com.ops.ops.modules.team.domain.TeamComment;
 import com.ops.ops.modules.team.domain.dao.TeamCommentRepository;
 import com.ops.ops.modules.team.exception.TeamCommentException;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,10 +20,8 @@ public class TeamCommentConvenience {
         return teamCommentRepository.findById(commentId).orElseThrow(() -> new TeamCommentException(NOT_FOUND_COMMENT));
     }
 
+    @Transactional
     public void deleteAllByTeamId(final Long teamId) {
-        final List<TeamComment> teamComments = teamCommentRepository.findAllByTeamId(teamId);
-        for (TeamComment teamComment : teamComments) {
-            teamCommentRepository.delete(teamComment);
-        }
+        teamCommentRepository.deleteAllByTeamId(teamId);
     }
 }

@@ -31,10 +31,8 @@ public class TeamMemberConvenience {
                 .toList();
     }
 
+    @Transactional
     public void deleteAllByTeamId(final Long teamId) {
-        final List<TeamMember> teamMembers = teamMemberRepository.findAllByTeamId(teamId);
-        for (TeamMember teamMember : teamMembers) {
-            teamMemberRepository.delete(teamMember);
-        }
+        teamMemberRepository.deleteAllByTeamId(teamId);
     }
 }

@@ -24,7 +24,7 @@ import org.hibernate.annotations.SQLRestriction;
 public class Team extends BaseEntity {
 
     private static final int MAX_OVERVIEW_LENGTH = 3000;
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -103,5 +103,9 @@ public class Team extends BaseEntity {
 
     public boolean isLeaderNameChanged(String newLeaderName) {
         return !this.getLeaderName().equals(newLeaderName);
+    }
+
+    public void setIsDeleted(final boolean isDeleted) {
+        this.isDeleted = isDeleted;
     }
 }
