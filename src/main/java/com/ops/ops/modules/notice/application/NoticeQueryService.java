@@ -21,13 +21,14 @@ public class NoticeQueryService {
 
     public NoticeDetailResponse getNotice(final Long noticeId) {
         final Notice notice = noticeConvenience.getValidateExistNotice(noticeId);
-        return new NoticeDetailResponse(notice.getTitle(), notice.getDescription(), notice.getUpdatedAt());
+        return new NoticeDetailResponse(notice.getTitle(), notice.getDescription(), notice.getUpdatedAt(),
+                notice.getCreatedAt());
     }
 
     public List<NoticeSummaryResponse> getAllNotices() {
         return noticeRepository.findAllByOrderByCreatedAtDesc()
                 .stream()
-                .map(n -> new NoticeSummaryResponse(n.getId(), n.getTitle(), n.getUpdatedAt()))
+                .map(n -> new NoticeSummaryResponse(n.getId(), n.getTitle(), n.getCreatedAt()))
                 .toList();
     }
 }
