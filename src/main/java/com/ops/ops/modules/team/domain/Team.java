@@ -104,8 +104,4 @@ public class Team extends BaseEntity {
     public boolean isLeaderNameChanged(String newLeaderName) {
         return !this.getLeaderName().equals(newLeaderName);
     }
-
-    public void setIsDeleted(final boolean isDeleted) {
-        this.isDeleted = isDeleted;
-    }
 }
