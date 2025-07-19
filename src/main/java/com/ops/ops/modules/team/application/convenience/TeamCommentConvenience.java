@@ -20,7 +20,6 @@ public class TeamCommentConvenience {
         return teamCommentRepository.findById(commentId).orElseThrow(() -> new TeamCommentException(NOT_FOUND_COMMENT));
     }
 
-    @Transactional
     public void deleteAllByTeamId(final Long teamId) {
         teamCommentRepository.deleteAllByTeamId(teamId);
     }

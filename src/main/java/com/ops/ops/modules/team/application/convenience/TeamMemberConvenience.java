@@ -31,7 +31,6 @@ public class TeamMemberConvenience {
                 .toList();
     }
 
-    @Transactional
     public void deleteAllByTeamId(final Long teamId) {
         teamMemberRepository.deleteAllByTeamId(teamId);
     }

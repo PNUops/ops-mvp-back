@@ -33,7 +33,6 @@ public class TeamLikeConvenience {
                 .toList();
     }
 
-    @Transactional
     public void deleteAllByTeamId(final Long teamId) {
         teamLikeRepository.deleteAllByTeamId(teamId);
     }
