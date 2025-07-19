@@ -24,7 +24,7 @@ import org.hibernate.annotations.SQLRestriction;
 public class Team extends BaseEntity {
 
     private static final int MAX_OVERVIEW_LENGTH = 3000;
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
