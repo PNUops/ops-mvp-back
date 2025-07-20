@@ -19,4 +19,8 @@ public class TeamCommentConvenience {
     public TeamComment getValidateExistComment(final Long commentId) {
         return teamCommentRepository.findById(commentId).orElseThrow(() -> new TeamCommentException(NOT_FOUND_COMMENT));
     }
+
+    public void deleteAllByTeamId(final Long teamId) {
+        teamCommentRepository.deleteAllByTeamId(teamId);
+    }
 }

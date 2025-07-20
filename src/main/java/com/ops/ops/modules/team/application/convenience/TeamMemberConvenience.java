@@ -30,4 +30,8 @@ public class TeamMemberConvenience {
                 .map(TeamMember::getMemberId)
                 .toList();
     }
+
+    public void deleteAllByTeamId(final Long teamId) {
+        teamMemberRepository.deleteAllByTeamId(teamId);
+    }
 }

@@ -18,7 +18,9 @@ import com.ops.ops.modules.file.domain.dao.FileRepository;
 import com.ops.ops.modules.file.exception.FileException;
 import com.ops.ops.modules.member.application.convenience.MemberConvenience;
 import com.ops.ops.modules.member.domain.Member;
+import com.ops.ops.modules.team.application.convenience.TeamCommentConvenience;
 import com.ops.ops.modules.team.application.convenience.TeamConvenience;
+import com.ops.ops.modules.team.application.convenience.TeamLikeConvenience;
 import com.ops.ops.modules.team.application.convenience.TeamMemberConvenience;
 import com.ops.ops.modules.team.application.convenience.TeamSortConvenience;
 import com.ops.ops.modules.team.application.dto.request.TeamCreateRequest;
@@ -52,6 +54,8 @@ public class TeamCommandService {
     private final TeamMemberConvenience teamMemberConvenience;
     private final MemberConvenience memberConvenience;
     private final TeamSortConvenience teamSortConvenience;
+    private final TeamCommentConvenience teamCommentConvenience;
+    private final TeamLikeConvenience teamLikeConvenience;
 
     public void saveThumbnailImage(final Long teamId, final MultipartFile image, final FileImageType thumbnailType) {
         teamConvenience.validateExistTeam(teamId);
@@ -88,6 +92,11 @@ public class TeamCommandService {
         final Long leaderId = memberConvenience.getLeaderIdByMemberIds(memberIds);
         final Member leader = memberConvenience.getValidateExistMember(leaderId);
         leader.updateRole();
+
+        teamCommentConvenience.deleteAllByTeamId(teamId);
+        teamLikeConvenience.deleteAllByTeamId(teamId);
+        teamMemberConvenience.deleteAllByTeamId(teamId);
+
         teamRepository.delete(team);
     }
 
