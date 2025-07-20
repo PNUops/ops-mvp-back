@@ -22,10 +22,13 @@ import com.ops.ops.modules.team.application.convenience.TeamCommentConvenience;
 import com.ops.ops.modules.team.application.convenience.TeamConvenience;
 import com.ops.ops.modules.team.application.convenience.TeamLikeConvenience;
 import com.ops.ops.modules.team.application.convenience.TeamMemberConvenience;
+import com.ops.ops.modules.team.application.convenience.TeamSortConvenience;
 import com.ops.ops.modules.team.application.dto.request.TeamCreateRequest;
 import com.ops.ops.modules.team.application.dto.request.TeamDetailUpdateRequest;
+import com.ops.ops.modules.team.application.dto.request.TeamSortRequest;
 import com.ops.ops.modules.team.application.dto.response.TeamCreateResponse;
 import com.ops.ops.modules.team.domain.Team;
+import com.ops.ops.modules.team.domain.TeamSort;
 import com.ops.ops.modules.team.domain.dao.TeamRepository;
 import java.util.List;
 import java.util.Set;
@@ -50,6 +53,7 @@ public class TeamCommandService {
     private final TeamConvenience teamConvenience;
     private final TeamMemberConvenience teamMemberConvenience;
     private final MemberConvenience memberConvenience;
+    private final TeamSortConvenience teamSortConvenience;
     private final TeamCommentConvenience teamCommentConvenience;
     private final TeamLikeConvenience teamLikeConvenience;
 
@@ -126,6 +130,13 @@ public class TeamCommandService {
         teamMemberCommandService.assignFakeTeamMember(team, request.leaderName(), Set.of(ROLE_팀장));
 
         return TeamCreateResponse.from(team);
+    }
+
+    public void updateTeamSort(final TeamSortRequest request) {
+        teamSortConvenience.validateExistTeamSort();
+        final TeamSort teamSort = teamSortConvenience.getValidateExistTeamSort();
+
+        teamSort.updateSortType(request.mode());
     }
 
     private void checkPreviewLimit(Long teamId, List<MultipartFile> images) {

@@ -9,8 +9,10 @@ import com.ops.ops.modules.contest.exception.ContestException;
 import com.ops.ops.modules.member.domain.Member;
 import com.ops.ops.modules.team.application.convenience.TeamConvenience;
 import com.ops.ops.modules.team.application.convenience.TeamLikeConvenience;
+import com.ops.ops.modules.team.application.convenience.TeamSortConvenience;
 import com.ops.ops.modules.team.application.dto.response.TeamSummaryResponse;
 import com.ops.ops.modules.team.domain.Team;
+import com.ops.ops.modules.team.domain.TeamSort;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,6 +27,7 @@ public class ContestQueryService {
 
     private final TeamConvenience teamConvenience;
     private final TeamLikeConvenience teamLikeConvenience;
+    private final TeamSortConvenience teamSortConvenience;
 
     public List<ContestResponse> getAllContests() {
         List<Contest> contests = contestRepository.findAll();
@@ -41,12 +44,14 @@ public class ContestQueryService {
 
     public List<TeamSummaryResponse> getContestTeamSummaries(final Long contestId, final Member member) {
         final List<Team> teams = teamConvenience.findAllByContestId(contestId);
-        return teamLikeConvenience.getAllTeamSummaries(teams, member);
+        final TeamSort teamSort = teamSortConvenience.getValidateExistTeamSort();
+        return teamLikeConvenience.getAllTeamSummaries(teams, member, teamSort.getMode());
     }
 
     public List<TeamSummaryResponse> getCurrentContestTeamSummaries(final Member member) {
         final List<Team> teams = findTeamsOfCurrentContest();
-        return teamLikeConvenience.getAllTeamSummaries(teams, member);
+        final TeamSort teamSort = teamSortConvenience.getValidateExistTeamSort();
+        return teamLikeConvenience.getAllTeamSummaries(teams, member, teamSort.getMode());
     }
 
     private List<Team> findTeamsOfCurrentContest() {
