@@ -14,6 +14,7 @@ import com.ops.ops.modules.team.application.dto.request.TeamDetailUpdateRequest;
 import com.ops.ops.modules.team.application.dto.request.TeamSortRequest;
 import com.ops.ops.modules.team.application.dto.response.TeamCreateResponse;
 import com.ops.ops.modules.team.application.dto.response.TeamDetailResponse;
+import com.ops.ops.modules.team.application.dto.response.TeamSortResponse;
 import com.ops.ops.modules.team.application.dto.response.TeamSubmissionStatusResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -176,5 +177,13 @@ public class TeamController {
     public ResponseEntity<Void> updateTeamSort(@RequestBody @Valid final TeamSortRequest request) {
         teamCommandService.updateTeamSort(request);
         return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "현재 정렬 상태 조회", description = "현재 적용되고 있는 정렬 방식을 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "정렬 상태 조회 성공")
+    @GetMapping("/sort")
+    @Secured("ROLE_관리자")
+    public ResponseEntity<TeamSortResponse> getTeamSort() {
+        return ResponseEntity.ok(teamQueryService.getTeamSort());
     }
 }

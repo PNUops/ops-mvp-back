@@ -17,14 +17,16 @@ import com.ops.ops.modules.file.exception.FileException;
 import com.ops.ops.modules.member.application.convenience.MemberConvenience;
 import com.ops.ops.modules.member.domain.Member;
 import com.ops.ops.modules.team.application.convenience.TeamConvenience;
-import com.ops.ops.modules.team.application.convenience.TeamLikeConvenience;
 import com.ops.ops.modules.team.application.convenience.TeamMemberConvenience;
+import com.ops.ops.modules.team.application.convenience.TeamSortConvenience;
 import com.ops.ops.modules.team.application.dto.response.TeamDetailResponse;
 import com.ops.ops.modules.team.application.dto.response.TeamMemberResponse;
+import com.ops.ops.modules.team.application.dto.response.TeamSortResponse;
 import com.ops.ops.modules.team.application.dto.response.TeamSubmissionStatusResponse;
 import com.ops.ops.modules.team.domain.Team;
 import com.ops.ops.modules.team.domain.TeamLike;
 import com.ops.ops.modules.team.domain.TeamMember;
+import com.ops.ops.modules.team.domain.TeamSort;
 import com.ops.ops.modules.team.domain.dao.TeamLikeRepository;
 import com.ops.ops.modules.team.domain.dao.TeamMemberRepository;
 import com.ops.ops.modules.team.domain.dao.TeamRepository;
@@ -52,7 +54,7 @@ public class TeamQueryService {
     private final ContestConvenience contestConvenience;
     private final MemberConvenience memberConvenience;
     private final TeamConvenience teamConvenience;
-    private final TeamLikeConvenience teamLikeConvenience;
+    private final TeamSortConvenience teamSortConvenience;
     private final TeamMemberConvenience teamMemberConvenience;
 
     public TeamDetailResponse getTeamDetail(final Long teamId, final Member member) {
@@ -97,6 +99,12 @@ public class TeamQueryService {
         Team team = teamMember.getTeam();
 
         return TeamSubmissionStatusResponse.fromEntity(team);
+    }
+
+    public TeamSortResponse getTeamSort() {
+        teamSortConvenience.validateExistTeamSort();
+        final TeamSort teamSort = teamSortConvenience.getValidateExistTeamSort();
+        return new TeamSortResponse(teamSort.getMode());
     }
 
     private void checkImageConverted(File findFile) {
