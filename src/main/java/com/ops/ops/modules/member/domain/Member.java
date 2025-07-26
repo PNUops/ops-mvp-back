@@ -3,6 +3,7 @@ package com.ops.ops.modules.member.domain;
 import static com.ops.ops.modules.member.domain.MemberRoleType.ROLE_회원;
 
 import com.ops.ops.global.base.BaseEntity;
+
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -14,14 +15,17 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import java.util.HashSet;
-import java.util.Set;
+
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -82,7 +86,7 @@ public class Member extends BaseEntity {
     }
 
     public static boolean isFake(Member member) {
-        return member.getEmail() != null && member.getStudentId().startsWith("fake_");
+        return member.getEmail().startsWith("fake_") && member.getStudentId().startsWith("fake_");
     }
 
     public boolean isTeamLeader() {
