@@ -12,12 +12,15 @@ import com.ops.ops.modules.member.domain.MemberRoleType;
 import com.ops.ops.modules.member.domain.dao.MemberRepository;
 import com.ops.ops.modules.member.exception.EmailAuthException;
 import com.ops.ops.modules.member.exception.MemberException;
+
+import lombok.RequiredArgsConstructor;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -73,7 +76,9 @@ public class MemberConvenience {
     }
 
     public long countTotalMember() {
-        return memberRepository.count();
+        return memberRepository.findAll().stream()
+                .filter(member -> !Member.isFake(member))
+                .count();
     }
 
     public List<Member> findAllById(final List<Long> memberIds) {
