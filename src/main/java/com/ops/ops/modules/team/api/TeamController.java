@@ -1,9 +1,6 @@
 package com.ops.ops.modules.team.api;
 
 
-import static com.ops.ops.modules.file.domain.FileImageType.PREVIEW;
-import static com.ops.ops.modules.file.domain.FileImageType.THUMBNAIL;
-
 import com.ops.ops.global.security.annotation.LoginMember;
 import com.ops.ops.modules.member.domain.Member;
 import com.ops.ops.modules.team.application.TeamCommandService;
@@ -90,7 +87,7 @@ public class TeamController {
     @PostMapping("/{teamId}/image/thumbnail")
     public ResponseEntity<Void> saveThumbnailImage(@PathVariable final Long teamId,
                                                    @RequestPart("image") final MultipartFile image) {
-        teamCommandService.saveThumbnailImage(teamId, image, THUMBNAIL);
+        teamCommandService.saveThumbnailImage(teamId, image);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
@@ -99,7 +96,7 @@ public class TeamController {
     @Secured({"ROLE_팀장", "ROLE_관리자"})
     @DeleteMapping("/{teamId}/image/thumbnail")
     public ResponseEntity<Void> deleteThumbnailImage(@PathVariable Long teamId) {
-        teamCommandService.deleteThumbnailImage(teamId, THUMBNAIL);
+        teamCommandService.deleteThumbnailImage(teamId);
         return ResponseEntity.noContent().build();
     }
 
@@ -131,7 +128,7 @@ public class TeamController {
     @DeleteMapping("/{teamId}/image")
     public ResponseEntity<Void> deletePreviewImage(@PathVariable Long teamId,
                                                    @RequestBody @Valid PreviewDeleteRequest previewDeleteRequest) {
-        teamCommandService.deletePreviewImages(teamId, previewDeleteRequest.imageIds(), PREVIEW);
+        teamCommandService.deletePreviewImages(teamId, previewDeleteRequest.imageIds());
         return ResponseEntity.noContent().build();
     }
 

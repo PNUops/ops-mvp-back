@@ -5,7 +5,9 @@ import static com.ops.ops.modules.contest.exception.ContestExceptionType.CANNOT_
 import static com.ops.ops.modules.contest.exception.ContestExceptionType.CANNOT_CREATE_TEAM_OF_CURRENT_CONTEST;
 import static com.ops.ops.modules.contest.exception.ContestExceptionType.CANNOT_UPDATE_TEAM_INFO_FOR_CURRENT;
 import static com.ops.ops.modules.file.domain.FileImageType.PREVIEW;
+import static com.ops.ops.modules.file.domain.FileImageType.THUMBNAIL;
 import static com.ops.ops.modules.file.exception.FileExceptionType.EXCEED_PREVIEW_LIMIT;
+import static com.ops.ops.modules.file.exception.FileExceptionType.NOT_WEBP_CONVERTED;
 import static com.ops.ops.modules.member.domain.MemberRoleType.ROLE_관리자;
 import static com.ops.ops.modules.member.domain.MemberRoleType.ROLE_팀장;
 
@@ -13,7 +15,7 @@ import com.ops.ops.global.util.FileStorageUtil;
 import com.ops.ops.modules.contest.application.convenience.ContestConvenience;
 import com.ops.ops.modules.contest.domain.Contest;
 import com.ops.ops.modules.contest.exception.ContestException;
-import com.ops.ops.modules.file.domain.FileImageType;
+import com.ops.ops.modules.file.domain.File;
 import com.ops.ops.modules.file.domain.dao.FileRepository;
 import com.ops.ops.modules.file.exception.FileException;
 import com.ops.ops.modules.member.application.convenience.MemberConvenience;
@@ -57,25 +59,29 @@ public class TeamCommandService {
     private final TeamCommentConvenience teamCommentConvenience;
     private final TeamLikeConvenience teamLikeConvenience;
 
-    public void saveThumbnailImage(final Long teamId, final MultipartFile image, final FileImageType thumbnailType) {
+    public void saveThumbnailImage(final Long teamId, final MultipartFile image) {
         teamConvenience.validateExistTeam(teamId);
-        fileRepository.findByTeamIdAndType(teamId, thumbnailType).ifPresent(existingFile -> {
+        fileRepository.findByTeamIdAndType(teamId, THUMBNAIL).ifPresent(existingFile -> {
+            checkWebpConverted(existingFile);
             fileStorageUtil.deleteFile(existingFile.getId());
         });
-        fileStorageUtil.storeFile(image, teamId, thumbnailType);
+        fileStorageUtil.storeFile(image, teamId, THUMBNAIL);
     }
 
-    public void deleteThumbnailImage(Long teamId, FileImageType thumbnailType) {
+    public void deleteThumbnailImage(Long teamId) {
         teamConvenience.validateExistTeam(teamId);
-        fileRepository.findByTeamIdAndType(teamId, thumbnailType).ifPresent(existingFile -> {
+        fileRepository.findByTeamIdAndType(teamId, THUMBNAIL).ifPresent(existingFile -> {
+            checkWebpConverted(existingFile);
             fileStorageUtil.deleteFile(existingFile.getId());
         });
     }
 
-    public void deletePreviewImages(Long teamId, List<Long> ids, FileImageType fileImageType) {
-        //todo : 파일 타입 확인 로직 필요
+    public void deletePreviewImages(Long teamId, List<Long> ids) {
         teamConvenience.validateExistTeam(teamId);
-        ids.forEach(fileStorageUtil::deleteFile);
+        ids.forEach(fileId -> {
+            fileRepository.findById(fileId).ifPresent(this::checkWebpConverted);
+            fileStorageUtil.deleteFile(fileId);
+        });
     }
 
     public void savePreviewImages(Long teamId, List<MultipartFile> images) {
@@ -137,6 +143,12 @@ public class TeamCommandService {
         final TeamSort teamSort = teamSortConvenience.getValidateExistTeamSort();
 
         teamSort.updateSortType(request.mode());
+    }
+
+    private void checkWebpConverted(File existingFile) {
+        if (!existingFile.isWebpConverted()) {
+            throw new FileException(NOT_WEBP_CONVERTED);
+        }
     }
 
     private void checkPreviewLimit(Long teamId, List<MultipartFile> images) {
