@@ -222,7 +222,7 @@ public class MemberCommandService {
 
     private void sendAuthCodeMail(final String email, final String authCode) {
         final List<String> userList = new ArrayList<>(List.of(email));
-        final String subject = "SW 성과관리시스템 인증코드 발송 메일입니다.";
+        final String subject = "SW프로젝트관리시스템 인증코드 발송 메일입니다.";
         final String text = "인증코드는 " + authCode + " 입니다.";
         mailUtil.sendMail(userList, subject, text);
     }
