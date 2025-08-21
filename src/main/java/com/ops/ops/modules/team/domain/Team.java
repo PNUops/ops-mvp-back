@@ -96,9 +96,8 @@ public class Team extends BaseEntity {
         return !this.contestId.equals(newContestId);
     }
 
-    public boolean isTeamInfoChanged(String newTeamName, String newProjectName, String newLeaderName) {
-        return !this.teamName.equals(newTeamName) || !this.projectName.equals(newProjectName)
-                || !this.leaderName.equals(newLeaderName);
+    public boolean isTeamInfoChanged(String newTeamName, String newLeaderName) {
+        return !this.teamName.equals(newTeamName) || !this.leaderName.equals(newLeaderName);
     }
 
     public boolean isLeaderNameChanged(String newLeaderName) {

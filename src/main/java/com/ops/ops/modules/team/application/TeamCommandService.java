@@ -109,8 +109,7 @@ public class TeamCommandService {
     public void updateTeamDetail(final Long teamId, final Member member, final TeamDetailUpdateRequest request) {
         final Team team = teamConvenience.getValidateExistTeam(teamId);
         final Contest newContest = contestConvenience.getValidateExistContest(request.contestId());
-        checkTeamContestChange(team, newContest, member, request.teamName(), request.projectName(),
-                request.leaderName());
+        checkTeamContestChange(team, newContest, member, request.teamName(), request.leaderName());
 
         updateLeaderIfChanged(team, request.leaderName());
 
@@ -159,22 +158,21 @@ public class TeamCommandService {
     }
 
     private void checkTeamContestChange(final Team team, final Contest newContest, final Member member,
-                                        final String newTeamName, final String newProjectName,
-                                        final String newLeaderName) {
+                                        final String newTeamName, final String newLeaderName) {
         final Contest oldContest = contestConvenience.getValidateExistContest(team.getContestId());
         if (oldContest.getIsCurrent()) {
-            checkCurrentContest(team, newContest, newTeamName, newProjectName, newLeaderName);
+            checkCurrentContest(team, newContest, newTeamName, newLeaderName);
         } else {
             checkPastContest(newContest, member);
         }
     }
 
     private void checkCurrentContest(final Team team, final Contest newContest, final String newTeamName,
-                                     final String newProjectName, final String newLeaderName) {
+                                     final String newLeaderName) {
         if (team.isContestChanged(newContest.getId())) {
             throw new ContestException(CANNOT_CHANGE_CONTEST_FOR_CURRENT);
         }
-        if (team.isTeamInfoChanged(newTeamName, newProjectName, newLeaderName)) {
+        if (team.isTeamInfoChanged(newTeamName, newLeaderName)) {
             throw new ContestException(CANNOT_UPDATE_TEAM_INFO_FOR_CURRENT);
         }
     }
