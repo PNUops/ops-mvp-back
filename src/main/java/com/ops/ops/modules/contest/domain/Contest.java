@@ -6,6 +6,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -32,11 +33,24 @@ public class Contest extends BaseEntity {
     @Column(nullable = false)
     private Boolean isDeleted;
 
+    @Column(nullable = false)
+    private LocalDateTime voteStartAt;
+
+    @Column(nullable = false)
+    private LocalDateTime voteEndAt;
+
     @Builder
     public Contest(final String contestName, final Boolean isCurrent) {
         this.contestName = contestName;
         this.isCurrent = isCurrent;
         this.isDeleted = false;
+        this.voteStartAt = LocalDateTime.now();
+        this.voteEndAt = LocalDateTime.now();
+    }
+
+    public void updateVotePeriod(final LocalDateTime voteStartAt, final LocalDateTime voteEndAt) {
+        this.voteStartAt = voteStartAt;
+        this.voteEndAt = voteEndAt;
     }
 
     public void updateContestName(final String newContestName) {
