@@ -6,6 +6,7 @@ import com.ops.ops.global.security.annotation.LoginMember;
 import com.ops.ops.modules.contest.application.ContestCommandService;
 import com.ops.ops.modules.contest.application.ContestQueryService;
 import com.ops.ops.modules.contest.application.dto.request.ContestRequest;
+import com.ops.ops.modules.contest.application.dto.request.VoteUpdateRequest;
 import com.ops.ops.modules.contest.application.dto.response.ContestResponse;
 import com.ops.ops.modules.member.domain.Member;
 import com.ops.ops.modules.team.application.dto.response.TeamSummaryResponse;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -96,5 +98,15 @@ public class ContestController {
     ) {
         List<TeamSummaryResponse> responses = contestQueryService.getCurrentContestTeamSummaries(member);
         return ResponseEntity.ok(responses);
+    }
+
+    @Operation(summary = "특정 대회 투표 기간 수정", description = "해당 대회의 투표 기간을 수정합니다.")
+    @ApiResponse(responseCode = "200", description = "대회의 투표 기간 수정 성공")
+    @Secured("ROLE_관리자")
+    @PutMapping("/{contestId}/vote")
+    public ResponseEntity<Void> updateVotePeriod(@PathVariable final Long contestId,
+                                                 @Valid @RequestBody final VoteUpdateRequest voteRequest) {
+        contestCommandService.updateVotePeriod(contestId, voteRequest);
+        return ResponseEntity.ok().build();
     }
 }
