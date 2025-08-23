@@ -8,6 +8,7 @@ import com.ops.ops.modules.contest.application.ContestQueryService;
 import com.ops.ops.modules.contest.application.dto.request.ContestRequest;
 import com.ops.ops.modules.contest.application.dto.request.VoteUpdateRequest;
 import com.ops.ops.modules.contest.application.dto.response.ContestResponse;
+import com.ops.ops.modules.contest.application.dto.response.VoteResponse;
 import com.ops.ops.modules.member.domain.Member;
 import com.ops.ops.modules.team.application.dto.response.TeamSummaryResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -108,5 +109,12 @@ public class ContestController {
                                                  @Valid @RequestBody final VoteUpdateRequest voteRequest) {
         contestCommandService.updateVotePeriod(contestId, voteRequest);
         return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "특정 대회 투표 기간 조회", description = "해당 대회의 투표 기간을 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "대회의 투표 기간 조회 성공")
+    @GetMapping("/{contestId}/vote")
+    public ResponseEntity<VoteResponse> getVotePeriod(@PathVariable final Long contestId) {
+        return ResponseEntity.ok(contestQueryService.getVotePeriod(contestId));
     }
 }

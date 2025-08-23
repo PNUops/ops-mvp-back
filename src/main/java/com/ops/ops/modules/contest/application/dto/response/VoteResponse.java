@@ -1,0 +1,9 @@
+package com.ops.ops.modules.contest.application.dto.response;
+
+import java.time.LocalDateTime;
+
+public record VoteResponse(
+        LocalDateTime voteStartAt,
+        LocalDateTime voteEndAt
+) {
+}
