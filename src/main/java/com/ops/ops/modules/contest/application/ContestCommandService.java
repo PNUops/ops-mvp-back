@@ -1,8 +1,11 @@
 package com.ops.ops.modules.contest.application;
 
 import com.ops.ops.modules.contest.application.convenience.ContestConvenience;
+import com.ops.ops.modules.contest.application.dto.request.VoteUpdateRequest;
 import com.ops.ops.modules.contest.domain.Contest;
 import com.ops.ops.modules.contest.domain.dao.ContestRepository;
+import com.ops.ops.modules.contest.exception.ContestException;
+import com.ops.ops.modules.contest.exception.ContestExceptionType;
 import com.ops.ops.modules.team.application.convenience.TeamConvenience;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -38,5 +41,18 @@ public class ContestCommandService {
         final Contest contest = contestConvenience.getValidateExistContest(contestId);
         teamConvenience.checkAllContestDelete(contestId);
         contestRepository.delete(contest);
+    }
+
+    public void updateVotePeriod(Long contestId, VoteUpdateRequest voteRequest) {
+        final Contest contest = contestConvenience.getValidateExistContest(contestId);
+        checkVoteRange(voteRequest);
+        contest.updateVotePeriod(voteRequest.voteStartAt(), voteRequest.voteEndAt());
+    }
+
+    private void checkVoteRange(VoteUpdateRequest voteRequest) {
+        int compare = voteRequest.voteStartAt().compareTo(voteRequest.voteEndAt());
+        if (compare > 0) {
+            throw new ContestException(ContestExceptionType.VOTE_END_PRECEDE_VOTE_START);
+        }
     }
 }

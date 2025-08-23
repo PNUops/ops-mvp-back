@@ -2,7 +2,9 @@ package com.ops.ops.modules.contest.application;
 
 import static com.ops.ops.modules.contest.exception.ContestExceptionType.NOT_FOUND_CURRENT_CONTEST;
 
+import com.ops.ops.modules.contest.application.convenience.ContestConvenience;
 import com.ops.ops.modules.contest.application.dto.response.ContestResponse;
+import com.ops.ops.modules.contest.application.dto.response.VoteResponse;
 import com.ops.ops.modules.contest.domain.Contest;
 import com.ops.ops.modules.contest.domain.dao.ContestRepository;
 import com.ops.ops.modules.contest.exception.ContestException;
@@ -28,6 +30,7 @@ public class ContestQueryService {
     private final TeamConvenience teamConvenience;
     private final TeamLikeConvenience teamLikeConvenience;
     private final TeamSortConvenience teamSortConvenience;
+    private final ContestConvenience contestConvenience;
 
     public List<ContestResponse> getAllContests() {
         List<Contest> contests = contestRepository.findAll();
@@ -58,5 +61,10 @@ public class ContestQueryService {
         final Contest contest = contestRepository.findByIsCurrentTrue()
                 .orElseThrow(() -> new ContestException(NOT_FOUND_CURRENT_CONTEST));
         return teamConvenience.findAllByContestId(contest.getId());
+    }
+
+    public VoteResponse getVotePeriod(Long contestId) {
+        final Contest contest = contestConvenience.getValidateExistContest(contestId);
+        return new VoteResponse(contest.getVoteStartAt(), contest.getVoteEndAt());
     }
 }
