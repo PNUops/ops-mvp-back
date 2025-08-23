@@ -1,6 +1,8 @@
 package com.ops.ops.modules.team.application;
 
+import com.ops.ops.modules.contest.application.convenience.ContestConvenience;
 import com.ops.ops.modules.team.application.convenience.TeamConvenience;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -19,11 +21,12 @@ import lombok.RequiredArgsConstructor;
 public class TeamLikeCommandService {
 
 	private final TeamLikeRepository teamLikeRepository;
-
 	private final TeamConvenience teamConvenience;
+	private final ContestConvenience contestConvenience;
 
 	public TeamLikeToggleResponse toggleLike(Long memberId, Long teamId, Boolean isLiked) {
 		Team team = teamConvenience.getValidateExistTeam(teamId);
+		contestConvenience.checkVotePeriodNow(team.getContestId(), LocalDateTime.now());
 
 		Optional<TeamLike> teamLikeOptional = teamLikeRepository.findByMemberIdAndTeam(memberId, team);
 		if (teamLikeOptional.isEmpty()) {

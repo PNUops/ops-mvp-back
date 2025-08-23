@@ -3,10 +3,12 @@ package com.ops.ops.modules.contest.application.convenience;
 import static com.ops.ops.modules.contest.exception.ContestExceptionType.CANNOT_UPDATE_TEAM_INFO_FOR_CURRENT;
 import static com.ops.ops.modules.contest.exception.ContestExceptionType.CONTEST_NAME_ALREADY_EXIST;
 import static com.ops.ops.modules.contest.exception.ContestExceptionType.NOT_FOUND_CONTEST;
+import static com.ops.ops.modules.contest.exception.ContestExceptionType.NOT_VOTE_PERIOD_NOW;
 
 import com.ops.ops.modules.contest.domain.Contest;
 import com.ops.ops.modules.contest.domain.dao.ContestRepository;
 import com.ops.ops.modules.contest.exception.ContestException;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +37,13 @@ public class ContestConvenience {
     public void checkDuplicateContestName(String contestName) {
         if (contestRepository.existsByContestName(contestName)) {
             throw new ContestException(CONTEST_NAME_ALREADY_EXIST);
+        }
+    }
+
+    public void checkVotePeriodNow(Long contestId, LocalDateTime now) {
+        Contest contest = getValidateExistContest(contestId);
+        if (!(now.isAfter(contest.getVoteStartAt()) && now.isBefore(contest.getVoteEndAt()))) {
+            throw new ContestException(NOT_VOTE_PERIOD_NOW);
         }
     }
 }
