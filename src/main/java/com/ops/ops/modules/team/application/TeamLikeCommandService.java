@@ -2,55 +2,54 @@ package com.ops.ops.modules.team.application;
 
 import com.ops.ops.modules.contest.application.convenience.ContestConvenience;
 import com.ops.ops.modules.team.application.convenience.TeamConvenience;
-import java.time.LocalDateTime;
-import java.util.Optional;
-
-import org.springframework.stereotype.Service;
-
 import com.ops.ops.modules.team.application.dto.response.TeamLikeToggleResponse;
 import com.ops.ops.modules.team.domain.Team;
 import com.ops.ops.modules.team.domain.TeamLike;
 import com.ops.ops.modules.team.domain.dao.TeamLikeRepository;
-
 import jakarta.transaction.Transactional;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class TeamLikeCommandService {
 
-	private final TeamLikeRepository teamLikeRepository;
-	private final TeamConvenience teamConvenience;
-	private final ContestConvenience contestConvenience;
+    private final TeamLikeRepository teamLikeRepository;
+    private final TeamConvenience teamConvenience;
+    private final ContestConvenience contestConvenience;
 
-	public TeamLikeToggleResponse toggleLike(Long memberId, Long teamId, Boolean isLiked) {
-		Team team = teamConvenience.getValidateExistTeam(teamId);
-		contestConvenience.checkVotePeriodNow(team.getContestId(), LocalDateTime.now());
+    public TeamLikeToggleResponse toggleLike(Long memberId, Long teamId, Boolean isLiked) {
+        Team team = teamConvenience.getValidateExistTeam(teamId);
+        contestConvenience.checkVotePeriodNow(team.getContestId(),
+                ZonedDateTime.now(ZoneId.of("Asia/Seoul")).toLocalDateTime());
 
-		Optional<TeamLike> teamLikeOptional = teamLikeRepository.findByMemberIdAndTeam(memberId, team);
-		if (teamLikeOptional.isEmpty()) {
-			saveTeamLike(memberId, team, isLiked);
-			String message = isLiked ? "좋아요가 처음 등록되었습니다." : "좋아요가 비활성화된 상태로 초기화되었습니다.";
-			return new TeamLikeToggleResponse(team.getId(), isLiked, message);
-		}
+        Optional<TeamLike> teamLikeOptional = teamLikeRepository.findByMemberIdAndTeam(memberId, team);
+        if (teamLikeOptional.isEmpty()) {
+            saveTeamLike(memberId, team, isLiked);
+            String message = isLiked ? "좋아요가 처음 등록되었습니다." : "좋아요가 비활성화된 상태로 초기화되었습니다.";
+            return new TeamLikeToggleResponse(team.getId(), isLiked, message);
+        }
 
-		TeamLike teamLike = teamLikeOptional.get();
-		if (teamLike.getIsLiked() == isLiked) {
-			String message = isLiked ? "이미 좋아요한 팀입니다." : "이미 좋아요를 취소한 팀입니다.";
-			return new TeamLikeToggleResponse(team.getId(), teamLike.getIsLiked(), message);
-		}
+        TeamLike teamLike = teamLikeOptional.get();
+        if (teamLike.getIsLiked() == isLiked) {
+            String message = isLiked ? "이미 좋아요한 팀입니다." : "이미 좋아요를 취소한 팀입니다.";
+            return new TeamLikeToggleResponse(team.getId(), teamLike.getIsLiked(), message);
+        }
 
-		teamLike.setLiked(isLiked);
-		String message = isLiked ? "좋아요가 등록되었습니다." : "좋아요가 취소되었습니다.";
-		return new TeamLikeToggleResponse(team.getId(), isLiked, message);
-	}
+        teamLike.setLiked(isLiked);
+        String message = isLiked ? "좋아요가 등록되었습니다." : "좋아요가 취소되었습니다.";
+        return new TeamLikeToggleResponse(team.getId(), isLiked, message);
+    }
 
-	private void saveTeamLike(Long memberId, Team team, Boolean isLiked) {
-		teamLikeRepository.save(TeamLike.builder()
-						.memberId(memberId)
-						.team(team)
-						.isLiked(isLiked)
-						.build());
-	}
+    private void saveTeamLike(Long memberId, Team team, Boolean isLiked) {
+        teamLikeRepository.save(TeamLike.builder()
+                .memberId(memberId)
+                .team(team)
+                .isLiked(isLiked)
+                .build());
+    }
 }
