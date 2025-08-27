@@ -12,6 +12,7 @@ import com.ops.ops.modules.team.domain.dao.TeamLikeRepository;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,7 +26,14 @@ public class TeamLikeConvenience {
 
     public List<TeamSummaryResponse> getAllTeamSummaries(final List<Team> teams, final Member member,
                                                          final SortType mode) {
-        if (mode.equals(RANDOM)) Collections.shuffle(teams);
+        if (mode.equals(RANDOM)) {
+            if (member != null) {
+                Random seed = new Random(member.getId());
+                Collections.shuffle(teams, seed);
+            } else {
+                Collections.shuffle(teams);
+            }
+        }
 
         final Map<Long, Boolean> likeMap =
                 (member != null) ? teamLikeRepository.findAllByMemberIdAndTeamIn(member.getId(), teams).stream()
