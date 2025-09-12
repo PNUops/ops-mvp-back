@@ -62,6 +62,18 @@ public class Team extends BaseEntity {
     @Column(nullable = false)
     private Long contestId;
 
+    @Column
+    private Integer displayOrder;
+
+    @Column
+    private String awardTitle;
+
+    @Column
+    private String awardBadgeColor;
+
+    @Column
+    private String awardBadgeSize;
+
     @Builder
     public Team(final String leaderName, final String teamName, final String projectName, final String overview,
                 final String productionPath, final String githubPath, final String youTubePath, final Long contestId) {
@@ -102,5 +114,17 @@ public class Team extends BaseEntity {
 
     public boolean isLeaderNameChanged(String newLeaderName) {
         return !this.getLeaderName().equals(newLeaderName);
+    }
+
+    public void updateAwardInfo(final String awardTitle, final String awardBadgeColor, 
+                                final String awardBadgeSize, final Integer displayOrder) {
+        this.awardTitle = awardTitle;
+        this.awardBadgeColor = awardBadgeColor;
+        this.awardBadgeSize = awardBadgeSize;
+        this.displayOrder = displayOrder;
+    }
+
+    public void updateDisplayOrder(final Integer displayOrder) {
+        this.displayOrder = displayOrder;
     }
 }

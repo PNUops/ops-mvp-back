@@ -6,14 +6,22 @@ public record TeamSubmissionStatusResponse(
 	Long teamId,
 	String teamName,
 	String projectName,
-	Boolean isSubmitted
+	Boolean isSubmitted,
+	Integer displayOrder,
+	String awardTitle,
+	String awardBadgeColor,
+	String awardBadgeSize
 ) {
 	public static TeamSubmissionStatusResponse fromEntity(Team team) {
 		return new TeamSubmissionStatusResponse(
 			team.getId(),
 			team.getTeamName(),
 			team.getProjectName(),
-			team.getIsSubmitted()
+			team.getIsSubmitted(),
+			team.getDisplayOrder(),
+			team.getAwardTitle(),
+			team.getAwardBadgeColor(),
+			team.getAwardBadgeSize()
 		);
 	}
 }

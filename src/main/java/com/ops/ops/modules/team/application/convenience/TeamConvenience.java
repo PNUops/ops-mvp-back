@@ -33,7 +33,14 @@ public class TeamConvenience {
     }
 
     public List<Team> findAllByContestId(final Long contestId) {
-        return teamRepository.findAllByContestId(contestId);
+        List<Team> teams = teamRepository.findAllByContestIdOrderByDisplayOrderAsc(contestId);
+        teams.sort((a, b) -> {
+            if (a.getDisplayOrder() == null && b.getDisplayOrder() == null) return 0;
+            if (a.getDisplayOrder() == null) return 1;
+            if (b.getDisplayOrder() == null) return -1;
+            return a.getDisplayOrder().compareTo(b.getDisplayOrder());
+        });
+        return teams;
     }
 
 }

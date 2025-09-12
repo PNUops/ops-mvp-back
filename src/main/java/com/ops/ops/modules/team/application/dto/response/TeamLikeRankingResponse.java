@@ -4,6 +4,10 @@ public record TeamLikeRankingResponse(
 	int rank,
 	String teamName,
 	String projectName,
-	int likeCount
+	int likeCount,
+	Integer displayOrder,
+	String awardTitle,
+	String awardBadgeColor,
+	String awardBadgeSize
 ) {
 }

@@ -34,27 +34,22 @@ public class TeamAdminQueryService {
 	public List<TeamSubmissionStatusResponse> getAllTeamSubmissions() {
 		final Contest currentContest = contestConvenience.get6thContest();
 
-		return teamRepository.findByContestId(currentContest.getId())
+		return teamRepository.findAllByContestId(currentContest.getId())
 			.stream()
 			.map(TeamSubmissionStatusResponse::fromEntity)
 			.collect(Collectors.toList());
 	}
 
 	public List<TeamLikeRankingResponse> getTeamLikeRanking() {
-		// 1. 팀별 좋아요 수를 Map 형태로 가져오기
 		Map<Long, Integer> likeCountMap = getTeamLikeCountMap();
-
-		// 2. 팀 좋아요 랭킹 리스트 생성
 		List<TeamRank> rankedList = getTeamRankList(likeCountMap);
-
-		// 3. 랭킹을 Competition Ranking 방식으로 적용하여 반환
 		return applyCompetitionRanking(rankedList);
 	}
 
 	public TeamVoteRateResponse getVoteRate() {
 		final Contest currentContest = contestConvenience.get6thContest();
 		
-		List<Team> currentTeams = teamRepository.findByContestId(currentContest.getId());
+		List<Team> currentTeams = teamRepository.findAllByContestId(currentContest.getId());
 		
 		long totalMemberCount = memberConvenience.countTotalMember();
 		long votedMemberCount = teamLikeRepository.countDistinctMemberIdsByIsLikedTrueAndTeams(currentTeams);
@@ -71,7 +66,7 @@ public class TeamAdminQueryService {
 	private Map<Long, Integer> getTeamLikeCountMap() {
 		final Contest currentContest = contestConvenience.get6thContest();
 		
-		List<Team> currentTeams = teamRepository.findByContestId(currentContest.getId());
+		List<Team> currentTeams = teamRepository.findAllByContestId(currentContest.getId());
 		List<TeamLikeCountDto> likedList = teamLikeRepository.findTeamLikeCountGroupedByTeams(currentTeams);
 
 		Map<Long, Integer> teamLikeCountMap = new HashMap<>();
@@ -85,7 +80,7 @@ public class TeamAdminQueryService {
 		final Contest currentContest = contestConvenience.get6thContest();
 		
 		List<TeamRank> teamRankList = new ArrayList<>();
-		List<Team> teamList = teamRepository.findByContestId(currentContest.getId());
+		List<Team> teamList = teamRepository.findAllByContestId(currentContest.getId());
 
 		for (Team team : teamList) {
 			if (team.getIsDeleted()) {
@@ -93,20 +88,23 @@ public class TeamAdminQueryService {
 			}
 			int likeCount = teamLikeCountMap.getOrDefault(team.getId(), 0);
 			TeamRank teamRank = new TeamRank(
+				team.getId(),
 				team.getTeamName(),
 				team.getProjectName(),
-				likeCount
+				likeCount,
+				team.getDisplayOrder(),
+				team.getAwardTitle(),
+				team.getAwardBadgeColor(),
+				team.getAwardBadgeSize()
 			);
 			teamRankList.add(teamRank);
 		}
 
-		// 좋아요 수를 기준으로 내림차순 정렬
 		teamRankList.sort((a, b) -> Integer.compare(b.likeCount(), a.likeCount()));
 
 		return teamRankList;
 	}
 
-	// competition ranking 방식으로 랭킹을 부여
 	private List<TeamLikeRankingResponse> applyCompetitionRanking(List<TeamRank> teamRankList) {
 		List<TeamLikeRankingResponse> teamLikeRankingResponses = new ArrayList<>();
 
@@ -118,7 +116,16 @@ public class TeamAdminQueryService {
 			}
 
 			teamLikeRankingResponses.add(
-				new TeamLikeRankingResponse(currentRank, team.teamName(), team.projectName(), likeCount)
+				new TeamLikeRankingResponse(
+					currentRank, 
+					team.teamName(), 
+					team.projectName(), 
+					likeCount,
+					team.displayOrder(),
+					team.awardTitle(),
+					team.awardBadgeColor(),
+					team.awardBadgeSize()
+				)
 			);
 			previousLikeCount = likeCount;
 			nextRank++;
