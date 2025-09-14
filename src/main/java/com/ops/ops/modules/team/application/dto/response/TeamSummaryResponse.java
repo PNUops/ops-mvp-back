@@ -6,14 +6,14 @@ public record TeamSummaryResponse(
         Long teamId,
         String teamName,
         String projectName,
-        boolean isLiked
-) {
+        boolean isLiked,
+        String awardName) {
     public static TeamSummaryResponse from(Team team, boolean isLiked) {
         return new TeamSummaryResponse(
                 team.getId(),
                 team.getTeamName(),
                 team.getProjectName(),
-                isLiked
-        );
+                isLiked,
+                team.getAwardName());
     }
 }
