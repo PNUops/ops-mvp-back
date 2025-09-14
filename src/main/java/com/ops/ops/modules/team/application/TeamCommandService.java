@@ -10,6 +10,7 @@ import static com.ops.ops.modules.file.exception.FileExceptionType.EXCEED_PREVIE
 import static com.ops.ops.modules.file.exception.FileExceptionType.NOT_WEBP_CONVERTED;
 import static com.ops.ops.modules.member.domain.MemberRoleType.ROLE_관리자;
 import static com.ops.ops.modules.member.domain.MemberRoleType.ROLE_팀장;
+import static com.ops.ops.modules.team.exception.TeamExceptionType.INVALID_AWARD_PARAMETERS;
 
 import com.ops.ops.global.util.FileStorageUtil;
 import com.ops.ops.modules.contest.application.convenience.ContestConvenience;
@@ -32,6 +33,7 @@ import com.ops.ops.modules.team.application.dto.response.TeamCreateResponse;
 import com.ops.ops.modules.team.domain.Team;
 import com.ops.ops.modules.team.domain.TeamSort;
 import com.ops.ops.modules.team.domain.dao.TeamRepository;
+import com.ops.ops.modules.team.exception.TeamException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -147,9 +149,26 @@ public class TeamCommandService {
         teamSort.updateSortType(request.mode());
     }
 
-    public void updateAwardName(final Long teamId, final String awardName) {
+    public void updateAwardName(
+            final Long teamId, final String awardName, final String awardColor) {
+        validateAwardParameters(awardName, awardColor);
         final Team team = teamConvenience.getValidateExistTeam(teamId);
-        team.updateAwardName(awardName);
+        team.updateAward(awardName, awardColor);
+    }
+
+    private void validateAwardParameters(final String awardName, final String awardColor) {
+        if (awardName == null && awardColor == null) {
+            return;
+        }
+
+        if (awardName != null
+                && awardColor != null
+                && !awardName.trim().isEmpty()
+                && !awardColor.trim().isEmpty()) {
+            return;
+        }
+
+        throw new TeamException(INVALID_AWARD_PARAMETERS);
     }
 
     private void checkWebpConverted(File existingFile) {
