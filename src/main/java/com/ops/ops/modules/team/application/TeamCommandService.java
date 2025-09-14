@@ -32,12 +32,15 @@ import com.ops.ops.modules.team.application.dto.response.TeamCreateResponse;
 import com.ops.ops.modules.team.domain.Team;
 import com.ops.ops.modules.team.domain.TeamSort;
 import com.ops.ops.modules.team.domain.dao.TeamRepository;
-import java.util.List;
-import java.util.Set;
+
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -142,6 +145,11 @@ public class TeamCommandService {
         final TeamSort teamSort = teamSortConvenience.getValidateExistTeamSort();
 
         teamSort.updateSortType(request.mode());
+    }
+
+    public void updateAwardName(final Long teamId, final String awardName) {
+        final Team team = teamConvenience.getValidateExistTeam(teamId);
+        team.updateAwardName(awardName);
     }
 
     private void checkWebpConverted(File existingFile) {
