@@ -62,7 +62,8 @@ public class TeamAdminController {
     @PostMapping("/teams/{teamId}/award")
     public ResponseEntity<Void> updateTeamAward(
             @PathVariable final Long teamId, @RequestBody final TeamAwardRequest teamAwardRequest) {
-        teamCommandService.updateAwardName(teamId, teamAwardRequest.awardName());
+        teamCommandService.updateAwardName(
+                teamId, teamAwardRequest.awardName(), teamAwardRequest.awardColor());
         return ResponseEntity.noContent().build();
     }
 }

@@ -65,6 +65,8 @@ public class Team extends BaseEntity {
 
     @Column private String awardName;
 
+    @Column private String awardColor;
+
     @Builder
     public Team(
             final String leaderName,
@@ -87,6 +89,7 @@ public class Team extends BaseEntity {
         this.teamMembers = new ArrayList<>();
         this.contestId = contestId;
         this.awardName = null;
+        this.awardColor = null;
     }
 
     public void updateDetail(
@@ -109,8 +112,9 @@ public class Team extends BaseEntity {
         this.contestId = newContestId;
     }
 
-    public void updateAwardName(final String awardName) {
+    public void updateAward(final String awardName, final String awardColor) {
         this.awardName = awardName;
+        this.awardColor = awardColor;
     }
 
     public boolean isContestChanged(Long newContestId) {
