@@ -66,27 +66,34 @@ public class TeamCommandService {
 
     public void saveThumbnailImage(final Long teamId, final MultipartFile image) {
         teamConvenience.validateExistTeam(teamId);
-        fileRepository.findByTeamIdAndType(teamId, THUMBNAIL).ifPresent(existingFile -> {
-            checkWebpConverted(existingFile);
-            fileStorageUtil.deleteFile(existingFile.getId());
-        });
+        fileRepository
+                .findByTeamIdAndType(teamId, THUMBNAIL)
+                .ifPresent(
+                        existingFile -> {
+                            checkWebpConverted(existingFile);
+                            fileStorageUtil.deleteFile(existingFile.getId());
+                        });
         fileStorageUtil.storeFile(image, teamId, THUMBNAIL);
     }
 
     public void deleteThumbnailImage(Long teamId) {
         teamConvenience.validateExistTeam(teamId);
-        fileRepository.findByTeamIdAndType(teamId, THUMBNAIL).ifPresent(existingFile -> {
-            checkWebpConverted(existingFile);
-            fileStorageUtil.deleteFile(existingFile.getId());
-        });
+        fileRepository
+                .findByTeamIdAndType(teamId, THUMBNAIL)
+                .ifPresent(
+                        existingFile -> {
+                            checkWebpConverted(existingFile);
+                            fileStorageUtil.deleteFile(existingFile.getId());
+                        });
     }
 
     public void deletePreviewImages(Long teamId, List<Long> ids) {
         teamConvenience.validateExistTeam(teamId);
-        ids.forEach(fileId -> {
-            fileRepository.findById(fileId).ifPresent(this::checkWebpConverted);
-            fileStorageUtil.deleteFile(fileId);
-        });
+        ids.forEach(
+                fileId -> {
+                    fileRepository.findById(fileId).ifPresent(this::checkWebpConverted);
+                    fileStorageUtil.deleteFile(fileId);
+                });
     }
 
     public void savePreviewImages(Long teamId, List<MultipartFile> images) {
@@ -111,31 +118,41 @@ public class TeamCommandService {
         teamRepository.delete(team);
     }
 
-    public void updateTeamDetail(final Long teamId, final Member member, final TeamDetailUpdateRequest request) {
+    public void updateTeamDetail(
+            final Long teamId, final Member member, final TeamDetailUpdateRequest request) {
         final Team team = teamConvenience.getValidateExistTeam(teamId);
         final Contest newContest = contestConvenience.getValidateExistContest(request.contestId());
         checkTeamContestChange(team, newContest, member, request.teamName(), request.leaderName());
 
         updateLeaderIfChanged(team, request.leaderName());
 
-        team.updateDetail(request.leaderName(), request.teamName(), request.projectName(), request.overview(),
-                request.productionPath(), request.githubPath(), request.youTubePath(), request.contestId());
+        team.updateDetail(
+                request.leaderName(),
+                request.teamName(),
+                request.projectName(),
+                request.overview(),
+                request.productionPath(),
+                request.githubPath(),
+                request.youTubePath(),
+                request.contestId());
     }
 
     public TeamCreateResponse createTeam(TeamCreateRequest request) {
         final Contest contest = contestConvenience.getValidateExistContest(request.contestId());
         checkIsTeamCreatable(contest);
 
-        final Team team = teamRepository.save(Team.builder()
-                .leaderName(request.leaderName())
-                .teamName(request.teamName())
-                .projectName(request.projectName())
-                .overview(request.overview())
-                .productionPath(request.productionPath())
-                .githubPath(request.githubPath())
-                .youTubePath(request.youTubePath())
-                .contestId(contest.getId())
-                .build());
+        final Team team =
+                teamRepository.save(
+                        Team.builder()
+                                .leaderName(request.leaderName())
+                                .teamName(request.teamName())
+                                .projectName(request.projectName())
+                                .overview(request.overview())
+                                .productionPath(request.productionPath())
+                                .githubPath(request.githubPath())
+                                .youTubePath(request.youTubePath())
+                                .contestId(contest.getId())
+                                .build());
 
         teamMemberCommandService.assignFakeTeamMember(team, request.leaderName(), Set.of(ROLE_팀장));
 
@@ -184,8 +201,12 @@ public class TeamCommandService {
         }
     }
 
-    private void checkTeamContestChange(final Team team, final Contest newContest, final Member member,
-                                        final String newTeamName, final String newLeaderName) {
+    private void checkTeamContestChange(
+            final Team team,
+            final Contest newContest,
+            final Member member,
+            final String newTeamName,
+            final String newLeaderName) {
         final Contest oldContest = contestConvenience.getValidateExistContest(team.getContestId());
         if (oldContest.getIsCurrent()) {
             checkCurrentContest(team, newContest, newTeamName, newLeaderName);
@@ -194,8 +215,11 @@ public class TeamCommandService {
         }
     }
 
-    private void checkCurrentContest(final Team team, final Contest newContest, final String newTeamName,
-                                     final String newLeaderName) {
+    private void checkCurrentContest(
+            final Team team,
+            final Contest newContest,
+            final String newTeamName,
+            final String newLeaderName) {
         if (team.isContestChanged(newContest.getId())) {
             throw new ContestException(CANNOT_CHANGE_CONTEST_FOR_CURRENT);
         }
