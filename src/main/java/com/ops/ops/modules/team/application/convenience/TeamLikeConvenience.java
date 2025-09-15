@@ -36,9 +36,7 @@ public class TeamLikeConvenience {
                 Collections.shuffle(teams);
             }
         } else if (mode == CUSTOM) {
-            teams.sort(Comparator.comparing(Team::getContestId)
-                    .thenComparingInt(Team::getItemOrder)
-            );
+            teams.sort(Comparator.comparing(Team::getItemOrder));
         }
 
         final Map<Long, Boolean> likeMap =
