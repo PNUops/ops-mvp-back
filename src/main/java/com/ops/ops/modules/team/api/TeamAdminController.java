@@ -1,28 +1,24 @@
 package com.ops.ops.modules.team.api;
 
+import com.ops.ops.modules.team.application.TeamAdminCommandService;
 import com.ops.ops.modules.team.application.TeamAdminQueryService;
-import com.ops.ops.modules.team.application.TeamCommandService;
 import com.ops.ops.modules.team.application.dto.request.TeamAwardRequest;
 import com.ops.ops.modules.team.application.dto.response.TeamLikeRankingResponse;
 import com.ops.ops.modules.team.application.dto.response.TeamSubmissionStatusResponse;
 import com.ops.ops.modules.team.application.dto.response.TeamVoteRateResponse;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
+import java.util.List;
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @Tag(name = "Team Admin", description = "팀 관리 기능 (관리자 전용)")
 @RestController
@@ -32,7 +28,7 @@ import java.util.List;
 public class TeamAdminController {
 
     private final TeamAdminQueryService teamAdminQueryService;
-    private final TeamCommandService teamCommandService;
+    private final TeamAdminCommandService teamAdminCommandService;
 
     @Operation(summary = "전체 팀 등록 현황 조회", description = "관리자가 모든 팀의 제출 여부를 포함한 현황을 조회합니다.")
     @ApiResponse(responseCode = "200", description = "조회 성공")
@@ -58,12 +54,11 @@ public class TeamAdminController {
     }
 
     @Operation(summary = "팀 수상 설정", description = "관리자가 특정 팀의 상훈명을 등록합니다.")
-    @ApiResponse(responseCode = "200", description = "설정 성공")
-    @PostMapping("/teams/{teamId}/award")
+    @ApiResponse(responseCode = "204", description = "팀 수상 설정 성공")
+    @PatchMapping("/teams/{teamId}/award")
     public ResponseEntity<Void> updateTeamAward(
             @PathVariable final Long teamId, @RequestBody final TeamAwardRequest teamAwardRequest) {
-        teamCommandService.updateAwardName(
-                teamId, teamAwardRequest.awardName(), teamAwardRequest.awardColor());
+        teamAdminCommandService.updateAward(teamId, teamAwardRequest.awardName(), teamAwardRequest.awardColor());
         return ResponseEntity.noContent().build();
     }
 }

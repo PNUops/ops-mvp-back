@@ -1,14 +1,14 @@
 package com.ops.ops.modules.team.exception;
 
 import com.ops.ops.global.base.BaseExceptionType;
-
 import org.springframework.http.HttpStatus;
 
 public enum TeamExceptionType implements BaseExceptionType {
     NOT_FOUND_TEAM(HttpStatus.NOT_FOUND, "팀을 찾을 수 없습니다."),
     NOT_TEAM_LEADER(HttpStatus.FORBIDDEN, "해당 팀의 팀장 권한이 없습니다."),
     EXIST_ONLY_ONE_ABOUT_TEAM_SORT(HttpStatus.NOT_FOUND, "팀 정렬 테이블의 id는 1번만 존재합니다."),
-    INVALID_AWARD_PARAMETERS(HttpStatus.BAD_REQUEST, "수상명과 색상 정보가 올바르지 않습니다.");
+    INVALID_AWARD_PARAMETERS(HttpStatus.BAD_REQUEST, "수상명과 색상 정보가 올바르지 않습니다."),
+    INVALID_COLOR_FORMAT(HttpStatus.BAD_REQUEST, "색상 정보가 올바르지 않습니다. (예: #FFFFFF)");
 
     private final HttpStatus httpStatus;
     private final String errorMessage;
