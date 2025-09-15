@@ -1,24 +1,20 @@
 package com.ops.ops.modules.team.domain;
 
 import com.ops.ops.global.base.BaseEntity;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
-
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Getter
@@ -45,11 +41,14 @@ public class Team extends BaseEntity {
     @Column(length = MAX_OVERVIEW_LENGTH)
     private String overview;
 
-    @Column private String githubPath;
+    @Column
+    private String githubPath;
 
-    @Column private String productionPath;
+    @Column
+    private String productionPath;
 
-    @Column private String youTubePath;
+    @Column
+    private String youTubePath;
 
     @Column(nullable = false)
     private Boolean isDeleted;
@@ -63,9 +62,11 @@ public class Team extends BaseEntity {
     @Column(nullable = false)
     private Long contestId;
 
-    @Column private String awardName;
+    @Column
+    private String awardName;
 
-    @Column private String awardColor;
+    @Column
+    private String awardColor;
 
     @Builder
     public Team(

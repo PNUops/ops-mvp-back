@@ -37,9 +37,7 @@ public class TeamAdminController {
         return ResponseEntity.ok(teamAdminQueryService.getAllTeamSubmissions());
     }
 
-    @Operation(
-            summary = "좋아요 랭킹 조회",
-            description = "좋아요 수 기준으로 팀 랭킹을 조회합니다. (Competition Ranking 방식)")
+    @Operation(summary = "좋아요 랭킹 조회", description = "좋아요 수 기준으로 팀 랭킹을 조회합니다. (Competition Ranking 방식)")
     @ApiResponse(responseCode = "200", description = "조회 성공")
     @GetMapping("/ranking")
     public ResponseEntity<List<TeamLikeRankingResponse>> getTeamLikeRanking() {
@@ -56,8 +54,8 @@ public class TeamAdminController {
     @Operation(summary = "팀 수상 설정", description = "관리자가 특정 팀의 상훈명을 등록합니다.")
     @ApiResponse(responseCode = "204", description = "팀 수상 설정 성공")
     @PatchMapping("/teams/{teamId}/award")
-    public ResponseEntity<Void> updateTeamAward(
-            @PathVariable final Long teamId, @RequestBody final TeamAwardRequest teamAwardRequest) {
+    public ResponseEntity<Void> updateTeamAward(@PathVariable final Long teamId,
+                                                @RequestBody final TeamAwardRequest teamAwardRequest) {
         teamAdminCommandService.updateAward(teamId, teamAwardRequest.awardName(), teamAwardRequest.awardColor());
         return ResponseEntity.noContent().build();
     }
