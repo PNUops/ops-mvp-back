@@ -7,6 +7,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
@@ -21,6 +23,8 @@ import org.hibernate.annotations.SQLRestriction;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @SQLRestriction("is_deleted = false")
 @SQLDelete(sql = "UPDATE team SET is_deleted = true where id = ?")
+@Table(name = "team", uniqueConstraints = {
+        @UniqueConstraint(name = "uq_team_contest_item_order", columnNames = {"contest_id", "item_order"})})
 public class Team extends BaseEntity {
 
     private static final int MAX_OVERVIEW_LENGTH = 3000;
@@ -62,9 +66,19 @@ public class Team extends BaseEntity {
     @Column(nullable = false)
     private Long contestId;
 
+    @Column
+    private String awardName;
+
+    @Column
+    private String awardColor;
+
+    @Column(nullable = false)
+    private Integer itemOrder;
+
     @Builder
     public Team(final String leaderName, final String teamName, final String projectName, final String overview,
-                final String productionPath, final String githubPath, final String youTubePath, final Long contestId) {
+                final String productionPath, final String githubPath, final String youTubePath, final Long contestId,
+                final Integer itemOrder) {
         this.leaderName = leaderName;
         this.teamName = teamName;
         this.projectName = projectName;
@@ -76,6 +90,9 @@ public class Team extends BaseEntity {
         this.isSubmitted = false;
         this.teamMembers = new ArrayList<>();
         this.contestId = contestId;
+        this.awardName = null;
+        this.awardColor = null;
+        this.itemOrder = itemOrder;
     }
 
     public void updateDetail(final String newLeaderName, final String newTeamName, final String newProjectName,

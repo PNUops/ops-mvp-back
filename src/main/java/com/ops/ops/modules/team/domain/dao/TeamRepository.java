@@ -1,10 +1,10 @@
 package com.ops.ops.modules.team.domain.dao;
 
 import com.ops.ops.modules.team.domain.Team;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
-
 import java.util.List;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 
 @Repository
 public interface TeamRepository extends JpaRepository<Team, Long> {
@@ -13,4 +13,7 @@ public interface TeamRepository extends JpaRepository<Team, Long> {
     List<Team> findByContestId(Long contestId);
 
     List<Team> findAllByContestId(Long contestId);
+
+    @Query("select coalesce(max(t.itemOrder), 0) from Team t where t.contestId = :contestId")
+    Integer findMaxItemOrderByContestId(final Long contestId);
 }

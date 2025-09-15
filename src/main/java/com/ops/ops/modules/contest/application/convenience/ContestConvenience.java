@@ -46,4 +46,9 @@ public class ContestConvenience {
             throw new ContestException(NOT_VOTE_PERIOD_NOW);
         }
     }
+
+    @Transactional
+    public Contest findByIdForUpdate(final Long contestId) {
+        return contestRepository.findByIdForUpdate(contestId).orElseThrow(() -> new ContestException(NOT_FOUND_CONTEST));
+    }
 }

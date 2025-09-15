@@ -118,8 +118,10 @@ public class TeamCommandService {
     }
 
     public TeamCreateResponse createTeam(TeamCreateRequest request) {
-        final Contest contest = contestConvenience.getValidateExistContest(request.contestId());
+        final Contest contest = contestConvenience.findByIdForUpdate(request.contestId());
         checkIsTeamCreatable(contest);
+
+        final int nextOrder = teamRepository.findMaxItemOrderByContestId(contest.getId()) + 1;
 
         final Team team = teamRepository.save(Team.builder()
                 .leaderName(request.leaderName())
@@ -130,6 +132,7 @@ public class TeamCommandService {
                 .githubPath(request.githubPath())
                 .youTubePath(request.youTubePath())
                 .contestId(contest.getId())
+                .itemOrder(nextOrder)
                 .build());
 
         teamMemberCommandService.assignFakeTeamMember(team, request.leaderName(), Set.of(ROLE_팀장));
