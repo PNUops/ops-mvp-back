@@ -121,11 +121,16 @@ public class TeamCommandService {
         final Contest contest = contestConvenience.getValidateExistContest(request.contestId());
         checkIsTeamCreatable(contest);
 
-        final Team team = teamRepository.save(
-                Team.builder().leaderName(request.leaderName()).teamName(request.teamName())
-                        .projectName(request.projectName()).overview(request.overview())
-                        .productionPath(request.productionPath()).githubPath(request.githubPath())
-                        .youTubePath(request.youTubePath()).contestId(contest.getId()).build());
+        final Team team = teamRepository.save(Team.builder()
+                .leaderName(request.leaderName())
+                .teamName(request.teamName())
+                .projectName(request.projectName())
+                .overview(request.overview())
+                .productionPath(request.productionPath())
+                .githubPath(request.githubPath())
+                .youTubePath(request.youTubePath())
+                .contestId(contest.getId())
+                .build());
 
         teamMemberCommandService.assignFakeTeamMember(team, request.leaderName(), Set.of(ROLE_팀장));
 
@@ -152,11 +157,8 @@ public class TeamCommandService {
         }
     }
 
-    private void checkTeamContestChange(final Team team,
-                                        final Contest newContest,
-                                        final Member member,
-                                        final String newTeamName,
-                                        final String newLeaderName) {
+    private void checkTeamContestChange(final Team team, final Contest newContest, final Member member,
+                                        final String newTeamName, final String newLeaderName) {
         final Contest oldContest = contestConvenience.getValidateExistContest(team.getContestId());
         if (oldContest.getIsCurrent()) {
             checkCurrentContest(team, newContest, newTeamName, newLeaderName);
@@ -165,9 +167,7 @@ public class TeamCommandService {
         }
     }
 
-    private void checkCurrentContest(final Team team,
-                                     final Contest newContest,
-                                     final String newTeamName,
+    private void checkCurrentContest(final Team team, final Contest newContest, final String newTeamName,
                                      final String newLeaderName) {
         if (team.isContestChanged(newContest.getId())) {
             throw new ContestException(CANNOT_CHANGE_CONTEST_FOR_CURRENT);
