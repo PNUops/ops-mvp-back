@@ -120,4 +120,8 @@ public class Team extends BaseEntity {
     public boolean isLeaderNameChanged(String newLeaderName) {
         return !this.getLeaderName().equals(newLeaderName);
     }
+
+    public void updateItemOrder(Integer newOrder) {
+        this.itemOrder = newOrder;
+    }
 }

@@ -10,6 +10,8 @@ import static com.ops.ops.modules.file.exception.FileExceptionType.EXCEED_PREVIE
 import static com.ops.ops.modules.file.exception.FileExceptionType.NOT_WEBP_CONVERTED;
 import static com.ops.ops.modules.member.domain.MemberRoleType.ROLE_관리자;
 import static com.ops.ops.modules.member.domain.MemberRoleType.ROLE_팀장;
+import static com.ops.ops.modules.team.domain.SortType.CUSTOM;
+import static com.ops.ops.modules.team.exception.TeamExceptionType.ONLY_CUSTOM_MODE_CAN_CHANGE;
 
 import com.ops.ops.global.util.FileStorageUtil;
 import com.ops.ops.modules.contest.application.convenience.ContestConvenience;
@@ -27,11 +29,13 @@ import com.ops.ops.modules.team.application.convenience.TeamMemberConvenience;
 import com.ops.ops.modules.team.application.convenience.TeamSortConvenience;
 import com.ops.ops.modules.team.application.dto.request.TeamCreateRequest;
 import com.ops.ops.modules.team.application.dto.request.TeamDetailUpdateRequest;
+import com.ops.ops.modules.team.application.dto.request.TeamSortCustomRequest;
 import com.ops.ops.modules.team.application.dto.request.TeamSortRequest;
 import com.ops.ops.modules.team.application.dto.response.TeamCreateResponse;
 import com.ops.ops.modules.team.domain.Team;
 import com.ops.ops.modules.team.domain.TeamSort;
 import com.ops.ops.modules.team.domain.dao.TeamRepository;
+import com.ops.ops.modules.team.exception.TeamException;
 import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
@@ -147,6 +151,18 @@ public class TeamCommandService {
         teamSort.updateSortType(request.mode());
     }
 
+    public void updateTeamSortCustom(final TeamSortCustomRequest request) {
+        final TeamSort teamSort = teamSortConvenience.getValidateExistTeamSort();
+        checkCustomSort(teamSort);
+
+        final List<Team> teams = teamRepository.findAllByContestId(request.contestId());
+
+        for (TeamSortCustomRequest.TeamOrder order : request.teamOrders()) {
+            teams.stream().filter(team -> team.getId().equals(order.teamId())).findFirst()
+                    .ifPresent(team -> team.updateItemOrder(order.itemOrder()));
+        }
+    }
+
     private void checkWebpConverted(File existingFile) {
         if (!existingFile.isWebpConverted()) {
             throw new FileException(NOT_WEBP_CONVERTED);
@@ -204,6 +220,12 @@ public class TeamCommandService {
     private void checkIsTeamCreatable(final Contest contest) {
         if (!contest.isTeamCreatable()) {
             throw new ContestException(CANNOT_CREATE_TEAM_OF_CURRENT_CONTEST);
+        }
+    }
+
+    private void checkCustomSort(final TeamSort teamSort) {
+        if (!teamSort.getMode().equals(CUSTOM)) {
+            throw new TeamException(ONLY_CUSTOM_MODE_CAN_CHANGE);
         }
     }
 }

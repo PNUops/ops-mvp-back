@@ -8,6 +8,7 @@ import com.ops.ops.modules.team.application.TeamQueryService;
 import com.ops.ops.modules.team.application.dto.request.PreviewDeleteRequest;
 import com.ops.ops.modules.team.application.dto.request.TeamCreateRequest;
 import com.ops.ops.modules.team.application.dto.request.TeamDetailUpdateRequest;
+import com.ops.ops.modules.team.application.dto.request.TeamSortCustomRequest;
 import com.ops.ops.modules.team.application.dto.request.TeamSortRequest;
 import com.ops.ops.modules.team.application.dto.response.TeamCreateResponse;
 import com.ops.ops.modules.team.application.dto.response.TeamDetailResponse;
@@ -182,5 +183,14 @@ public class TeamController {
     @Secured("ROLE_관리자")
     public ResponseEntity<TeamSortResponse> getTeamSort() {
         return ResponseEntity.ok(teamQueryService.getTeamSort());
+    }
+
+    @Operation(summary = "팀 수동 정렬", description = "관리자가 팀을 수동으로 정렬합니다. (CUSTOM)")
+    @ApiResponse(responseCode = "204", description = "팀 수동 정렬 성공")
+    @PatchMapping("/sort/custom")
+    @Secured("ROLE_관리자")
+    public ResponseEntity<Void> updateTeamSortCustom(@RequestBody @Valid final TeamSortCustomRequest request) {
+        teamCommandService.updateTeamSortCustom(request);
+        return ResponseEntity.noContent().build();
     }
 }
