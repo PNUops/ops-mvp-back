@@ -69,15 +69,8 @@ public class Team extends BaseEntity {
     private String awardColor;
 
     @Builder
-    public Team(
-            final String leaderName,
-            final String teamName,
-            final String projectName,
-            final String overview,
-            final String productionPath,
-            final String githubPath,
-            final String youTubePath,
-            final Long contestId) {
+    public Team(final String leaderName, final String teamName, final String projectName, final String overview,
+                final String productionPath, final String githubPath, final String youTubePath, final Long contestId) {
         this.leaderName = leaderName;
         this.teamName = teamName;
         this.projectName = projectName;
@@ -93,15 +86,9 @@ public class Team extends BaseEntity {
         this.awardColor = null;
     }
 
-    public void updateDetail(
-            final String newLeaderName,
-            final String newTeamName,
-            final String newProjectName,
-            final String newOverview,
-            final String newProductionPath,
-            final String newGithubPath,
-            final String newYouTubePath,
-            final Long newContestId) {
+    public void updateDetail(final String newLeaderName, final String newTeamName, final String newProjectName,
+                             final String newOverview, final String newProductionPath, final String newGithubPath,
+                             final String newYouTubePath, final Long newContestId) {
         this.leaderName = newLeaderName;
         this.teamName = newTeamName;
         this.projectName = newProjectName;
