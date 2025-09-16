@@ -9,6 +9,7 @@ import com.ops.ops.modules.team.application.dto.response.TeamVoteRateResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -55,7 +56,7 @@ public class TeamAdminController {
     @ApiResponse(responseCode = "204", description = "팀 수상 설정 성공")
     @PatchMapping("/teams/{teamId}/award")
     public ResponseEntity<Void> updateTeamAward(@PathVariable final Long teamId,
-                                                @RequestBody final TeamAwardRequest teamAwardRequest) {
+                                                @Valid @RequestBody final TeamAwardRequest teamAwardRequest) {
         teamAdminCommandService.updateAward(teamId, teamAwardRequest.awardName(), teamAwardRequest.awardColor());
         return ResponseEntity.noContent().build();
     }

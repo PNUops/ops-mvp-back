@@ -27,8 +27,11 @@ public class ExceptionAdvice {
     private static String getErrorMessage(final BindException e) {
         final BindingResult bindingResult = e.getBindingResult();
         return bindingResult.getFieldErrors().stream()
-                .map(fieldError -> getErrorMessage(fieldError.getField(), (String) fieldError.getRejectedValue(),
-                        fieldError.getDefaultMessage())).collect(Collectors.joining(", "));
+                .map(fieldError -> {
+                    assert fieldError.getRejectedValue() != null;
+                    return getErrorMessage(fieldError.getField(), fieldError.getRejectedValue().toString(),
+                            fieldError.getDefaultMessage());
+                }).collect(Collectors.joining(", "));
     }
 
     private static String getErrorMessage(final String errorField, final String invalidValue,
