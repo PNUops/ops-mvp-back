@@ -109,6 +109,11 @@ public class Team extends BaseEntity {
         this.contestId = newContestId;
     }
 
+    public void updateAward(final String awardName, final String awardColor) {
+        this.awardName = awardName;
+        this.awardColor = awardColor;
+    }
+
     public boolean isContestChanged(Long newContestId) {
         return !this.contestId.equals(newContestId);
     }
