@@ -62,6 +62,12 @@ public class Team extends BaseEntity {
     @Column(nullable = false)
     private Long contestId;
 
+    @Column
+    private String awardName;
+
+    @Column
+    private String awardColor;
+
     @Builder
     public Team(final String leaderName, final String teamName, final String projectName, final String overview,
                 final String productionPath, final String githubPath, final String youTubePath, final Long contestId) {
@@ -76,6 +82,8 @@ public class Team extends BaseEntity {
         this.isSubmitted = false;
         this.teamMembers = new ArrayList<>();
         this.contestId = contestId;
+        this.awardName = null;
+        this.awardColor = null;
     }
 
     public void updateDetail(final String newLeaderName, final String newTeamName, final String newProjectName,
@@ -90,6 +98,11 @@ public class Team extends BaseEntity {
         this.youTubePath = newYouTubePath;
         this.isSubmitted = true;
         this.contestId = newContestId;
+    }
+
+    public void updateAward(final String awardName, final String awardColor) {
+        this.awardName = awardName;
+        this.awardColor = awardColor;
     }
 
     public boolean isContestChanged(Long newContestId) {
