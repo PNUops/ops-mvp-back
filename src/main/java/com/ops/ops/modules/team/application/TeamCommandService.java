@@ -224,7 +224,7 @@ public class TeamCommandService {
     }
 
     private void checkCustomSort(final TeamSort teamSort) {
-        if (!teamSort.getMode().equals(CUSTOM)) {
+        if (teamSort.getMode() != CUSTOM) {
             throw new TeamException(ONLY_CUSTOM_MODE_CAN_CHANGE);
         }
     }
