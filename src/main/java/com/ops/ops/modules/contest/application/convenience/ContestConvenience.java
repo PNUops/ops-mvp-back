@@ -4,6 +4,7 @@ import static com.ops.ops.modules.contest.exception.ContestExceptionType.CANNOT_
 import static com.ops.ops.modules.contest.exception.ContestExceptionType.CONTEST_NAME_ALREADY_EXIST;
 import static com.ops.ops.modules.contest.exception.ContestExceptionType.NOT_FOUND_CONTEST;
 import static com.ops.ops.modules.contest.exception.ContestExceptionType.NOT_VOTE_PERIOD_NOW;
+import static org.springframework.transaction.annotation.Propagation.MANDATORY;
 
 import com.ops.ops.modules.contest.domain.Contest;
 import com.ops.ops.modules.contest.domain.dao.ContestRepository;
@@ -45,5 +46,10 @@ public class ContestConvenience {
         if (!(now.isAfter(contest.getVoteStartAt()) && now.isBefore(contest.getVoteEndAt()))) {
             throw new ContestException(NOT_VOTE_PERIOD_NOW);
         }
+    }
+
+    @Transactional(propagation = MANDATORY)
+    public Contest findByIdForUpdate(final Long contestId) {
+        return contestRepository.findByIdForUpdate(contestId).orElseThrow(() -> new ContestException(NOT_FOUND_CONTEST));
     }
 }

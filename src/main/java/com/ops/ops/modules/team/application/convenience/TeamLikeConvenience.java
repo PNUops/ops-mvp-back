@@ -1,5 +1,6 @@
 package com.ops.ops.modules.team.application.convenience;
 
+import static com.ops.ops.modules.team.domain.SortType.CUSTOM;
 import static com.ops.ops.modules.team.domain.SortType.RANDOM;
 import static java.util.stream.Collectors.toMap;
 
@@ -10,6 +11,7 @@ import com.ops.ops.modules.team.domain.Team;
 import com.ops.ops.modules.team.domain.TeamLike;
 import com.ops.ops.modules.team.domain.dao.TeamLikeRepository;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -26,13 +28,15 @@ public class TeamLikeConvenience {
 
     public List<TeamSummaryResponse> getAllTeamSummaries(final List<Team> teams, final Member member,
                                                          final SortType mode) {
-        if (mode.equals(RANDOM)) {
+        if (mode == RANDOM) {
             if (member != null) {
                 Random seed = new Random(member.getId());
                 Collections.shuffle(teams, seed);
             } else {
                 Collections.shuffle(teams);
             }
+        } else if (mode == CUSTOM) {
+            teams.sort(Comparator.comparing(Team::getItemOrder));
         }
 
         final Map<Long, Boolean> likeMap =
