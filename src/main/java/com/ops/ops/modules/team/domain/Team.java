@@ -7,8 +7,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
@@ -23,8 +21,6 @@ import org.hibernate.annotations.SQLRestriction;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @SQLRestriction("is_deleted = false")
 @SQLDelete(sql = "UPDATE team SET is_deleted = true where id = ?")
-@Table(name = "team", uniqueConstraints = {
-        @UniqueConstraint(name = "uq_team_contest_item_order", columnNames = {"contest_id", "item_order"})})
 public class Team extends BaseEntity {
 
     private static final int MAX_OVERVIEW_LENGTH = 3000;
