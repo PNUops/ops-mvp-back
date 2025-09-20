@@ -18,6 +18,7 @@ public record TeamDetailUpdateRequest(
         @NotBlank(message = "깃헙 주소는 필수입니다.")
         String githubPath,
         @NotBlank(message = "유튜브 주소는 필수입니다.")
-        String youTubePath
+        String youTubePath,
+        String professorName
 ) {
 }

@@ -118,7 +118,8 @@ public class TeamCommandService {
         updateLeaderIfChanged(team, request.leaderName());
 
         team.updateDetail(request.leaderName(), request.teamName(), request.projectName(), request.overview(),
-                request.productionPath(), request.githubPath(), request.youTubePath(), request.contestId());
+                request.productionPath(), request.githubPath(), request.youTubePath(), request.contestId(),
+                request.professorName());
     }
 
     public TeamCreateResponse createTeam(TeamCreateRequest request) {
