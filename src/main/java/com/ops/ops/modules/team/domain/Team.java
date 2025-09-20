@@ -97,7 +97,7 @@ public class Team extends BaseEntity {
 
     public void updateDetail(final String newLeaderName, final String newTeamName, final String newProjectName,
                              final String newOverview, final String newProductionPath, final String newGithubPath,
-                             final String newYouTubePath, final Long newContestId, final String newpPofessorName) {
+                             final String newYouTubePath, final Long newContestId, final String newProfessorName) {
         this.leaderName = newLeaderName;
         this.teamName = newTeamName;
         this.projectName = newProjectName;
@@ -107,7 +107,7 @@ public class Team extends BaseEntity {
         this.youTubePath = newYouTubePath;
         this.isSubmitted = true;
         this.contestId = newContestId;
-        this.professorName = newpPofessorName;
+        this.professorName = newProfessorName;
     }
 
     public void updateAward(final String awardName, final String awardColor) {

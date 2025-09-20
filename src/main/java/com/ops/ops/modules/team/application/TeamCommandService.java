@@ -137,6 +137,7 @@ public class TeamCommandService {
                 .youTubePath(request.youTubePath())
                 .contestId(contest.getId())
                 .itemOrder(nextOrder)
+                .professorName(request.professorName())
                 .build());
 
         teamMemberCommandService.assignFakeTeamMember(team, request.leaderName(), Set.of(ROLE_팀장));
