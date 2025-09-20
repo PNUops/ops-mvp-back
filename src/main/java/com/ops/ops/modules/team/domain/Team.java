@@ -71,10 +71,13 @@ public class Team extends BaseEntity {
     @Column(nullable = false)
     private Integer itemOrder;
 
+    @Column
+    private String professorName;
+
     @Builder
     public Team(final String leaderName, final String teamName, final String projectName, final String overview,
                 final String productionPath, final String githubPath, final String youTubePath, final Long contestId,
-                final Integer itemOrder) {
+                final Integer itemOrder, final String professorName) {
         this.leaderName = leaderName;
         this.teamName = teamName;
         this.projectName = projectName;
@@ -89,11 +92,12 @@ public class Team extends BaseEntity {
         this.awardName = null;
         this.awardColor = null;
         this.itemOrder = itemOrder;
+        this.professorName = professorName;
     }
 
     public void updateDetail(final String newLeaderName, final String newTeamName, final String newProjectName,
                              final String newOverview, final String newProductionPath, final String newGithubPath,
-                             final String newYouTubePath, final Long newContestId) {
+                             final String newYouTubePath, final Long newContestId, final String newpPofessorName) {
         this.leaderName = newLeaderName;
         this.teamName = newTeamName;
         this.projectName = newProjectName;
@@ -103,6 +107,7 @@ public class Team extends BaseEntity {
         this.youTubePath = newYouTubePath;
         this.isSubmitted = true;
         this.contestId = newContestId;
+        this.professorName = newpPofessorName;
     }
 
     public void updateAward(final String awardName, final String awardColor) {
