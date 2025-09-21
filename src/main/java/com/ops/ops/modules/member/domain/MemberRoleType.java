@@ -7,6 +7,7 @@ public enum MemberRoleType {
     ROLE_회원(1),
     ROLE_팀장(2),
     ROLE_관리자(3),
+    ROLE_팀원(4),
     ;
 
     private final long id;
