@@ -18,7 +18,8 @@ public record TeamDetailResponse(
         String productionPath,
         String githubPath,
         String youTubePath,
-        boolean isLiked
+        boolean isLiked,
+        String professorName
 ) {
     public static TeamDetailResponse from(
             Contest contest,
@@ -42,7 +43,8 @@ public record TeamDetailResponse(
                 team.getProductionPath(),
                 team.getGithubPath(),
                 team.getYouTubePath(),
-                isLiked
+                isLiked,
+                team.getProfessorName()
         );
     }
 }
