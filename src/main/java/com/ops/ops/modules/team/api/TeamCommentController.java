@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/teams/{teamId}/comments")
-@Secured({"ROLE_회원", "ROLE_팀장", "ROLE_관리자"})
+@Secured({"ROLE_회원", "ROLE_팀장", "ROLE_관리자", "ROLE_팀원"})
 public class TeamCommentController {
 
 	private final TeamCommentCommandService teamCommentCommandService;
