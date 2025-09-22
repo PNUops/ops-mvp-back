@@ -118,7 +118,8 @@ public class TeamCommandService {
         updateLeaderIfChanged(team, request.leaderName());
 
         team.updateDetail(request.leaderName(), request.teamName(), request.projectName(), request.overview(),
-                request.productionPath(), request.githubPath(), request.youTubePath(), request.contestId());
+                request.productionPath(), request.githubPath(), request.youTubePath(), request.contestId(),
+                request.professorName());
     }
 
     public TeamCreateResponse createTeam(TeamCreateRequest request) {
@@ -137,6 +138,7 @@ public class TeamCommandService {
                 .youTubePath(request.youTubePath())
                 .contestId(contest.getId())
                 .itemOrder(nextOrder)
+                .professorName(request.professorName())
                 .build());
 
         teamMemberCommandService.assignFakeTeamMember(team, request.leaderName(), Set.of(ROLE_팀장));

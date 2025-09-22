@@ -18,6 +18,7 @@ public record TeamCreateRequest(
         @NotBlank(message = "깃헙주소는 필수입니다.")
         String githubPath,
         @NotBlank(message = "유튜브주소는 필수입니다.")
-        String youTubePath
+        String youTubePath,
+        String professorName
 ) {
 }
