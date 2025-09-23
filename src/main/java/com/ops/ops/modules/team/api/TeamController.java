@@ -84,7 +84,7 @@ public class TeamController {
 
     @Operation(summary = "팀 썸네일 등록", description = "팀의 썸네일 이미지를 저장합니다.")
     @ApiResponse(responseCode = "201", description = "팀 썸네일 저장 완료")
-    @Secured({"ROLE_팀장", "ROLE_관리자"})
+    @Secured({"ROLE_팀장", "ROLE_관리자", "ROLE_팀원"})
     @PostMapping("/{teamId}/image/thumbnail")
     public ResponseEntity<Void> saveThumbnailImage(@PathVariable final Long teamId,
                                                    @RequestPart("image") final MultipartFile image) {
@@ -94,7 +94,7 @@ public class TeamController {
 
     @Operation(summary = "팀 썸네일 삭제", description = "팀의 썸네일 이미지를 삭제합니다.")
     @ApiResponse(responseCode = "204", description = "팀 썸네일 삭제 성공")
-    @Secured({"ROLE_팀장", "ROLE_관리자"})
+    @Secured({"ROLE_팀장", "ROLE_관리자", "ROLE_팀원"})
     @DeleteMapping("/{teamId}/image/thumbnail")
     public ResponseEntity<Void> deleteThumbnailImage(@PathVariable Long teamId) {
         teamCommandService.deleteThumbnailImage(teamId);
@@ -115,7 +115,7 @@ public class TeamController {
 
     @Operation(summary = "팀 프리뷰 등록", description = "팀의 프리뷰 이미지를 등록합니다.")
     @ApiResponse(responseCode = "201", description = "팀 프리뷰 등록 성공")
-    @Secured({"ROLE_팀장", "ROLE_관리자"})
+    @Secured({"ROLE_팀장", "ROLE_관리자", "ROLE_팀원"})
     @PostMapping("/{teamId}/image")
     public ResponseEntity<Void> savePreviewImage(@PathVariable Long teamId,
                                                  @RequestPart("images") final List<MultipartFile> images) {
@@ -125,7 +125,7 @@ public class TeamController {
 
     @Operation(summary = "팀 프리뷰 삭제", description = "팀의 프리뷰 이미지를 삭제합니다.")
     @ApiResponse(responseCode = "204", description = "팀 프리뷰 삭제 성공")
-    @Secured({"ROLE_팀장", "ROLE_관리자"})
+    @Secured({"ROLE_팀장", "ROLE_관리자", "ROLE_팀원"})
     @DeleteMapping("/{teamId}/image")
     public ResponseEntity<Void> deletePreviewImage(@PathVariable Long teamId,
                                                    @RequestBody @Valid PreviewDeleteRequest previewDeleteRequest) {
@@ -136,7 +136,7 @@ public class TeamController {
     @Operation(summary = "팀 상세보기 수정", description = "특정 팀의 상세보기를 수정합니다.")
     @ApiResponse(responseCode = "204", description = "팀 상세보기 수정 성공")
     @PatchMapping("/{teamId}")
-    @Secured({"ROLE_팀장", "ROLE_관리자"})
+    @Secured({"ROLE_팀장", "ROLE_관리자", "ROLE_팀원"})
     public ResponseEntity<Void> updateTeamDetail(
             @PathVariable final Long teamId,
             @Valid @RequestBody final TeamDetailUpdateRequest request,

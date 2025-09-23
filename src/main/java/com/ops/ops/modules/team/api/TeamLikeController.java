@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/teams")
-@Secured({"ROLE_회원", "ROLE_팀장", "ROLE_관리자"})
+@Secured({"ROLE_회원", "ROLE_팀장", "ROLE_관리자", "ROLE_팀원"})
 public class TeamLikeController {
 
     private final TeamLikeCommandService teamLikeService;
