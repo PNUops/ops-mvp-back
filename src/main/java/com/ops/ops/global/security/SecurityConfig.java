@@ -45,7 +45,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/teams/**", "/api/teams/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/contests/**", "/api/contests/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/notices/**", "/api/notices/**").permitAll()
-                        .anyRequest().hasAnyRole("회원", "관리자", "팀장")
+                        .anyRequest().hasAnyRole("회원", "관리자", "팀장", "팀원")
                 )
                 .exceptionHandling(exceptions -> exceptions
                         .accessDeniedHandler(customAccessDeniedHandler)
