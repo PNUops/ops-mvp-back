@@ -29,13 +29,10 @@ public class Team extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
     private String leaderName;
 
-    @Column(nullable = false)
     private String teamName;
 
-    @Column(nullable = false)
     private String projectName;
 
     @Column(length = MAX_OVERVIEW_LENGTH)
