@@ -50,7 +50,7 @@ public class TeamLikeController {
             @ApiResponse(responseCode = "200", description = "좋아요 개수 조회 성공"),
             @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자")
     })
-    @GetMapping("/likes/count")
+    @GetMapping("/likes")
     public ResponseEntity<TeamLikeCountResponse> getUserLikeCount(@RequestParam Long contestId,
                                                                   @LoginMember Member member) {
         TeamLikeCountResponse response = new TeamLikeCountResponse(
