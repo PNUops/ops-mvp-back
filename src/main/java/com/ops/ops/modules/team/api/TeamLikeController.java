@@ -45,7 +45,7 @@ public class TeamLikeController {
         return ResponseEntity.ok(teamLikeService.toggleLike(member.getId(), teamId, request.isLiked()));
     }
 
-    @Operation(summary = "사용자의 좋아요 개수 상태 조회", description = "현재 사용자가 특정 공모전에서 좋아요를 누른 팀의 개수를 조회합니다.")
+    @Operation(summary = "사용자의 좋아요 개수 상태 조회", description = "현재 사용자가 특정 대회에서 좋아요를 누른 팀의 개수를 조회합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "좋아요 개수 조회 성공"),
             @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자")
