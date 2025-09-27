@@ -80,6 +80,8 @@ public class TeamLikeCommandService {
     }
 
     public long countCurrentMemberLikes(Long memberId, Long contestId) {
+        contestConvenience.checkVotePeriodNow(contestId,
+                ZonedDateTime.now(ZoneId.of("Asia/Seoul")).toLocalDateTime());
         return teamLikeRepository.countMemberLikesInContest(memberId, contestId);
     }
 
