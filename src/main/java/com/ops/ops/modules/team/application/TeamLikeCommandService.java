@@ -80,6 +80,7 @@ public class TeamLikeCommandService {
     }
 
     public long countCurrentMemberLikes(Long memberId, Long contestId) {
+        contestConvenience.getValidateExistContest(contestId);
         return teamLikeRepository.countMemberLikesInContest(memberId, contestId);
     }
 
