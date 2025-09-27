@@ -9,8 +9,10 @@ import static com.ops.ops.modules.file.domain.FileImageType.THUMBNAIL;
 import static com.ops.ops.modules.file.exception.FileExceptionType.EXCEED_PREVIEW_LIMIT;
 import static com.ops.ops.modules.file.exception.FileExceptionType.NOT_WEBP_CONVERTED;
 import static com.ops.ops.modules.member.domain.MemberRoleType.ROLE_관리자;
+import static com.ops.ops.modules.member.domain.MemberRoleType.ROLE_팀원;
 import static com.ops.ops.modules.member.domain.MemberRoleType.ROLE_팀장;
 import static com.ops.ops.modules.team.domain.SortType.CUSTOM;
+import static com.ops.ops.modules.team.exception.TeamExceptionType.MUST_FILL_FIELD;
 import static com.ops.ops.modules.team.exception.TeamExceptionType.ONLY_CUSTOM_MODE_CAN_CHANGE;
 
 import com.ops.ops.global.util.FileStorageUtil;
@@ -22,6 +24,7 @@ import com.ops.ops.modules.file.domain.dao.FileRepository;
 import com.ops.ops.modules.file.exception.FileException;
 import com.ops.ops.modules.member.application.convenience.MemberConvenience;
 import com.ops.ops.modules.member.domain.Member;
+import com.ops.ops.modules.member.domain.MemberRoleType;
 import com.ops.ops.modules.team.application.convenience.TeamCommentConvenience;
 import com.ops.ops.modules.team.application.convenience.TeamConvenience;
 import com.ops.ops.modules.team.application.convenience.TeamLikeConvenience;
@@ -38,6 +41,7 @@ import com.ops.ops.modules.team.domain.dao.TeamRepository;
 import com.ops.ops.modules.team.exception.TeamException;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -113,6 +117,10 @@ public class TeamCommandService {
     public void updateTeamDetail(final Long teamId, final Member member, final TeamDetailUpdateRequest request) {
         final Team team = teamConvenience.getValidateExistTeam(teamId);
         final Contest newContest = contestConvenience.getValidateExistContest(request.contestId());
+        final Set<MemberRoleType> roles = member.getRoles();
+
+        checkRoleBaseValidation(request, roles);
+
         checkTeamContestChange(team, newContest, member, request.teamName(), request.leaderName());
 
         updateLeaderIfChanged(team, request.leaderName());
@@ -120,6 +128,20 @@ public class TeamCommandService {
         team.updateDetail(request.leaderName(), request.teamName(), request.projectName(), request.overview(),
                 request.productionPath(), request.githubPath(), request.youTubePath(), request.contestId(),
                 request.professorName());
+    }
+
+    private void checkRoleBaseValidation(TeamDetailUpdateRequest request, Set<MemberRoleType> roles) {
+        if (roles.contains(ROLE_팀장) || roles.contains(ROLE_팀원)) {
+            Stream.of(request.teamName(), request.projectName(), request.leaderName(), request.overview(),
+                    request.githubPath(), request.youTubePath()
+            ).forEach(this::checkNullAndEmpty);
+        }
+    }
+
+    private void checkNullAndEmpty(String s) {
+        if (s == null || s.trim().isEmpty()) {
+            throw new TeamException(MUST_FILL_FIELD);
+        }
     }
 
     public TeamCreateResponse createTeam(TeamCreateRequest request) {
