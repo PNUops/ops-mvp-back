@@ -15,6 +15,7 @@ import com.ops.ops.modules.team.exception.TeamLikeExceptionType;
 import jakarta.transaction.Transactional;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -58,7 +59,7 @@ public class TeamLikeCommandService {
                                                       Boolean isLiked,
                                                       Long memberId,
                                                       Long contestId) {
-        if (teamLike.getIsLiked() == isLiked) { // 좋아요 상태 변화가 없는 경우
+        if (Objects.equals(teamLike.getIsLiked(), isLiked)) { // 좋아요 상태 변화가 없는 경우
             TeamLikeExceptionType exceptionType = isLiked ? ALREADY_LIKED : ALREADY_UNLIKED;
             throw new TeamLikeException(exceptionType);
         }
