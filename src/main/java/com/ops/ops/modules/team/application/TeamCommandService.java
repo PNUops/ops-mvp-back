@@ -11,6 +11,7 @@ import static com.ops.ops.modules.file.exception.FileExceptionType.NOT_WEBP_CONV
 import static com.ops.ops.modules.member.domain.MemberRoleType.ROLE_관리자;
 import static com.ops.ops.modules.member.domain.MemberRoleType.ROLE_팀원;
 import static com.ops.ops.modules.member.domain.MemberRoleType.ROLE_팀장;
+import static com.ops.ops.modules.member.domain.MemberRoleType.ROLE_회원;
 import static com.ops.ops.modules.team.domain.SortType.CUSTOM;
 import static com.ops.ops.modules.team.exception.TeamExceptionType.MUST_FILL_FIELD;
 import static com.ops.ops.modules.team.exception.TeamExceptionType.ONLY_CUSTOM_MODE_CAN_CHANGE;
@@ -131,7 +132,7 @@ public class TeamCommandService {
     }
 
     private void checkRoleBaseValidation(TeamDetailUpdateRequest request, Set<MemberRoleType> roles) {
-        if (roles.contains(ROLE_팀장) || roles.contains(ROLE_팀원)) {
+        if (roles.contains(ROLE_팀장) || roles.contains(ROLE_팀원) || roles.contains(ROLE_회원)) {
             Stream.of(request.teamName(), request.projectName(), request.leaderName(), request.overview(),
                     request.githubPath(), request.youTubePath()
             ).forEach(this::checkNullAndEmpty);
