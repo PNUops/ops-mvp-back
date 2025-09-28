@@ -4,7 +4,7 @@ import com.ops.ops.global.security.annotation.LoginMember;
 import com.ops.ops.modules.member.domain.Member;
 import com.ops.ops.modules.team.application.TeamLikeCommandService;
 import com.ops.ops.modules.team.application.dto.request.TeamLikeToggleRequest;
-import com.ops.ops.modules.team.application.dto.response.TeamLikeCountResponse;
+import com.ops.ops.modules.team.application.dto.response.MemberLikeCountResponse;
 import com.ops.ops.modules.team.application.dto.response.TeamLikeToggleResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -51,9 +51,8 @@ public class TeamLikeController {
             @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자")
     })
     @GetMapping("/likes")
-    public ResponseEntity<TeamLikeCountResponse> getUserLikeCount(@RequestParam Long contestId,
-                                                                  @LoginMember Member member) {
-        TeamLikeCountResponse response = new TeamLikeCountResponse(
+    public ResponseEntity<MemberLikeCountResponse> getUserLikeCount(@RequestParam Long contestId, @LoginMember Member member) {
+        MemberLikeCountResponse response = new MemberLikeCountResponse(
                 teamLikeService.countCurrentMemberLikes(member.getId(), contestId));
         return ResponseEntity.ok(response);
     }

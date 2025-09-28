@@ -4,6 +4,6 @@ public record TeamLikeToggleResponse(
         Long teamId,
         Boolean isLiked,
         String message,
-        Long currentLikeCount
+        Long currentMemberLikeCount
 ) {
 }
