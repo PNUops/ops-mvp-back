@@ -23,4 +23,7 @@ public interface TeamLikeRepository extends JpaRepository<TeamLike, Long> {
     List<TeamLike> findAllByMemberIdAndTeamIn(Long id, List<Team> teams);
 
     void deleteAllByTeamId(Long teamId);
+
+    @Query("SELECT COUNT(tl) FROM TeamLike tl JOIN tl.team t WHERE tl.memberId = :memberId AND tl.isLiked = true AND t.contestId = :contestId")
+    long countMemberLikesInContest(Long memberId, Long contestId);
 }
