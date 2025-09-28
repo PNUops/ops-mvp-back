@@ -55,10 +55,7 @@ public class TeamLikeCommandService {
         return new TeamLikeToggleResponse(team.getId(), isLiked, message, currentLikeCount);
     }
 
-    private TeamLikeToggleResponse handleExistingLike(TeamLike teamLike,
-                                                      Boolean isLiked,
-                                                      Long memberId,
-                                                      Long contestId) {
+    private TeamLikeToggleResponse handleExistingLike(TeamLike teamLike, Boolean isLiked, Long memberId, Long contestId) {
         if (Objects.equals(teamLike.getIsLiked(), isLiked)) { // 좋아요 상태 변화가 없는 경우
             TeamLikeExceptionType exceptionType = isLiked ? ALREADY_LIKED : ALREADY_UNLIKED;
             throw new TeamLikeException(exceptionType);
