@@ -42,7 +42,8 @@ public class TeamLikeController {
     public ResponseEntity<TeamLikeToggleResponse> toggleLike(@PathVariable Long teamId,
                                                              @RequestBody @Valid TeamLikeToggleRequest request,
                                                              @LoginMember Member member) {
-        return ResponseEntity.ok(teamLikeService.toggleLike(member.getId(), teamId, request.isLiked()));
+        TeamLikeToggleResponse response = teamLikeService.toggleLike(member.getId(), teamId, request.isLiked());
+        return ResponseEntity.ok(response);
     }
 
     @Operation(summary = "사용자의 좋아요 개수 상태 조회", description = "현재 사용자가 특정 대회에서 좋아요를 누른 팀의 개수를 조회합니다.")
@@ -52,8 +53,7 @@ public class TeamLikeController {
     })
     @GetMapping("/likes")
     public ResponseEntity<MemberLikeCountResponse> getUserLikeCount(@RequestParam Long contestId, @LoginMember Member member) {
-        MemberLikeCountResponse response = new MemberLikeCountResponse(
-                teamLikeService.countCurrentMemberLikes(member.getId(), contestId));
+        MemberLikeCountResponse response = teamLikeService.getMemberLikeCount(member.getId(), contestId);
         return ResponseEntity.ok(response);
     }
 }

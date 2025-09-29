@@ -4,6 +4,12 @@ public record TeamLikeToggleResponse(
         Long teamId,
         Boolean isLiked,
         String message,
-        Long currentMemberLikeCount
+        Long remainingLikeCount,
+        Long maxLikeCount
 ) {
+    public static TeamLikeToggleResponse of(Long teamId, Boolean isLiked, String message,
+                                            long currentLikeCount, long maxLikeCount) {
+        long remainingLikeCount = maxLikeCount - currentLikeCount;
+        return new TeamLikeToggleResponse(teamId, isLiked, message, remainingLikeCount, maxLikeCount);
+    }
 }
