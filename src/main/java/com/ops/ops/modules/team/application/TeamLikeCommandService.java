@@ -6,6 +6,7 @@ import static com.ops.ops.modules.team.exception.TeamLikeExceptionType.LIKE_LIMI
 
 import com.ops.ops.modules.contest.application.convenience.ContestConvenience;
 import com.ops.ops.modules.team.application.convenience.TeamConvenience;
+import com.ops.ops.modules.team.application.dto.response.MemberLikeCountResponse;
 import com.ops.ops.modules.team.application.dto.response.TeamLikeToggleResponse;
 import com.ops.ops.modules.team.domain.Team;
 import com.ops.ops.modules.team.domain.TeamLike;
@@ -24,7 +25,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Transactional
 public class TeamLikeCommandService {
-    private static final int MAX_LIKES_PER_CONTEST = 2;
+    private static final long MAX_LIKES_PER_CONTEST = 2;
 
     private final TeamLikeRepository teamLikeRepository;
     private final TeamConvenience teamConvenience;
@@ -52,7 +53,7 @@ public class TeamLikeCommandService {
         saveTeamLike(memberId, team, isLiked);
 
         String message = isLiked ? "좋아요가 처음 등록되었습니다." : "좋아요가 비활성화된 상태로 초기화되었습니다.";
-        return new TeamLikeToggleResponse(team.getId(), isLiked, message, currentLikeCount);
+        return TeamLikeToggleResponse.of(team.getId(), isLiked, message, currentLikeCount, MAX_LIKES_PER_CONTEST);
     }
 
     private TeamLikeToggleResponse handleExistingLike(TeamLike teamLike, Boolean isLiked, Long memberId, Long contestId) {
@@ -74,11 +75,10 @@ public class TeamLikeCommandService {
         teamLike.setLiked(isLiked);
 
         String message = isLiked ? "좋아요가 등록되었습니다." : "좋아요가 취소되었습니다.";
-        return new TeamLikeToggleResponse(teamLike.getTeam().getId(), isLiked, message, currentLikeCount);
+        return TeamLikeToggleResponse.of(teamLike.getTeam().getId(), isLiked, message, currentLikeCount, MAX_LIKES_PER_CONTEST);
     }
 
-    public long countCurrentMemberLikes(Long memberId, Long contestId) {
-        contestConvenience.getValidateExistContest(contestId);
+    private long countCurrentMemberLikes(Long memberId, Long contestId) {
         return teamLikeRepository.countMemberLikesInContest(memberId, contestId);
     }
 
@@ -94,5 +94,12 @@ public class TeamLikeCommandService {
                 .team(team)
                 .isLiked(isLiked)
                 .build());
+    }
+
+    public MemberLikeCountResponse getMemberLikeCount(Long memberId, Long contestId) {
+        contestConvenience.getValidateExistContest(contestId);
+        long currentLikeCount = teamLikeRepository.countMemberLikesInContest(memberId, contestId);
+        long remainingLikeCount = MAX_LIKES_PER_CONTEST - currentLikeCount;
+        return new MemberLikeCountResponse(remainingLikeCount, MAX_LIKES_PER_CONTEST);
     }
 }
