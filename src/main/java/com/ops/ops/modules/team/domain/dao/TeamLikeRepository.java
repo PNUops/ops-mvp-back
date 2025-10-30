@@ -26,4 +26,7 @@ public interface TeamLikeRepository extends JpaRepository<TeamLike, Long> {
 
     @Query("SELECT COUNT(tl) FROM TeamLike tl JOIN tl.team t WHERE tl.memberId = :memberId AND tl.isLiked = true AND t.contestId = :contestId")
     long countMemberLikesInContest(Long memberId, Long contestId);
+
+    @Query("SELECT tl FROM TeamLike tl WHERE tl.isLiked = true AND tl.team IN :teams ORDER BY tl.createdAt DESC")
+    List<TeamLike> findAllByIsLikedTrueAndTeamsOrderByCreatedAtDesc(List<Team> teams);
 }

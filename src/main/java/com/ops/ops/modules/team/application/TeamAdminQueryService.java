@@ -8,7 +8,11 @@ import com.ops.ops.modules.team.application.dto.TeamRank;
 import com.ops.ops.modules.team.application.dto.response.TeamLikeRankingResponse;
 import com.ops.ops.modules.team.application.dto.response.TeamSubmissionStatusResponse;
 import com.ops.ops.modules.team.application.dto.response.TeamVoteRateResponse;
+import com.ops.ops.modules.team.application.dto.response.VoteLogResponse;
+import com.ops.ops.modules.team.application.dto.response.VoteStatisticsResponse;
+import com.ops.ops.modules.member.domain.Member;
 import com.ops.ops.modules.team.domain.Team;
+import com.ops.ops.modules.team.domain.TeamLike;
 import com.ops.ops.modules.team.domain.dao.TeamLikeRepository;
 import com.ops.ops.modules.team.domain.dao.TeamRepository;
 import java.util.ArrayList;
@@ -125,5 +129,41 @@ public class TeamAdminQueryService {
 		}
 
 		return teamLikeRankingResponses;
+	}
+
+	public VoteStatisticsResponse getVoteStatistics() {
+		final Contest currentContest = contestConvenience.get6thContest();
+
+		List<Team> currentTeams = teamRepository.findByContestId(currentContest.getId());
+
+		long votedMemberCount = teamLikeRepository.countDistinctMemberIdsByIsLikedTrueAndTeams(currentTeams);
+		long totalVoteCount = teamLikeRepository.countByIsLikedTrueAndTeams(currentTeams);
+
+		double averageVotePerPerson = 0.0;
+		if (votedMemberCount > 0) {
+			averageVotePerPerson = Math.round((double) totalVoteCount / votedMemberCount * 10) / 10.0;
+		}
+
+		return new VoteStatisticsResponse((int) totalVoteCount, (int) votedMemberCount, averageVotePerPerson);
+	}
+
+	public List<VoteLogResponse> getVoteLogs() {
+		final Contest currentContest = contestConvenience.get6thContest();
+
+		List<Team> currentTeams = teamRepository.findByContestId(currentContest.getId());
+		List<TeamLike> voteLogs = teamLikeRepository.findAllByIsLikedTrueAndTeamsOrderByCreatedAtDesc(currentTeams);
+
+		return voteLogs.stream()
+			.map(teamLike -> {
+				Member member = memberConvenience.getValidateExistMember(teamLike.getMemberId());
+				Team team = teamLike.getTeam();
+				return new VoteLogResponse(
+					member.getName(),
+					member.getEmail(),
+					team.getTeamName(),
+					teamLike.getCreatedAt()
+				);
+			})
+			.collect(Collectors.toList());
 	}
 }

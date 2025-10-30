@@ -6,6 +6,8 @@ import com.ops.ops.modules.team.application.dto.request.TeamAwardRequest;
 import com.ops.ops.modules.team.application.dto.response.TeamLikeRankingResponse;
 import com.ops.ops.modules.team.application.dto.response.TeamSubmissionStatusResponse;
 import com.ops.ops.modules.team.application.dto.response.TeamVoteRateResponse;
+import com.ops.ops.modules.team.application.dto.response.VoteLogResponse;
+import com.ops.ops.modules.team.application.dto.response.VoteStatisticsResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -59,5 +61,19 @@ public class TeamAdminController {
                                                 @Valid @RequestBody final TeamAwardRequest teamAwardRequest) {
         teamAdminCommandService.updateAward(teamId, teamAwardRequest.awardName(), teamAwardRequest.awardColor());
         return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "투표 통계 조회", description = "총 투표수, 투표한 사람 수, 인당 평균 투표수를 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "조회 성공")
+    @GetMapping("/vote-statistics")
+    public ResponseEntity<VoteStatisticsResponse> getVoteStatistics() {
+        return ResponseEntity.ok(teamAdminQueryService.getVoteStatistics());
+    }
+
+    @Operation(summary = "투표 로그 조회", description = "투표 로그를 최신순으로 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "조회 성공")
+    @GetMapping("/vote-logs")
+    public ResponseEntity<List<VoteLogResponse>> getVoteLogs() {
+        return ResponseEntity.ok(teamAdminQueryService.getVoteLogs());
     }
 }
